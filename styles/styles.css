@@ -1,0 +1,251 @@
+
+html , body {
+    margin: 0;
+    padding: 0;
+}
+
+.header {
+    background-color: #ffffff; /* Light background for the header */
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: larger;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    height: 40px; /* Adjust as needed */
+    width: 40px;
+    margin-right: 20px;
+    border-radius: 50%;
+}
+
+.navbar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    margin-right: 550px; /* Space between navbar and auth buttons */
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.navbar li {
+    margin-left: 25px;
+}
+
+.navbar a {
+    text-decoration: none;
+    color: #333; /* Dark text color for navbar links */
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.navbar a:hover {
+    color: #003087; /* Highlight color on hover */
+}
+
+.auth-buttons button {
+    background-color: #003087;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-left: 15px;
+    transition: background-color 0.3s ease;
+    border-radius: 18px;
+}
+
+.auth-buttons button:hover {
+    background-color: #002266; /* Darker shade on hover */
+}
+
+/* Dropdown styles */
+.navbar li {
+    position: relative; /* Needed for positioning the dropdown content */
+}
+
+.dropdown-content {
+    display: none; /* Initially hide the dropdown content */
+    position: absolute; /* Position it relative to the nearest positioned ancestor (.dropdown) */
+    top: 100%; /* Position it below the link */
+    left: 0;
+    background-color: #f9f9f9; /* Background color for the dropdown */
+    padding: 15px;
+    border: 1px solid #ddd;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 10; /* Ensure it appears above other elements */
+    min-width: 300px; /* Adjust as needed */
+    text-align: left; /* Align text within the dropdown */
+}
+
+/* Show the dropdown content on hover of the .dropdown li */
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.dropdown-content p {
+    margin: 0; /* Remove default paragraph margins */
+    color: #555; /* Style the paragraph text */
+    line-height: 1.6; /* Improve readability */
+}
+
+/* Optional: Style the arrow to be slightly smaller */
+.navbar a i {
+    margin-left: 5px;
+    font-size: 0.7em;
+}
+
+.hero-section {
+    height: 45vh;
+    background-color: #f3f3f6;
+}
+
+.slogan {
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    color: #001c64;
+    text-align: center;
+    padding-top: 4.5rem;
+    font-size: 16pxpx;
+}
+
+.hero-heading-one {
+    text-align: center;
+    font-size: 48px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    color: #001c64;
+}
+
+.hero-heading-two {
+    text-align: center;
+    margin-top: -2.5rem;
+    font-size: 48px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    color: #001c64;
+}
+
+
+
+.hero-image-section {
+    background-color: #f3f3f6; /* Light background for the hero section */
+    margin-top: 0;
+    width: 100%;
+    height: 80vh; /* Full viewport height */
+    background-image: linear-gradient(rgba(0, 0, 0, 0.8), transparent), url('../images/video-editing.jpeg'); /* Whitish gradient overlay */
+    background-size: cover; /* Cover the entire section */
+    background-position: center; /* Center the image */
+}
+
+
+/* pricing-cards.css */
+
+.pricing-carousel {
+    display: flex;
+    justify-content: space-around;
+    background-color: #f3f3f6;
+    padding: 20px;
+    margin-top: 2px;
+    position: relative;
+    overflow-x: visible; /* Default to visible for desktop */
+    scroll-snap-type: none; /* Default to none for desktop */
+}
+
+
+.pricing-card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    text-align: center;
+    width: 30%;
+    width: calc(33.33% - 40px); /* Adjust width to account for margins */
+    margin-right: 20px; /* Add right margin to create space */
+}
+
+.pricing-card h3 {
+    color: #003087;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.pricing-card p {
+    color: #555;
+    margin-bottom: 8px;
+}
+
+.pricing-card .price {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #001c64;
+}
+
+footer{
+    background-color: #001435; /* Dark background for the footer */
+    height: 30vh;
+}
+
+
+/* Responsive adjustments for desktop view (can be further refined) */
+@media (max-width: 768px) {
+    .header {
+        padding: 15px 20px;
+    }
+
+    .logo {
+        height: 30px;
+        width: 30px;
+        margin-right: 15px;
+    }
+
+    .navbar ul {
+        display: none; /* Hide navbar on smaller screens */
+    }
+
+    .auth-buttons button {
+        padding: 4px 10px;
+        margin-left: 5px;
+        font-size: 0.9em;
+    }
+
+    .slogan {
+        font-size: 14px;
+        padding-top: 3rem; /* Adjust padding for smaller screens */
+    }
+
+    .hero-section {
+        height: 60vh; /* Reduce height for smaller screens */
+    }
+
+    .hero-setion-wrapper {
+        padding-top: 40px 
+    }
+
+    .hero-image-section {
+        height: 60vh; /* Reduce height for smaller screens */
+    }
+
+    .pricing-carousel {
+        margin-top: -18px;
+        display: flex;
+        overflow-x: auto; /* Enable horizontal scrolling */
+        scroll-snap-type: x mandatory; /* Enable snap scrolling */
+    }
+
+    .pricing-card {
+        width: 90%; /* Make cards wider when in carousel */
+        flex-shrink: 0; /* Prevent cards from shrinking */   
+    }
+
+    .carousel-button {
+        display: block; /* Show buttons on mobile */
+    }
+}
