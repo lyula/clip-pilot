@@ -1,4 +1,3 @@
-
 html , body {
     margin: 0;
     padding: 0;
@@ -136,47 +135,87 @@ html , body {
     color: #001c64;
 }
 
-/* pricing-cards.css */
 
+/* General styles for the pricing cards (desktop and mobile) */
 .pricing-carousel {
     display: flex;
-    justify-content: space-around;
-    background-color: #f3f3f6;
-    padding: 20px;
-    margin-top: 2px;
+    align-items: center;
     position: relative;
-    overflow-x: visible; /* Default to visible for desktop */
-    scroll-snap-type: none; /* Default to none for desktop */
+    overflow: hidden;
+    margin: 10px auto; /* Center the carousel and add vertical spacing */
+    padding: 0 2px; /* Add padding to prevent cards from touching the edges */
+    max-width: 1200px; /* Limit the width of the carousel on larger screens */
 }
 
+.carousel-wrapper {
+    display: flex;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    gap: 20px; /* Add spacing between the cards */
+    padding: 10px;
+    width: 100%;
+}
 
 .pricing-card {
-    background-color: #fff;
+    flex: 45%; /* Desktop width for cards */
+    background-color: #f4f4f4;
+    border: 1px solid #ccc;
     border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     padding: 20px;
     text-align: center;
-    width: 30%;
-    width: calc(33.33% - 40px); /* Adjust width to account for margins */
-    margin-right: 20px; /* Add right margin to create space */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-family: Helvetica, Arial, sans-serif;
+    color: #333;
 }
 
 .pricing-card h3 {
+    font-size: 1.5rem;
     color: #003087;
-    margin-top: 0;
     margin-bottom: 10px;
 }
 
 .pricing-card p {
-    color: #555;
-    margin-bottom: 8px;
+    font-size: 1rem;
+    margin: 5px 0;
 }
 
 .pricing-card .price {
-    font-size: 1.5em;
+    font-size: 1.2rem;
     font-weight: bold;
-    color: #001c64;
+    color: #003087;
+    margin-top: 10px;
+    display: inline-block;
 }
+
+.carousel-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: #003087;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: none; /* Hidden by default */
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.carousel-button.prev {
+    left: 10px;
+}
+
+.carousel-button.next {
+    right: 10px;
+}
+
+.carousel-button:hover {
+    background-color: #002060;
+}
+
 
 .hero-image-section {
     background-color: #f3f3f6; /* Light background for the hero section */
@@ -425,23 +464,30 @@ hr {
 
 
     .pricing-carousel {
-        margin-top: -18px;
+        margin-top: -5px; /* Adjust margin for smaller screens */
+        margin-bottom: -5px;
         display: flex;
         overflow-x: auto; /* Enable horizontal scrolling */
         scroll-snap-type: x mandatory; /* Enable snap scrolling */
     }
 
+    .carousel-wrapper {
+        gap: 10px; /* Reduce gap between cards on mobile */
+    }
+
     .pricing-card {
-        width: 90%; /* Make cards wider when in carousel */
-        flex-shrink: 0; /* Prevent cards from shrinking */   
+        width: 60%; /* Make cards wider when in carousel */
+        flex-shrink: 0; /* Prevent cards from shrinking */  
+        flex: 0 0 89%; /* Adjust card size for smaller screens */
+        margin: 0 2.5px; /* Add spacing between cards on mobile */ 
     }
 
     .carousel-button {
-        display: block; /* Show buttons on mobile */
+        display: flex; /* Show arrows only on mobile */
     }
 
     .hero-image-section {
-        height: auto; /* Reduce height for smaller screens */
+        height: 70vh; /* Reduce height for smaller screens */
     }
     
 
