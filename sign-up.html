@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registration Page</title>
-    <link rel="stylesheet" href="styles/styles.css">
     <style>
+        /* Existing CSS */
         .container {
             max-width: 500px;
             margin: 50px auto;
@@ -13,6 +13,7 @@
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            font-family: Helvetica, Arial, sans-serif;
         }
 
         h1 {
@@ -39,8 +40,44 @@
             border-radius: 4px;
         }
 
-        input[type="checkbox"] {
-            margin-right: 10px;
+        .country-list {
+            position: relative;
+            width: 100%;
+        }
+
+        #country-input {
+            width: calc(100% - 22px);
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        #countries-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            background-color: white;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none; /* Initially hidden */
+        }
+
+        #countries-list li {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        #countries-list li:hover {
+            background-color: #f0f0f0;
         }
 
         button {
@@ -57,53 +94,12 @@
             background-color: #002060;
         }
 
-        .terms {
-            display: flex;
-            align-items: center;
-        }
-
-        .country-list {
-            position: relative;
-            width: 100%; /* Ensure it takes the full width */
-        }
-
-        #countries {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            width: 100%; /* Match the width of the input field */
-            max-height: 200px;
-            overflow-y: auto;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            background-color: white;
-            z-index: 1000;
-            display: none;
-        }
-
-        #countries option {
-            padding: 10px;
-            cursor: pointer;
-        }
-
-        #countries option:hover {
-            background-color: #f0f0f0;
-        }
-
-        @media (max-width: 600px) {
-            .container {
-                margin: 20px;
-                padding: 15px;
-            }
-
-            button {
-                font-size: 14px;
-            }
-
-            #countries {
-                max-height: 150px; /* Adjust height for smaller screens */
-                overflow-y: scroll;
-            }
+        /* New CSS for flag inside input */
+        #phone_number {
+            padding-left: 45px; /* Increased padding to create more space */
+            background-repeat: no-repeat;
+            background-position: 5px center;
+            background-size: auto 20px;
         }
     </style>
 </head>
@@ -120,14 +116,15 @@
             <label for="username">Username</label>
             <input type="text" id="username" name="username" placeholder="Choose a username" required>
 
-            <label for="id">Phone Number</label>
-            <input type="text" id="id" name="id" placeholder="Enter your phone number" required>
-
-            <label for="country">Country</label>
+            <label for="country-input">Country</label>
             <div class="country-list">
-                <input type="text" id="country" name="country" placeholder="select your country" autocomplete="off" required>
-                <select id="countries" size="5"></select>
+                <input type="text" id="country-input" placeholder="Type to search country" autocomplete="off" required>
+                <ul id="countries-list" class="country-dropdown">
+                    </ul>
             </div>
+
+            <label for="phone_number">Phone Number</label>
+            <input type="text" id="phone_number" name="phone_number" placeholder="Enter your phone number" required>
 
             <label for="dob">Date of Birth</label>
             <input type="date" id="dob" name="dob" placeholder="YYYY-MM-DD" required>
@@ -150,51 +147,84 @@
     </div>
 
     <script>
-        const countryInput = document.getElementById('country');
-        const countrySelect = document.getElementById('countries');
+        const countryInput = document.getElementById('country-input');
+        const countriesList = document.getElementById('countries-list');
+        const phoneInput = document.getElementById('phone_number');
+        let allCountriesData = []; // Array to store all fetched country data
+        let countryCodeMap = {}; // Object to store country name to dialing code mapping
 
-        // Fetch countries from an API and populate the dropdown
         fetch('https://restcountries.com/v3.1/all')
             .then(response => response.json())
             .then(data => {
-                const countries = data.sort((a, b) => a.name.common.localeCompare(b.name.common));
-                countries.forEach(country => {
-                    const option = document.createElement('option');
-                    option.value = country.name.common;
-                    option.textContent = country.name.common;
-                    countrySelect.appendChild(option);
-                });
+                allCountriesData = data.sort((a, b) => a.name.common.localeCompare(b.name.common));
+                populateCountryList(allCountriesData);
+                // Create the country code map after fetching data
+                createCountryCodeMap(allCountriesData);
             })
             .catch(error => console.error('Error fetching countries:', error));
 
-        // Show dropdown when input is focused
-        countryInput.addEventListener('focus', () => {
-            countrySelect.style.display = 'block';
-        });
-
-        // Hide dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!countryInput.contains(e.target) && !countrySelect.contains(e.target)) {
-                countrySelect.style.display = 'none';
-            }
-        });
-
-        // Filter countries based on input
-        countryInput.addEventListener('input', () => {
-            const filter = countryInput.value.toLowerCase();
-            Array.from(countrySelect.options).forEach(option => {
-                if (option.value.toLowerCase().includes(filter)) {
-                    option.style.display = '';
-                } else {
-                    option.style.display = 'none';
+        function createCountryCodeMap(countriesData) {
+            countryCodeMap = {};
+            countriesData.forEach(country => {
+                if (country.idd && country.idd.root && Array.isArray(country.idd.suffixes) && country.idd.suffixes.length > 0) {
+                    countryCodeMap[country.name.common] = country.idd.root + country.idd.suffixes[0];
                 }
+                // You might need to handle cases with multiple suffixes or no suffixes differently
             });
+            console.log("Country Code Map:", countryCodeMap); // For debugging
+        }
+
+        function populateCountryList(countriesData) {
+            countriesList.innerHTML = '';
+            countriesData.forEach(countryData => {
+                const li = document.createElement('li');
+                li.textContent = countryData.name.common;
+                li.dataset.value = countryData.name.common;
+                li.dataset.flagUrl = countryData.flags.svg; // Store flag URL
+                li.addEventListener('click', function() {
+                    countryInput.value = this.textContent;
+                    countriesList.style.display = 'none';
+                    updatePhoneInfo(this.textContent, this.dataset.flagUrl);
+                });
+                countriesList.appendChild(li);
+            });
+        }
+
+        function updatePhoneInfo(countryName, flagUrl) {
+            let phoneCode = countryCodeMap[countryName] || "";
+            if (phoneCode) {
+                phoneInput.value = phoneCode + " ";
+            } else {
+                phoneInput.value = ""; // Clear or set a default if code not found
+            }
+
+            if (flagUrl) {
+                phoneInput.style.backgroundImage = `url('${flagUrl}')`;
+            } else {
+                phoneInput.style.backgroundImage = 'none';
+            }
+        }
+
+        function showDropdown() {
+            countriesList.style.display = 'block';
+        }
+
+        countryInput.addEventListener('focus', showDropdown);
+        countryInput.addEventListener('click', showDropdown);
+
+        countryInput.addEventListener('input', () => {
+            const filterValue = countryInput.value.toLowerCase();
+            const filteredCountries = allCountriesData.filter(country =>
+                country.name.common.toLowerCase().includes(filterValue)
+            );
+            populateCountryList(filteredCountries);
+            showDropdown();
         });
 
-        // Set input value when selecting a country
-        countrySelect.addEventListener('change', () => {
-            countryInput.value = countrySelect.value;
-            countrySelect.style.display = 'none';
+        document.addEventListener('click', (e) => {
+            if (!countryInput.contains(e.target) && !countriesList.contains(e.target)) {
+                countriesList.style.display = 'none';
+            }
         });
     </script>
 </body>
