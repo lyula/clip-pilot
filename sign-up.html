@@ -99,6 +99,11 @@
             button {
                 font-size: 14px;
             }
+
+            #countries {
+                max-height: 150px; /* Adjust height for smaller screens */
+                overflow-y: scroll;
+            }
         }
     </style>
 </head>
@@ -120,12 +125,12 @@
 
             <label for="country">Country</label>
             <div class="country-list">
-                <input type="text" id="country" name="country" placeholder="Type to search for your country" autocomplete="off" required>
+                <input type="text" id="country" name="country" placeholder="select your country" autocomplete="off" required>
                 <select id="countries" size="5"></select>
             </div>
 
             <label for="dob">Date of Birth</label>
-            <input type="date" id="dob" name="dob" required>
+            <input type="date" id="dob" name="dob" placeholder="YYYY-MM-DD" required>
 
             <label for="address">Address</label>
             <input type="text" id="address" name="address" placeholder="Enter your address" required>
