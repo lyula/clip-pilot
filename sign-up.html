@@ -62,6 +62,34 @@
             align-items: center;
         }
 
+        .country-list {
+            position: relative;
+            width: 100%; /* Ensure it takes the full width */
+        }
+
+        #countries {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%; /* Match the width of the input field */
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: white;
+            z-index: 1000;
+            display: none;
+        }
+
+        #countries option {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        #countries option:hover {
+            background-color: #f0f0f0;
+        }
+
         @media (max-width: 600px) {
             .container {
                 margin: 20px;
@@ -91,10 +119,10 @@
             <input type="text" id="id" name="id" placeholder="Enter your phone number" required>
 
             <label for="country">Country</label>
-            <input list="countries" id="country" name="country" placeholder="Type to search for your country" required>
-            <datalist id="countries">
-                <!-- Options will be dynamically populated -->
-            </datalist>
+            <div class="country-list">
+                <input type="text" id="country" name="country" placeholder="Type to search for your country" autocomplete="off" required>
+                <select id="countries" size="5"></select>
+            </div>
 
             <label for="dob">Date of Birth</label>
             <input type="date" id="dob" name="dob" required>
@@ -117,9 +145,10 @@
     </div>
 
     <script>
-        // Fetch countries from an API and populate the datalist
-        const countryDatalist = document.getElementById('countries');
+        const countryInput = document.getElementById('country');
+        const countrySelect = document.getElementById('countries');
 
+        // Fetch countries from an API and populate the dropdown
         fetch('https://restcountries.com/v3.1/all')
             .then(response => response.json())
             .then(data => {
@@ -127,10 +156,41 @@
                 countries.forEach(country => {
                     const option = document.createElement('option');
                     option.value = country.name.common;
-                    countryDatalist.appendChild(option);
+                    option.textContent = country.name.common;
+                    countrySelect.appendChild(option);
                 });
             })
             .catch(error => console.error('Error fetching countries:', error));
+
+        // Show dropdown when input is focused
+        countryInput.addEventListener('focus', () => {
+            countrySelect.style.display = 'block';
+        });
+
+        // Hide dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!countryInput.contains(e.target) && !countrySelect.contains(e.target)) {
+                countrySelect.style.display = 'none';
+            }
+        });
+
+        // Filter countries based on input
+        countryInput.addEventListener('input', () => {
+            const filter = countryInput.value.toLowerCase();
+            Array.from(countrySelect.options).forEach(option => {
+                if (option.value.toLowerCase().includes(filter)) {
+                    option.style.display = '';
+                } else {
+                    option.style.display = 'none';
+                }
+            });
+        });
+
+        // Set input value when selecting a country
+        countrySelect.addEventListener('change', () => {
+            countryInput.value = countrySelect.value;
+            countrySelect.style.display = 'none';
+        });
     </script>
 </body>
 </html>
