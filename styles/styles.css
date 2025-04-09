@@ -2,12 +2,14 @@
 html , body {
     margin: 0;
     padding: 0;
+    font-family: Helvetica, Arial, sans-serif;
 }
 
 .header {
     background-color: #ffffff; /* Light background for the header */
-    padding: 15px 30px;
+    padding: 25px 30px;
     display: flex;
+    flex-direction: row;
     justify-content: space-between;
     align-items: center;
     font-size: larger;
@@ -57,6 +59,7 @@ html , body {
     border-radius: 5px;
     cursor: pointer;
     font-weight: bold;
+    font-size: 14px;
     margin-left: 15px;
     transition: background-color 0.3s ease;
     border-radius: 18px;
@@ -133,19 +136,6 @@ html , body {
     color: #001c64;
 }
 
-
-
-.hero-image-section {
-    background-color: #f3f3f6; /* Light background for the hero section */
-    margin-top: 0;
-    width: 100%;
-    height: 80vh; /* Full viewport height */
-    background-image: linear-gradient(rgba(0, 0, 0, 0.8), transparent), url('../images/video-editing.jpeg'); /* Whitish gradient overlay */
-    background-size: cover; /* Cover the entire section */
-    background-position: center; /* Center the image */
-}
-
-
 /* pricing-cards.css */
 
 .pricing-carousel {
@@ -188,16 +178,220 @@ html , body {
     color: #001c64;
 }
 
-footer{
+.hero-image-section {
+    background-color: #f3f3f6; /* Light background for the hero section */
+    margin-top: 0;
+    width: 100%;
+    height: auto; /* Full viewport height */
+    background-image: linear-gradient(rgba(0, 0, 0, 0.8), transparent), url('../images/editing-5.jpg'); /* Whitish gradient overlay */
+    background-size: cover; /* Cover the entire section */
+    background-position: center; /* Center the image */
+    position: relative;
+  display: flex; /* Enable Flexbox for the children */
+  justify-content: space-between; /* Distribute space between the children */
+  align-items: center; /* Vertically align items in the center (optional) */
+}
+
+.hero-text-group-left{
+    margin-left: 15px;
+    margin-top: -45px;
+    width: 45%;
+}
+
+.hero-text-group-left h2{
+    font-weight: bold;
+    color: #D3D3D3;
+    font-weight: 500;
+    font-size: 36px;
+    padding-top: 35px;
+    margin-left: 50px;
+}
+
+.hero-text-group-left ul{
+    color: #D3D3D3;
+    font-weight: 500;
+    font-size: 16.2px;
+}
+
+ul li { /* For unordered lists */
+    margin-bottom: 7px; /* Adjust the value as needed */
+  }
+
+.hero-text-group-right {
+    /* Add basic styles for the right group */
+    margin-right: 15px;
+    padding-top: 10px;
+    /* You might want to set a width here as well, or let Flexbox handle it */
+    width: 45%;
+  }
+  
+  .hero-text-group-right h2 {
+    font-weight: bold;
+    color:#D3D3D3;
+    font-weight: 500;
+    font-size: 36px;
+    padding-top: 35px;
+  }
+  
+  .hero-text-group-right ul {
+    color:#D3D3D3;
+    font-weight: 500;
+    font-size: 16.2px;
+  }
+
+  .about-us {
+    padding: 40px;
+    background-color: #f9f9f9; /* Light background for the section */
+    text-align: center; /* Center align content for initial presentation */
+}
+
+.about-us-content {
+    max-width: 800px; /* Limit the width of the content for better readability */
+    margin: 0 auto; /* Center the content within the section */
+    text-align: left; /* Align text to the left within the content area */
+}
+
+.about-us h2 {
+    color: #003087; /* Your primary color */
+    margin-bottom: 20px;
+    font-size: 2.5em;
+}
+
+.about-us p {
+    line-height: 1.6;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.about-us strong {
+    font-weight: bold;
+    color: #555; /* Slightly darker color for emphasis */
+}
+
+.about-us-buttons {
+    display: flex; /* Enable flexbox for horizontal arrangement */
+    justify-content: center; /* Center the buttons horizontally */
+    margin-top: 30px; /* Add some space above the buttons */
+}
+
+.about-us-buttons button {
+    padding: 12px 25px;
+    font-size: 1em;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.hire-talent-button {
+    background-color: #003087; /* Example button color */
+    color: white;
+    margin-right: 10px; /* Add space between the buttons */
+}
+
+.join-editor-button {
+    background-color: #003087; /* Example button color */
+    color: white;
+    margin-left: 10px; /* Add space between the buttons */
+}
+
+.hire-talent-button:hover {
+    background-color: #001435;
+}
+
+.join-editor-button:hover {
+    background-color: #001435;
+}
+
+  footer {
     background-color: #001435; /* Dark background for the footer */
-    height: 30vh;
+    height: auto; /* Adjust height to content */
+    display: flex; /* Enable flexbox for the footer (for larger screens) */
+    align-items: center; /* Vertically align items (for larger screens) */
+    justify-content: space-between; /* Distribute space (for larger screens) */
+    padding: 20px; /* Increased padding */
+    flex-direction: column; /* Stack items on smaller screens */
+    text-align: center; /* Center text and links on smaller screens */
 }
 
 
-/* Responsive adjustments for desktop view (can be further refined) */
+
+.footer-header {
+    display: flex; /* Enable flexbox for horizontal alignment */
+    align-items: center; /* Vertically align the logo and text */
+    justify-content: center; /* Center the logo and text together horizontally */
+}
+
+.footer-logo {
+    height: 40px; /* Adjust as needed */
+    width: 40px;
+    border-radius: 50%;
+    margin-right: 10px; /* Add space between the logo and the text */
+}
+
+.footer-header h2 {
+    color: white;
+    font-size: 36px;
+    margin-top: 0; /* Reset default top margin */
+    margin-bottom: 0; /* Reset default bottom margin */
+}
+
+
+.footer-links-top {
+    list-style: none;
+    padding: 0;
+    margin-top: 20px; /* Space below logo/text on smaller screens */
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap; /* Allow links to wrap on smaller screens */
+}
+
+.footer-links-top li {
+    margin: 0 15px;
+}
+
+.footer-links-top a {
+    text-decoration: none;
+    color: white; /* White links */
+}
+
+hr {
+    border: 1px solid darkgrey; /* Slightly lighter line */
+    margin: 8px 0;
+    width: 80%; /* Narrow the line */
+}
+
+.footer-links-bottom {
+    list-style: none;
+    padding: 0;
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap; /* Allow links to wrap */
+}
+
+.footer-links-bottom li {
+    margin: 0 10px;
+}
+
+.footer-links-bottom a {
+    text-decoration: none;
+    color: #a0aec0; /* Lighter text color */
+    font-size: 0.9em;
+}
+
+.footer-links-bottom a:hover , .footer-links-top a:hover {
+    color: #ffffff; /* Change color to white on hover */
+    text-decoration: underline; /* Add an underline on hover for better feedback */
+}
+
+
+
+/* Responsive adjustments for mobile view (can be further refined) */
 @media (max-width: 768px) {
     .header {
         padding: 15px 20px;
+        font-size: medium; /* Adjust font size for smaller screens */
     }
 
     .logo {
@@ -229,9 +423,6 @@ footer{
         padding-top: 40px 
     }
 
-    .hero-image-section {
-        height: 60vh; /* Reduce height for smaller screens */
-    }
 
     .pricing-carousel {
         margin-top: -18px;
@@ -247,5 +438,33 @@ footer{
 
     .carousel-button {
         display: block; /* Show buttons on mobile */
+    }
+
+    .hero-image-section {
+        height: auto; /* Reduce height for smaller screens */
+    }
+    
+
+    .hero-text-group-left {
+       width: 100%;
+    }
+    .hero-text-group-left ul{
+        color: #D3D3D3;
+        font-weight: 500;
+    }
+
+    .hero-text-group-right {
+        display : none;
+    }
+
+    .about-us-buttons a{
+        flex-direction: column; /* Stack buttons on smaller screens */
+        align-items: center; /* Center stacked buttons */
+        width: 80%;
+    }
+
+    .about-us-buttons button {
+        margin: 10px 0; /* Add vertical margin when stacked */
+        width: 80%; /* Make buttons wider on smaller screens */
     }
 }
