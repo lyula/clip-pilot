@@ -118,6 +118,18 @@
         </div>
     </section>
 
+    <div class="ad-banner" id="ad-banner">
+        <div class="ad-content" id="ad-content">
+            <img src="images/microphone.jpg" alt="Sample Product" class="ad-product-image" id="ad-product-image">
+            <div class="ad-text">
+                <h3 id="ad-title">Special Offer: High-Quality Microphone</h3>
+                <p id="ad-description">Get this professional microphone for clear audio recording at just <strong>$89.99</strong>.</p>
+                <a href="shop.html" class="ad-link" id="ad-link">Visit Shop</a>
+            </div>
+            <button class="ad-close-button" onclick="dismissAd()">X</button>
+        </div>
+    </div>
+
     <footer>
         <div class="footer-top">
             <div class="footer-header">
@@ -167,6 +179,71 @@
 
                 carouselWrapper.addEventListener('scroll', updateButtonVisibility);
                 updateButtonVisibility(); // Initial check
+            }
+
+            const products = [
+                {
+                    image: "images/microphone.jpg",
+                    title: "Special Offer: High-Quality Microphone",
+                    description: "Get this professional microphone for clear audio recording at just <strong>$89.99</strong>.",
+                    link: "shop.html"
+                },
+                {
+                    image: "images/camera-2.avif",
+                    title: "Capture Moments: 4K Video Camera",
+                    description: "Capture high-quality footage for your projects at just <strong>$499.99</strong>.",
+                    link: "shop.html"
+                },
+                {
+                    image: "images/green-screen.jpg",
+                    title: "Creative Backgrounds: Green Screen",
+                    description: "Seamless background removal for creative projects at just <strong>$59.99</strong>.",
+                    link: "shop.html"
+                },
+                {
+                    image: "images/lighting-kit.jpg",
+                    title: "Perfect Lighting: Lighting Kit",
+                    description: "Professional lighting for video shoots at just <strong>$79.99</strong>.",
+                    link: "shop.html"
+                }
+            ];
+
+            let currentProductIndex = 0;
+
+            function updateAdContent() {
+                const adContent = document.getElementById("ad-content");
+                const adImage = document.getElementById("ad-product-image");
+                const adTitle = document.getElementById("ad-title");
+                const adDescription = document.getElementById("ad-description");
+                const adLink = document.getElementById("ad-link");
+
+                // Fade out
+                adContent.classList.add("fade-out");
+
+                setTimeout(() => {
+                    // Update content
+                    currentProductIndex = (currentProductIndex + 1) % products.length;
+                    const product = products[currentProductIndex];
+
+                    adImage.src = product.image;
+                    adImage.alt = product.title;
+                    adTitle.textContent = product.title;
+                    adDescription.innerHTML = product.description;
+                    adLink.href = product.link;
+
+                    // Fade in
+                    adContent.classList.remove("fade-out");
+                    adContent.classList.add("fade-in");
+                }, 1000); // Wait for fade-out animation to complete
+            }
+
+            // Start alternating products every 5 seconds
+            const adInterval = setInterval(updateAdContent, 5000);
+
+            function dismissAd() {
+                const adBanner = document.getElementById("ad-banner");
+                adBanner.style.display = "none"; // Hide the ad
+                clearInterval(adInterval); // Stop alternating products
             }
     </script>
 </body>

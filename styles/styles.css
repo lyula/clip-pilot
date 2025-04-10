@@ -424,7 +424,116 @@ hr {
     text-decoration: underline; /* Add an underline on hover for better feedback */
 }
 
+/* Ad Banner Styles */
+.ad-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #001c64; /* Updated background color */
+    color: white;
+    padding: 20px;
+    position: relative;
+    margin: 20px auto;
+    border-radius: 8px;
+    max-width: 800px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
 
+.ad-content {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    opacity: 1;
+    transition: opacity 1s ease-in-out;
+}
+
+.ad-content.fade-out {
+    opacity: 0;
+}
+
+.ad-content.fade-in {
+    opacity: 1;
+}
+
+.ad-product-image {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid white;
+}
+
+.ad-text {
+    flex: 1;
+}
+
+.ad-text h3 {
+    margin: 0 0 10px;
+    font-size: 1.2rem;
+}
+
+.ad-text p {
+    margin: 0 0 10px;
+    font-size: 1rem;
+}
+
+.ad-link {
+    display: inline-block;
+    background-color: white;
+    color: #003087;
+    padding: 10px 15px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.ad-link:hover {
+    background-color: #f4f4f4;
+}
+
+/* Updated Dismiss Button */
+.ad-close-button {
+    background-color: white;
+    color: #003087;
+    border: 2px solid #003087;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    font-size: 1rem;
+    cursor: pointer;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex; /* Use Flexbox */
+    align-items: center; /* Center vertically */
+    justify-content: center; /* Center horizontally */
+}
+
+.ad-close-button:hover {
+    background-color: #f4f4f4;
+    color: #002060;
+}
+
+/* Responsive Adjustments for Mobile */
+@media (max-width: 768px) {
+    .ad-banner {
+        font-size: 0.9rem; /* Reduce font size */
+        margin: 10px 15px; /* Add left and right margins */
+    }
+
+    .ad-product-image {
+        width: 80px;
+        height: 80px;
+    }
+
+    .ad-text h3 {
+        font-size: 1rem;
+    }
+
+    .ad-text p {
+        font-size: 0.9rem;
+    }
+}
 
 /* Responsive adjustments for mobile view (can be further refined) */
 @media (max-width: 768px) {
