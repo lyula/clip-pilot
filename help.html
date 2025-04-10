@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help - Clip-Pilot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #003087;
+            margin-bottom: 20px;
+        }
+
+        p {
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .help-section {
+            margin-top: 20px;
+        }
+
+        .help-section h2 {
+            color: #003087;
+            margin-bottom: 10px;
+        }
+
+        .help-section ul {
+            list-style-type: disc;
+            margin: 10px 0 20px 20px;
+        }
+
+        .help-section ul li {
+            margin-bottom: 10px;
+        }
+
+        .help-form {
+            margin-top: 30px;
+        }
+
+        .help-form label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #003087;
+        }
+
+        .help-form input, .help-form textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .help-form button {
+            background-color: #003087;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .help-form button:hover {
+            background-color: #002060;
+        }
+
+        .contact-info {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .contact-info a {
+            color: #003087;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .contact-info a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                margin: 20px;
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .help-form input, .help-form textarea {
+                font-size: 0.9rem;
+            }
+
+            .help-form button {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Help Center</h1>
+        <p>Welcome to the Clip-Pilot Help Center. We're here to assist you with any questions, feedback, or inquiries you may have.</p>
+
+        <div class="help-section">
+            <h2>Frequently Asked Questions</h2>
+            <ul>
+                <li><strong>How do I submit a video for editing?</strong> You can upload your video through our platform after logging into your account.</li>
+                <li><strong>What is the turnaround time for editing?</strong> Our standard turnaround time is 3-5 business days, depending on the complexity of the project.</li>
+                <li><strong>Can I request revisions?</strong> Yes, we offer up to two free revisions for each project.</li>
+            </ul>
+        </div>
+
+        <div class="help-form">
+            <h2>Contact Us</h2>
+            <form action="#" method="POST">
+                <label for="name">Your Name</label>
+                <input type="text" id="name" name="name" placeholder="Enter your name" required>
+
+                <label for="email">Your Email</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email" required>
+
+                <label for="message">How Can We Help You?</label>
+                <textarea id="message" name="message" rows="5" placeholder="Write your message here..." required></textarea>
+
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+
+        <div class="contact-info">
+            <p>Alternatively, you can reach us at:</p>
+            <p><strong>Email:</strong> <a href="mailto:support@clippilot.com">support@clippilot.com</a></p>
+            <p><strong>Phone:</strong> +254 700 123 456</p>
+        </div>
+    </div>
+</body>
+</html>

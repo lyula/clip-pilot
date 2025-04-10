@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Partners</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 50px auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #003087;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #003087;
+            margin-top: 20px;
+        }
+
+        p {
+            margin-bottom: 15px;
+        }
+
+        .partners-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .partner-card {
+            flex: 1 1 calc(33.333% - 20px); /* Three cards per row */
+            background-color: #f4f4f4;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .partner-card img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .partner-card h3 {
+            font-size: 1.2rem;
+            color: #003087;
+            margin-bottom: 10px;
+        }
+
+        .partner-card p {
+            font-size: 1rem;
+            color: #333;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                margin: 20px;
+                padding: 20px;
+            }
+
+            .partner-card {
+                flex: 1 1 100%; /* One card per row on smaller screens */
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            h2 {
+                font-size: 1.4rem;
+            }
+
+            p {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Our Partners</h1>
+        <p>At Clip-Pilot, we are proud to collaborate with industry-leading partners who share our passion for delivering exceptional video editing services. Our partners help us provide innovative solutions and ensure the highest quality for our clients.</p>
+
+        <h2>Our Trusted Partners</h2>
+        <div class="partners-list">
+            <div class="partner-card">
+                <img src="partner1-logo.jpg" alt="Partner 1 Logo">
+                <h3>Partner 1</h3>
+                <p>Specializing in video production and creative solutions.</p>
+            </div>
+            <div class="partner-card">
+                <img src="partner2-logo.jpg" alt="Partner 2 Logo">
+                <h3>Partner 2</h3>
+                <p>Experts in audio engineering and sound design.</p>
+            </div>
+            <div class="partner-card">
+                <img src="partner3-logo.jpg" alt="Partner 3 Logo">
+                <h3>Partner 3</h3>
+                <p>Leaders in social media video marketing strategies.</p>
+            </div>
+        </div>
+
+        <h2>Become a Partner</h2>
+        <p>We are always looking to expand our network of partners. If you are interested in collaborating with Clip-Pilot, please reach out to us at <a href="mailto:support@clippilot.com" style="color: #003087; text-decoration: none;">support@clippilot.com</a>.</p>
+    </div>
+</body>
+</html>
