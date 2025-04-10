@@ -38,8 +38,8 @@
     </header>
     <section class="hero-section">
         <div class="hero-setion-wrapper">
-           <p class="slogan">Beyond Ordinary Videos</p>
-           <h2 class="hero-heading-one">Get Fast , Reliable </h2>
+           <p class="slogan">Making Pixels Unforgetable</p>
+           <h2 class="hero-heading-one">Get Fast, Reliable </h2>
            <h2 class="hero-heading-two">and Professional Edits</h2>
         </div>
     </section>
@@ -106,7 +106,7 @@
                 Our experienced management and editorial teams ensure precision and compelling narratives in every project, regardless of scale.
             </p>
             <p>
-                We recruit talented video editors passionate about visual storytelling, guaranteeing professional results.
+                We recruit talented elite video editors who breathe life into stories delivering cinematic quality with every cut.
             </p>
             <p>
                 From social media to documentaries, we're your partner in creating impactful video experiences.
@@ -216,6 +216,7 @@
                 const adTitle = document.getElementById("ad-title");
                 const adDescription = document.getElementById("ad-description");
                 const adLink = document.getElementById("ad-link");
+                const adBanner = document.getElementById("ad-banner");
 
                 // Fade out
                 adContent.classList.add("fade-out");
@@ -230,6 +231,11 @@
                     adTitle.textContent = product.title;
                     adDescription.innerHTML = product.description;
                     adLink.href = product.link;
+
+                    // Update the entire ad banner to be clickable
+                    adBanner.onclick = () => {
+                        window.location.href = product.link;
+                    };
 
                     // Fade in
                     adContent.classList.remove("fade-out");

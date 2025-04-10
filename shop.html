@@ -242,7 +242,7 @@
         .header {
             background-color: #003087;
             color: white;
-            padding: 15px 30px;
+            padding: 5px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -254,8 +254,8 @@
         }
 
         .logo {
-            height: 40px;
-            width: 40px;
+            height: 60px;
+            width: 60px;
             margin-right: 10px;
             border-radius: 50%;
         }
@@ -367,6 +367,39 @@
         .pagination button.active {
             background-color: #002060;
             font-weight: bold;
+        }
+
+        /* Consolidated Mobile Styles */
+        @media (max-width: 768px) {
+            .product-card {
+                flex: 1 1 calc(50% - 20px); /* Two cards per row on tablets */
+                max-width: calc(50% - 20px); /* Ensure consistent width */
+            }
+
+            .cart-icon {
+                top: 140px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .navbar ul {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .footer ul {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .product-card {
+                flex: 1 1 calc(100% - 20px); /* One card per row on mobile */
+                max-width: calc(100% - 20px); /* Ensure consistent width */
+            }
         }
     </style>
 </head>
