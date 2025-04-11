@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="js/record.js"></script> <!-- Include the external record.js file -->
     <style>
         /* General Styles */
         body {
@@ -171,7 +172,7 @@
             border-radius: 50%;
         }
 
-        .content-header .user-info h3 {
+        .content-header .user-info h4 {
             font-size: 1.5rem;
             color: #00235f; /* Updated theme color */
             margin: 0; /* Remove default margin */
@@ -216,77 +217,108 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
             display: flex;
-            flex-direction: column; /* Stack children vertically */
-            align-items: flex-start; /* Align children to the left */
-            width: 100%; /* Full width of the parent container */
-            max-width: none; /* Remove width limit */
-            box-sizing: border-box; /* Include padding and border in width */
+            flex-direction: column;
+            align-items: stretch; /* Make children fill the width */
+            width: 100%;
+            box-sizing: border-box;
         }
 
-        /* Adjust form inputs and labels */
-        .project-form div {
+        .project-form > div {
             display: flex;
-            flex-direction: column; /* Default vertical stacking for mobile */
-            width: 100%; /* Ensure full width */
-            margin-bottom: 15px; /* Add spacing between rows */
+            flex-direction: column;
+            margin-bottom: 15px;
         }
 
         .project-form label {
             font-weight: bold;
-            color: #00235f; /* Updated theme color */
-            margin-bottom: 5px; /* Add spacing below label */
+            color: #00235f;
+            margin-bottom: 5px;
         }
 
-        .project-form input,
-        .project-form textarea,
-        .project-form button {
-            width: 100%; /* Full width of the parent container */
+        .project-form input[type="text"],
+        .project-form input[type="file"],
+        .project-form textarea {
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
             font-size: 1rem;
-            box-sizing: border-box; /* Include padding and border in width */
+            box-sizing: border-box;
+            width: 100%; /* Ensure they take full width within their container */
         }
 
-        /* Button Styles */
-        .project-form button {
+        /* Microphone and Submit Button Container */
+        .form-actions {
+            display: flex;
+            flex-direction: column; /* Stack on all screen sizes initially */
+            align-items: center; /* Center items horizontally */
+            gap: 15px; /* Space between microphone and submit button */
+            width: 100%; /* Ensure it spans the form width */
+            box-sizing: border-box;
+        }
+
+        .microphone-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            width: 100%; /* Ensure full width for centering */
+        }
+
+        .microphone-title {
+            font-size: 0.9rem;
+            color: #666;
+            white-space: nowrap; /* Prevent text wrapping */
+            text-align: center; /* Center the title */
+        }
+
+        .sidebar.expanded-desktop + .main-content .microphone-title {
+            width: auto; /* Adjust width when sidebar is expanded */
+            text-align: left; /* Align title to the left when expanded */
+        }
+
+        /* Microphone Button Styles */
+        .microphone-button {
+            background-color: #003087; /* Match theme color */
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 50%; /* Circular button */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+            transition: background-color 0.3s ease;
+            width: 40px; /* Fixed width and height for circle */
+            height: 40px;
+        }
+
+        .microphone-button:hover {
+            background-color: #003080; /* Slightly lighter shade for hover */
+        }
+
+        /* Submit Button Styles */
+        .submit-button {
             background-color: #003087; /* Updated theme color */
             color: white;
             border: none;
             cursor: pointer;
             transition: background-color 0.3s ease;
-            padding: 10px 20px; /* Add padding for better appearance */
-            border-radius: 5px; /* Rounded corners */
-            align-self: center; /* Center the button horizontally */
-            max-width: 200px; /* Limit the button width on desktop */
-            width: 100%; /* Full width on smaller screens */
-            text-align: center; /* Center the text inside the button */
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-align: center;
+            width: 100%; /* Full width on all screens initially */
+            box-sizing: border-box;
         }
 
-        .project-form button:hover {
+        .submit-button:hover {
             background-color: #003080; /* Slightly lighter shade for hover */
         }
 
-        /* Desktop-Specific Styles */
-        @media (min-width: 769px) {
-            .project-form div {
-                display: flex;
-                flex-direction: row; /* Stack label and input horizontally on desktop */
-                align-items: center; /* Align label and input vertically */
-                justify-content: flex-start; /* Align content to the left */
-                gap: 10px; /* Add spacing between label and input */
-            }
-
-            .project-form label {
-                width: 150px; /* Fixed width for labels */
-                margin-bottom: 0; /* Remove bottom margin for horizontal layout */
-                text-align: right; /* Align label text to the right */
-            }
-
-            .project-form input,
-            .project-form textarea {
-                flex-grow: 1; /* Allow inputs to take up remaining space */
-            }
+        #audio-container {
+            margin-top: 10px;
+            width: 100%; /* Make audio player responsive */
         }
 
         /* Footer Styles */
@@ -296,10 +328,10 @@
             height: 5vh;
             text-align: center;
             padding: 10px 0;
-            margin-left: 15x;
             border-radius: 5px;
             position: relative; /* To ensure it's below other fixed elements */
             z-index: 900; /* Ensure it's below header and sidebar */
+            margin-top: auto;
         }
 
         /* Mobile Styles */
@@ -325,17 +357,40 @@
             }
 
             .content-header {
-                margin-top: -50px;
-                margin-bottom: 5px; /* Reduced margin on mobile by 15px (original was 20px) */
+                margin-bottom: 5px; /* Reduced margin on mobile */
             }
 
             .main-header .hamburger {
                 display: block;
             }
 
-            .project-form button {
-                max-width: 100%; /* Remove width limit on mobile */
-                width: 100%; /* Match the width of input elements */
+            .form-actions {
+                flex-direction: column; /* Stack on mobile */
+                align-items: stretch; /* Full width on mobile */
+            }
+
+            .submit-button {
+                margin-left: 0; /* Reset desktop margin */
+            }
+        }
+
+        /* Desktop Styles */
+        @media (min-width: 769px) {
+            .form-actions {
+                flex-direction: row; /* Align microphone and button in a row on desktop */
+                align-items: flex-start; /* Align items to the top */
+            }
+
+            .microphone-container {
+                align-items: flex-start; /* Align microphone elements to the left */
+                flex-shrink: 0; /* Prevent shrinking */
+            }
+
+            .submit-button {
+                width: auto; /* Adjust width based on content */
+                flex-grow: 1; /* Allow it to take more space */
+                align-self: stretch; /* Make it the same height as the microphone area */
+                margin-left: 15px; /* Add some space between microphone and submit button */
             }
         }
     </style>
@@ -359,7 +414,7 @@
         <div class="content-header">
             <div class="user-info">
                 <img src="images/my-image.jpeg" alt="User Avatar">
-                <h4>Welcome, User</h4> <!-- Moved inside the user-info div -->
+                <h4>Welcome, User</h4>
             </div>
         </div>
 
@@ -370,18 +425,24 @@
                     <label for="project-title">Project Title</label>
                     <input type="text" id="project-title" name="project-title" placeholder="Enter project title" required>
                 </div>
-
-                <div>
-                    <label for="project-description">Project Description</label>
-                    <textarea id="project-description" name="project-description" rows="4" placeholder="Describe your project" required></textarea>
-                </div>
-
                 <div>
                     <label for="project-files">Upload Files</label>
                     <input type="file" id="project-files" name="project-files" multiple required>
                 </div>
-
-                <button type="submit">Submit Project</button>
+                <div>
+                    <label for="project-description">Project Instructions</label>
+                    <textarea id="project-description" name="project-description" rows="4" placeholder="Please type your instructions here" required></textarea>
+                </div>
+                <div class="form-actions">
+                    <div class="microphone-container">
+                        <span class="microphone-title">Or let us hear them</span>
+                        <button id="record-button" class="microphone-button">
+                            <i class="fas fa-microphone"></i>
+                        </button>
+                        <div id="audio-container"></div>
+                    </div>
+                    <button class="submit-button" type="submit">Submit Project</button>
+                </div>
             </form>
         </div>
 
@@ -405,31 +466,41 @@
         const hamburger = document.querySelector('.hamburger');
         const sidebar = document.querySelector('.sidebar');
         const mainContent = document.querySelector('.main-content');
-        let isDesktopExpanded = false;
+        const microphoneTitle = document.querySelector('.microphone-title');
 
         hamburger.addEventListener('click', () => {
             if (window.innerWidth > 768) {
-                sidebar.classList.toggle('expanded-desktop');
-                mainContent.classList.toggle('expanded-desktop');
+                sidebar.classList.toggle('expanded-desktop');mainContent.classList.toggle('expanded-desktop');
                 isDesktopExpanded = !isDesktopExpanded;
+                adjustMicrophoneTitle();
             } else {
                 sidebar.classList.toggle('open');
                 mainContent.classList.toggle('collapsed');
+                adjustMicrophoneTitle();
             }
         });
 
-        // Set initial state based on screen width
         function setInitialSidebarState() {
             if (window.innerWidth > 768) {
                 sidebar.classList.remove('open'); // Ensure mobile class is not active
                 mainContent.classList.remove('collapsed'); // Ensure mobile class is not active
                 sidebar.classList.add('collapsed-desktop'); // Initially collapsed on desktop
                 mainContent.classList.add('collapsed-desktop');
+                adjustMicrophoneTitle();
             } else {
                 sidebar.classList.remove('expanded-desktop'); // Ensure desktop class is not active
                 mainContent.classList.remove('expanded-desktop');
                 sidebar.classList.remove('open'); // Initially hidden on mobile
                 mainContent.classList.add('collapsed'); // Initially full width on mobile
+                adjustMicrophoneTitle();
+            }
+        }
+
+        function adjustMicrophoneTitle() {
+            if (window.innerWidth > 768 && sidebar.classList.contains('expanded-desktop')) {
+                microphoneTitle.style.textAlign = 'left';
+            } else {
+                microphoneTitle.style.textAlign = 'center';
             }
         }
 
