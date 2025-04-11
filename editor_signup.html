@@ -3,71 +3,226 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coming Soon</title>
+    <title>Editor Registration Form</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #003087;
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            text-align: center;
-        }
-
+        /* Existing CSS */
         .container {
-            max-width: 600px;
+            max-width: 500px;
+            margin: 50px auto;
+            background-color: white;
             padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            font-family: Helvetica, Arial, sans-serif;
         }
 
         h1 {
-            font-size: 3rem;
-            margin-bottom: 20px;
+            text-align: center;
+            color: #003087;
         }
 
-        p {
-            font-size: 1.5rem;
-            margin-bottom: 30px;
+        form {
+            display: flex;
+            flex-direction: column;
         }
 
-        .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top: 4px solid white;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
+        label {
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #003087;
         }
 
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
+        input, select, textarea {
+            margin-bottom: 15px;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
         }
 
-        @media (max-width: 600px) {
-            h1 {
-                font-size: 2.5rem;
-            }
+        .country-list {
+            position: relative;
+            width: 100%;
+        }
 
-            p {
-                font-size: 1.2rem;
-            }
+        #country-input {
+            width: calc(100% - 22px);
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        #countries-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            background-color: white;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none; /* Initially hidden */
+        }
+
+        #countries-list li {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        #countries-list li:hover {
+            background-color: #f0f0f0;
+        }
+
+        button {
+            background-color: #003087;
+            color: white;
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #002060;
+        }
+
+        /* New CSS for flag inside input */
+        #phone_number {
+            padding-left: 45px; /* Increased padding to create more space */
+            background-repeat: no-repeat;
+            background-position: 5px center;
+            background-size: auto 20px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Coming Soon</h1>
-        <p>Please come back again later.</p>
-        <div class="spinner"></div>
+        <h1>Register as Editor</h1>
+        <form action="#" method="POST">
+            <label for="firstname">First Name</label>
+            <input type="text" id="firstname" name="firstname" placeholder="Enter your first name" required>
+
+            <label for="lastname">Last Name</label>
+            <input type="text" id="lastname" name="lastname" placeholder="Enter your last name" required>
+
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" placeholder="Choose a username" required>
+
+            <label for="country-input">Country</label>
+            <div class="country-list">
+                <input type="text" id="country-input" placeholder="Type to search country" autocomplete="off" required>
+                <ul id="countries-list" class="country-dropdown"></ul>
+            </div>
+
+            <label for="phone_number">Phone Number</label>
+            <input type="text" id="phone_number" name="phone_number" placeholder="Enter your phone number" required>
+
+            <label for="dob">Date of Birth</label>
+            <input type="date" id="dob" name="dob" placeholder="YYYY-MM-DD" required>
+
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email" placeholder="Enter your email address" required>
+
+            <label for="portfolio">Portfolio Link</label>
+            <input type="url" id="portfolio" name="portfolio" placeholder="Enter your portfolio link" required>
+
+            <label for="experience">Years of Experience</label>
+            <select id="experience" name="experience" required>
+                <option value="" disabled selected>Select your experience level</option>
+                <option value="0-1">0-1 years</option>
+                <option value="2-3">2-3 years</option>
+                <option value="4-5">4-5 years</option>
+                <option value="5+">5+ years</option>
+            </select>
+
+            <label for="skills">Skills</label>
+            <textarea id="skills" name="skills" rows="4" placeholder="List your editing skills and tools you're proficient with" required></textarea>
+
+            <label for="tools">Preferred Editing Tools</label>
+            <textarea id="tools" name="tools" rows="3" placeholder="List your preferred editing tools (e.g., Adobe Premiere, Final Cut Pro)" required></textarea>
+
+            <div class="terms">
+                <input type="checkbox" id="terms" name="terms" required>
+                <label for="terms">
+                    <a href="editor_terms.html" style="text-decoration: none; color: #003087;">I agree to the terms and conditions</a>
+                </label>
+            </div>
+
+            <button type="submit">Register</button>
+        </form>
+        <a href="editor_login.html" style="text-decoration: none;text-align: center;"><p>Already have an account? Login</p></a>
     </div>
+
+    <script>
+        // Existing JavaScript for country dropdown and phone number flag
+        const countryInput = document.getElementById('country-input');
+        const countriesList = document.getElementById('countries-list');
+        const phoneInput = document.getElementById('phone_number');
+        let allCountriesData = [];
+        let countryCodeMap = {};
+
+        fetch('https://restcountries.com/v3.1/all')
+            .then(response => response.json())
+            .then(data => {
+                allCountriesData = data.sort((a, b) => a.name.common.localeCompare(b.name.common));
+                populateCountryList(allCountriesData);
+                createCountryCodeMap(allCountriesData);
+            })
+            .catch(error => console.error('Error fetching countries:', error));
+
+        function createCountryCodeMap(countriesData) {
+            countryCodeMap = {};
+            countriesData.forEach(country => {
+                if (country.idd && country.idd.root && Array.isArray(country.idd.suffixes) && country.idd.suffixes.length > 0) {
+                    countryCodeMap[country.name.common] = country.idd.root + country.idd.suffixes[0];
+                }
+            });
+        }
+
+        function populateCountryList(countriesData) {
+            countriesList.innerHTML = '';
+            countriesData.forEach(countryData => {
+                const li = document.createElement('li');
+                li.textContent = countryData.name.common;
+                li.dataset.value = countryData.name.common;
+                li.dataset.flagUrl = countryData.flags.svg;
+                li.addEventListener('click', function() {
+                    countryInput.value = this.textContent;
+                    countriesList.style.display = 'none';
+                    updatePhoneInfo(this.textContent, this.dataset.flagUrl);
+                });
+                countriesList.appendChild(li);
+            });
+        }
+
+        function updatePhoneInfo(countryName, flagUrl) {
+            let phoneCode = countryCodeMap[countryName] || "";
+            phoneInput.value = phoneCode ? phoneCode + " " : "";
+            phoneInput.style.backgroundImage = flagUrl ? `url('${flagUrl}')` : 'none';
+        }
+
+        countryInput.addEventListener('focus', () => countriesList.style.display = 'block');
+        countryInput.addEventListener('input', () => {
+            const filterValue = countryInput.value.toLowerCase();
+            const filteredCountries = allCountriesData.filter(country =>
+                country.name.common.toLowerCase().includes(filterValue)
+            );
+            populateCountryList(filteredCountries);
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!countryInput.contains(e.target) && !countriesList.contains(e.target)) {
+                countriesList.style.display = 'none';
+            }
+        });
+    </script>
 </body>
 </html>

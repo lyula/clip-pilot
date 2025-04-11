@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #00235f;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Main Header Styles */
+        .main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #00235f; /* Updated theme color */
+            color: white;
+            padding: 15px 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1100;
+        }
+
+        .main-header h1 {
+            font-size: 1.5rem;
+            margin: 0;
+        }
+
+        .main-header .hamburger {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: white;
+        }
+
+        .main-header .logout {
+            color: white;
+            font-size: 1.5rem;
+            text-decoration: none;
+            margin-right: 40px;
+        }
+
+        .main-header .logout:hover {
+            color: #ddd;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 60px; /* Increased initial collapsed width on desktop */
+            height: 100vh;
+            background-color: #00235f; /* Updated theme color */
+            color: white;
+            position: fixed;
+            top: 60px;
+            left: 0; /* Initially visible on desktop */
+            display: flex;
+            flex-direction: column;
+            padding-top: 20px; /* Adjust top padding */
+            transition: width 0.3s ease, left 0.3s ease; /* Added width transition */
+            z-index: 1000;
+            overflow-x: hidden; /* Hide text when collapsed */
+        }
+
+        .sidebar.expanded-desktop {
+            width: 220px;
+        }
+
+        .sidebar.expanded-desktop a span {
+            display: inline; /* Show labels when expanded on desktop */
+        }
+
+        .sidebar.open {
+            left: -220px; /* Hidden off-screen on mobile initially */
+            width: 220px; /* Full width on mobile when open */
+            overflow-x: visible; /* Show text on mobile */
+        }
+
+        .sidebar.open.expanded-desktop {
+            left: 0; /* Override mobile hidden when manually expanded on a larger mobile screen */
+        }
+
+        .sidebar.open a span {
+            display: inline; /* Always show labels on mobile when open */
+            white-space: normal; /* Allow wrapping */
+        }
+
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .sidebar a {
+            text-decoration: none;
+            color: white;
+            padding: 10px 15px;
+            margin: 5px 0;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .sidebar a i {
+            font-size: 1.2rem;
+            min-width: 40px; /* Ensure icon takes enough space for visibility */
+            text-align: center;
+        }
+
+        .sidebar a span {
+            white-space: nowrap; /* Hide text when collapsed on desktop */
+            display: none; /* Initially hidden on desktop */
+        }
+
+        .sidebar a:hover {
+            background-color: #003080; /* Slightly lighter shade for hover */
+        }
+
+        .sidebar a.active {
+            background-color: #003080; /* Active link color */
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            margin-left: 60px; /* Adjusted to match increased initial collapsed sidebar width */
+            padding: 20px;
+            margin-top: 80px; /* Add margin to push content below the fixed header */
+            transition: margin-left 0.3s ease;
+            flex-grow: 1; /* Allow content to take up remaining vertical space */
+        }
+
+        .main-content.collapsed {
+            margin-left: 0; /* Adjust when sidebar is hidden on mobile */
+        }
+
+        .main-content.expanded-desktop {
+            margin-left: 220px; /* Adjust when desktop sidebar is expanded */
+        }
+
+        /* Content Header Styles */
+        .content-header {
+            display: flex;
+            justify-content: flex-start; /* Align content to the left */
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px 20px;
+            background-color: white;
+            border-bottom: 1px solid #ddd;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .content-header .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px; /* Add spacing between the image and the title */
+        }
+
+        .content-header .user-info img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        .content-header .user-info h3 {
+            font-size: 1.5rem;
+            color: #00235f; /* Updated theme color */
+            margin: 0; /* Remove default margin */
+        }
+
+        /* Dashboard Section */
+        .dashboard-section {
+            margin-top: 20px;
+        }
+
+        .dashboard-section h2 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: #00235f; /* Updated theme color */
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .card h3 {
+            margin: 0 0 10px;
+            font-size: 1.1rem;
+            color: #00235f; /* Updated theme color */
+        }
+
+        .card p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* Project Form Styles */
+        .project-form {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column; /* Stack children vertically */
+            align-items: flex-start; /* Align children to the left */
+            width: 100%; /* Full width of the parent container */
+            max-width: none; /* Remove width limit */
+            box-sizing: border-box; /* Include padding and border in width */
+        }
+
+        /* Adjust form inputs and labels */
+        .project-form div {
+            display: flex;
+            flex-direction: column; /* Default vertical stacking for mobile */
+            width: 100%; /* Ensure full width */
+            margin-bottom: 15px; /* Add spacing between rows */
+        }
+
+        .project-form label {
+            font-weight: bold;
+            color: #00235f; /* Updated theme color */
+            margin-bottom: 5px; /* Add spacing below label */
+        }
+
+        .project-form input,
+        .project-form textarea,
+        .project-form button {
+            width: 100%; /* Full width of the parent container */
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+            box-sizing: border-box; /* Include padding and border in width */
+        }
+
+        /* Button Styles */
+        .project-form button {
+            background-color: #003087; /* Updated theme color */
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            padding: 10px 20px; /* Add padding for better appearance */
+            border-radius: 5px; /* Rounded corners */
+            align-self: center; /* Center the button horizontally */
+            max-width: 200px; /* Limit the button width on desktop */
+            width: 100%; /* Full width on smaller screens */
+            text-align: center; /* Center the text inside the button */
+        }
+
+        .project-form button:hover {
+            background-color: #003080; /* Slightly lighter shade for hover */
+        }
+
+        /* Desktop-Specific Styles */
+        @media (min-width: 769px) {
+            .project-form div {
+                display: flex;
+                flex-direction: row; /* Stack label and input horizontally on desktop */
+                align-items: center; /* Align label and input vertically */
+                justify-content: flex-start; /* Align content to the left */
+                gap: 10px; /* Add spacing between label and input */
+            }
+
+            .project-form label {
+                width: 150px; /* Fixed width for labels */
+                margin-bottom: 0; /* Remove bottom margin for horizontal layout */
+                text-align: right; /* Align label text to the right */
+            }
+
+            .project-form input,
+            .project-form textarea {
+                flex-grow: 1; /* Allow inputs to take up remaining space */
+            }
+        }
+
+        /* Footer Styles */
+        .main-footer {
+            background-color: #001435;
+            color: white;
+            height: 5vh;
+            text-align: center;
+            padding: 10px 0;
+            margin-left: 15x;
+            border-radius: 5px;
+            position: relative; /* To ensure it's below other fixed elements */
+            z-index: 900; /* Ensure it's below header and sidebar */
+        }
+
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            .sidebar {
+                left: -220px; /* Hidden off-screen */
+                width: 220px;
+                overflow-x: visible; /* Allow text to be visible */
+            }
+
+            .sidebar.open {
+                left: 0; /* Slide in */
+            }
+
+            .sidebar a span {
+                display: inline; /* Always show labels on mobile when open */
+                white-space: normal; /* Allow wrapping */
+            }
+
+            .main-content {
+                margin-left: 0 !important; /* No left margin on mobile */
+                padding-top: 60px; /* Adjust padding below fixed header */
+            }
+
+            .content-header {
+                margin-top: -50px;
+                margin-bottom: 5px; /* Reduced margin on mobile by 15px (original was 20px) */
+            }
+
+            .main-header .hamburger {
+                display: block;
+            }
+
+            .project-form button {
+                max-width: 100%; /* Remove width limit on mobile */
+                width: 100%; /* Match the width of input elements */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-header">
+        <i class="fas fa-bars hamburger"></i>
+        <h1>Clip-Pilot</h1>
+        <a href="index.html" class="logout"><i class="fas fa-sign-out-alt"></i></a>
+    </div>
+
+    <div class="sidebar collapsed-desktop">
+        <a href="#" class="active"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+        <a href="#"><i class="fas fa-upload"></i> <span>Submit Project</span></a>
+        <a href="#"><i class="fas fa-envelope"></i> <span>Messages</span></a>
+        <a href="#"><i class="fas fa-cog"></i> <span>Settings</span></a>
+        <a href="#"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a>
+    </div>
+
+    <div class="main-content collapsed-desktop">
+        <div class="content-header">
+            <div class="user-info">
+                <img src="images/my-image.jpeg" alt="User Avatar">
+                <h4>Welcome, User</h4> <!-- Moved inside the user-info div -->
+            </div>
+        </div>
+
+        <div class="dashboard-section">
+            <h2>Submit a New Project</h2>
+            <form class="project-form">
+                <div>
+                    <label for="project-title">Project Title</label>
+                    <input type="text" id="project-title" name="project-title" placeholder="Enter project title" required>
+                </div>
+
+                <div>
+                    <label for="project-description">Project Description</label>
+                    <textarea id="project-description" name="project-description" rows="4" placeholder="Describe your project" required></textarea>
+                </div>
+
+                <div>
+                    <label for="project-files">Upload Files</label>
+                    <input type="file" id="project-files" name="project-files" multiple required>
+                </div>
+
+                <button type="submit">Submit Project</button>
+            </form>
+        </div>
+
+        <div class="dashboard-section">
+            <h2>My Projects</h2>
+            <div class="card">
+                <h3>Project: Social Media Ad</h3>
+                <p>Status: In Progress</p>
+            </div>
+            <div class="card">
+                <h3>Project: Corporate Video</h3>
+                <p>Status: Completed</p>
+            </div>
+        </div>
+        <footer class="main-footer">
+            &copy; 2025 Clip-Pilot. All rights reserved.
+        </footer>
+    </div>
+
+    <script>
+        const hamburger = document.querySelector('.hamburger');
+        const sidebar = document.querySelector('.sidebar');
+        const mainContent = document.querySelector('.main-content');
+        let isDesktopExpanded = false;
+
+        hamburger.addEventListener('click', () => {
+            if (window.innerWidth > 768) {
+                sidebar.classList.toggle('expanded-desktop');
+                mainContent.classList.toggle('expanded-desktop');
+                isDesktopExpanded = !isDesktopExpanded;
+            } else {
+                sidebar.classList.toggle('open');
+                mainContent.classList.toggle('collapsed');
+            }
+        });
+
+        // Set initial state based on screen width
+        function setInitialSidebarState() {
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('open'); // Ensure mobile class is not active
+                mainContent.classList.remove('collapsed'); // Ensure mobile class is not active
+                sidebar.classList.add('collapsed-desktop'); // Initially collapsed on desktop
+                mainContent.classList.add('collapsed-desktop');
+            } else {
+                sidebar.classList.remove('expanded-desktop'); // Ensure desktop class is not active
+                mainContent.classList.remove('expanded-desktop');
+                sidebar.classList.remove('open'); // Initially hidden on mobile
+                mainContent.classList.add('collapsed'); // Initially full width on mobile
+            }
+        }
+
+        // Call on initial load and resize
+        setInitialSidebarState();
+        window.addEventListener('resize', setInitialSidebarState);
+    </script>
+</body>
+</html>
