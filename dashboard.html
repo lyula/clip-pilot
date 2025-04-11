@@ -354,6 +354,7 @@
             .main-content {
                 margin-left: 0 !important; /* No left margin on mobile */
                 padding-top: 60px; /* Adjust padding below fixed header */
+                margin-top: 25px;
             }
 
             .content-header {
@@ -391,6 +392,32 @@
                 flex-grow: 1; /* Allow it to take more space */
                 align-self: stretch; /* Make it the same height as the microphone area */
                 margin-left: 15px; /* Add some space between microphone and submit button */
+            }
+        }
+
+        /* Default layout for desktop */
+        .audio-wrapper {
+            display: flex;
+            flex-direction: column; /* Default to column layout */
+            align-items: flex-start;
+            margin-top: 10px;
+        }
+
+        .button-wrapper {
+            display: flex;
+            gap: 10px; /* Add spacing between buttons */
+            margin-top: 10px;
+        }
+
+        /* Mobile-specific styles */
+        @media (max-width: 768px) {
+            .audio-wrapper {
+                flex-direction: column; /* Stack audio and buttons vertically */
+            }
+
+            .button-wrapper {
+                flex-direction: column; /* Stack buttons vertically */
+                align-items: flex-start;
             }
         }
     </style>

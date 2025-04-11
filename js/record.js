@@ -57,7 +57,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Wrap the audio player, download button, and delete button
                 const audioWrapper = document.createElement('div');
                 audioWrapper.style.display = 'flex';
-                audioWrapper.style.alignItems = 'center';
+                audioWrapper.style.flexDirection = 'column'; // Default to column layout
+                audioWrapper.style.alignItems = 'flex-start';
                 audioWrapper.style.marginTop = '10px';
 
                 const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
@@ -68,21 +69,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 audioPlayer.controls = true;
                 audioPlayer.src = audioUrl;
 
+                // Create a container for the buttons
+                const buttonWrapper = document.createElement('div');
+                buttonWrapper.style.display = 'flex';
+                buttonWrapper.style.gap = '10px'; // Add spacing between buttons
+                buttonWrapper.style.marginTop = '10px';
+
                 // Create a download button
                 const downloadButton = document.createElement('a');
                 downloadButton.href = audioUrl;
                 downloadButton.download = `recording-${audioCount + 1}.wav`;
                 downloadButton.textContent = 'Download';
-                downloadButton.style.marginLeft = '10px';
                 downloadButton.style.backgroundColor = '#003087'; // Theme color
                 downloadButton.style.color = '#fff'; // White text
-                downloadButton.style.padding = '8px 12px'; // Padding for better appearance
-                downloadButton.style.borderRadius = '5px'; // Rounded corners
-                downloadButton.style.textDecoration = 'none'; // Remove underline
-                downloadButton.style.fontSize = '0.9rem'; // Adjust font size
-                downloadButton.style.fontWeight = 'bold'; // Bold text
-                downloadButton.style.display = 'inline-block'; // Ensure proper alignment
-                downloadButton.style.transition = 'background-color 0.3s ease'; // Smooth hover effect
+                downloadButton.style.padding = '8px 12px';
+                downloadButton.style.borderRadius = '5px';
+                downloadButton.style.textDecoration = 'none';
+                downloadButton.style.fontSize = '0.9rem';
+                downloadButton.style.fontWeight = 'bold';
+                downloadButton.style.transition = 'background-color 0.3s ease';
 
                 // Add hover effect
                 downloadButton.addEventListener('mouseover', () => {
@@ -95,7 +100,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Create a delete button
                 const deleteButton = document.createElement('button');
                 deleteButton.textContent = 'Delete';
-                deleteButton.style.marginLeft = '10px';
                 deleteButton.style.backgroundColor = '#FF0000'; // Red for delete
                 deleteButton.style.color = '#fff'; // White text
                 deleteButton.style.padding = '8px 12px';
@@ -119,9 +123,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     audioCount--; // Decrease the audio count
                 });
 
+                // Append buttons to the button wrapper
+                buttonWrapper.appendChild(downloadButton);
+                buttonWrapper.appendChild(deleteButton);
+
+                // Append the audio player and button wrapper to the audio wrapper
                 audioWrapper.appendChild(audioPlayer);
-                audioWrapper.appendChild(downloadButton);
-                audioWrapper.appendChild(deleteButton);
+                audioWrapper.appendChild(buttonWrapper);
 
                 // Append the audio wrapper to the container
                 audioContainer.appendChild(audioWrapper);
