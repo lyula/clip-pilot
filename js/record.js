@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Check if the maximum number of audios has been reached
             if (audioCount >= maxAudios) {
-                alert('You have reached the maximum limit of 3 audios. Please delete an existing audio to record a new one.');
+                alert("You have reached Clip-Pilot's maximum limit of 3 audios. Please delete an existing audio to record a new one.");
                 return;
             }
 
@@ -68,6 +68,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const audioPlayer = document.createElement('audio');
                 audioPlayer.controls = true;
                 audioPlayer.src = audioUrl;
+
+                // Prevent the audio element from triggering the keyboard on mobile
+                audioPlayer.addEventListener('touchstart', (event) => {
+                    event.preventDefault(); // Prevent focus behavior
+                });
 
                 // Create a container for the buttons
                 const buttonWrapper = document.createElement('div');
