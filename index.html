@@ -118,6 +118,30 @@
         </div>
     </section>
 
+    <section class="testimonials">
+        <h2>What Our Clients Are Saying</h2>
+        <div class="testimonials-wrapper">
+            <div class="testimonials-container">
+                <div class="testimonial">
+                    <p class="testimonial-text">"Clip-Pilot transformed my raw footage into a masterpiece. The team is incredibly talented and professional!"</p>
+                    <p class="testimonial-author">- Sarah J., Content Creator</p>
+                </div>
+                <div class="testimonial">
+                    <p class="testimonial-text">"The turnaround time was amazing, and the quality exceeded my expectations. Highly recommend!"</p>
+                    <p class="testimonial-author">- Mark T., Marketing Manager</p>
+                </div>
+                <div class="testimonial">
+                    <p class="testimonial-text">"Affordable, reliable, and top-notch editing services. Clip-Pilot is my go-to for all my video projects."</p>
+                    <p class="testimonial-author">- Emily R., Small Business Owner</p>
+                </div>
+                <div class="testimonial">
+                    <p class="testimonial-text">"Exceptional service and attention to detail. Highly recommended!"</p>
+                    <p class="testimonial-author">- John D., Filmmaker</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <div class="ad-banner" id="ad-banner">
         <div class="ad-content" id="ad-content">
             <img src="images/microphone.jpg" alt="Sample Product" class="ad-product-image" id="ad-product-image">
@@ -138,7 +162,7 @@
             </div>
             <ul class="footer-links-top">
                 <li><a href="help.html">Help</a></li>
-                <li><a href="contact_us.html">Contact</a></li>
+                <li><a href="reviews.html">Review</a></li>
                 <li><a href="fees.html">Fees</a></li>
                 <li><a href="shop.html">Shop</a></li>
             </ul>
@@ -251,6 +275,47 @@
                 adBanner.style.display = "none"; // Hide the ad
                 clearInterval(adInterval); // Stop alternating products
             }
+
+            const testimonialsContainer = document.querySelector('.testimonials-container');
+            const testimonials = document.querySelectorAll('.testimonial');
+
+            // Clone testimonials to create an infinite loop effect
+            testimonials.forEach((testimonial) => {
+                const clone = testimonial.cloneNode(true);
+                testimonialsContainer.appendChild(clone);
+            });
+
+            let currentIndex = 0;
+
+            // Function to update the position of the testimonials
+            function updateTestimonialPosition() {
+                const visibleCards = window.innerWidth > 768 ? 3 : 1; // Show 3 cards on larger screens, 1 on smaller screens
+                const cardWidth = testimonialsContainer.firstElementChild.offsetWidth + 20; // Card width + gap
+                testimonialsContainer.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
+            }
+
+            // Automatically swipe testimonials every 5 seconds
+            setInterval(() => {
+                const visibleCards = window.innerWidth > 768 ? 3 : 1; // Show 3 cards on larger screens, 1 on smaller screens
+                const totalCards = testimonials.length;
+
+                currentIndex++;
+
+                // Reset to the first card when the last card is reached
+                if (currentIndex >= totalCards) {
+                    testimonialsContainer.style.transition = 'none'; // Disable transition for seamless reset
+                    currentIndex = 0;
+                    updateTestimonialPosition();
+                    setTimeout(() => {
+                        testimonialsContainer.style.transition = 'transform 0.5s ease'; // Re-enable transition
+                    }, 50);
+                } else {
+                    updateTestimonialPosition();
+                }
+            }, 5000);
+
+            // Adjust the position on window resize
+            window.addEventListener('resize', updateTestimonialPosition);
     </script>
 </body>
 </html>

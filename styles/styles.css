@@ -279,8 +279,9 @@ ul li { /* For unordered lists */
   }
 
   .about-us {
+    margin: auto;
     padding: 40px;
-    background-color: #f9f9f9; /* Light background for the section */
+    background-color: white; /* Light background for the section */
     text-align: center; /* Center align content for initial presentation */
 }
 
@@ -621,5 +622,117 @@ hr {
     .about-us-buttons button {
         margin: 10px 0; /* Add vertical margin when stacked */
         width: 80%; /* Make buttons wider on smaller screens */
+    }
+}
+
+.testimonials {
+    background-color: #f9f9f9;
+    padding: 20px 20px;
+    text-align: center;
+    overflow: hidden; /* Hide overflowing testimonials */
+    position: relative;
+}
+
+.testimonials h2 {
+    font-size: 2rem;
+    color: #003087;
+    margin-bottom: 20px;
+}
+
+.testimonials-wrapper {
+    overflow: hidden; /* Hide overflowing content */
+    position: relative;
+    margin: 0 auto; /* Center the testimonials section */
+    width: 100%;
+}
+
+.testimonials-container {
+    display: flex;
+    gap: 25px;
+    transition: transform 0.5s ease; /* Smooth transition for swiping */
+}
+
+/* Ensure text wraps properly inside the testimonial cards */
+.testimonial {
+    background-color: white;
+    width: 30%;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px auto;
+    min-width: calc(33.333% - 20px); /* Three cards per row */
+    flex-shrink: 0; /* Prevent shrinking */
+    text-align: left;
+    word-wrap: break-word; /* Ensure long words break to the next line */
+    overflow-wrap: break-word; /* Break long words if necessary */
+    box-sizing: border-box; /* Include padding and border in width calculations */
+}
+
+.testimonial-text {
+    padding: 10px;
+    font-size: 1rem;
+    color: #333;
+    margin-bottom: 10px;
+    font-style: italic;
+    line-height: 1.5; /* Improve readability */
+}
+
+.testimonial-author {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    color: #555;
+    font-weight: bold;
+    text-align: right;
+}
+
+/* Responsive Design for Small Screens */
+@media (max-width: 768px) {
+    .testimonial {
+        min-width: 100%; /* One card per row on small screens */
+        padding: 15px; /* Reduce padding for smaller screens */
+    }
+
+    .testimonial-text {
+        font-size: 0.9rem; /* Adjust font size for smaller screens */
+        line-height: 1.4; /* Adjust line height for better readability */
+    }
+
+    .testimonial-author {
+        font-size: 0.8rem; /* Adjust font size for smaller screens */
+    }
+}
+
+/* Keyframes for scrolling animation */
+@keyframes scrollTestimonials {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+/* Responsive Design for Small Screens */
+@media (max-width: 768px) {
+    .testimonials-container {
+        display: flex;
+        gap: 10px;
+    }
+
+    .testimonial {
+        min-width: 100%; /* One card per row on small screens */
+    }
+}
+
+@media (max-width: 768px) {
+    .testimonial {
+        min-width: 100%; /* One card per row on small screens */
+    }
+
+    .testimonial-text {
+        font-size: 0.9rem; /* Adjust font size for smaller screens */
+    }
+
+    .testimonial-author {
+        font-size: 0.8rem; /* Adjust font size for smaller screens */
     }
 }

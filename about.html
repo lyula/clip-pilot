@@ -39,13 +39,18 @@
         }
 
         .team-section {
+            display: flex;
+            flex-wrap: wrap; /* Allow wrapping to the next row */
+            gap: 20px; /* Add spacing between rows and columns */
             margin-top: 30px;
         }
 
         .team-member {
+            flex: 1 1 calc(50% - 20px); /* Two members per row with spacing */
             display: flex;
             align-items: center;
             margin-bottom: 20px;
+            box-sizing: border-box; /* Include padding and border in width calculation */
         }
 
         .team-member img {
@@ -78,11 +83,14 @@
             }
 
             .team-member {
+                flex: 1 1 calc(50% - 10px); /* Two members per row */
                 flex-direction: column;
                 align-items: flex-start;
             }
 
             .team-member img {
+                width: 70px; /* Slightly smaller images */
+                height: 70px;
                 margin-bottom: 10px;
             }
         }

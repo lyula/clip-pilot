@@ -111,12 +111,22 @@
                 font-size: 1.8rem;
             }
 
+            .help-form {
+                display: flex;
+                flex-direction: column;
+                align-items: center; /* Center the input fields horizontally */
+            }
+
             .help-form input, .help-form textarea {
                 font-size: 0.9rem;
+                width: 90%; /* Reduce width to fit within the container */
+                max-width: 400px; /* Limit the maximum width */
             }
 
             .help-form button {
                 font-size: 0.9rem;
+                width: 90%; /* Match the width of the input fields */
+                max-width: 400px; /* Limit the maximum width */
             }
         }
     </style>
