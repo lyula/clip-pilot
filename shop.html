@@ -401,6 +401,20 @@
                 max-width: calc(100% - 20px); /* Ensure consistent width */
             }
         }
+
+        /* Center the search input on mobile screens */
+        @media (max-width: 600px) {
+            .search-bar {
+                display: flex;
+                justify-content: center; /* Center horizontally */
+                align-items: center; /* Center vertically if needed */
+            }
+
+            .search-bar input {
+                width: 90%; /* Adjust width to fit within the screen */
+                max-width: 400px; /* Limit the maximum width */
+            }
+        }
     </style>
 </head>
 <body>
