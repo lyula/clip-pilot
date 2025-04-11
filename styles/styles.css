@@ -136,15 +136,15 @@ html , body {
 }
 
 
-/* General styles for the pricing cards (desktop and mobile) */
+/* General styles for the pricing section */
 .pricing-carousel {
-    display: flex;
-    align-items: center;
-    position: relative;
-    overflow: hidden;
-    margin: 10px auto; /* Center the carousel and add vertical spacing */
-    padding: 0 2px; /* Add padding to prevent cards from touching the edges */
-    max-width: 1200px; /* Limit the width of the carousel on larger screens */
+    display: block; /* Stack elements vertically */
+    text-align: center; /* Center-align the heading and content */
+    margin: 20px auto; /* Center the section and add vertical spacing */
+    padding: 0 10px; /* Add padding for better spacing */
+    max-width: 1200px; /* Limit the width of the section */
+    position: relative; /* Set relative positioning for the section */
+    overflow: hidden; /* Hide overflowing content */
 }
 
 .carousel-wrapper {
@@ -188,34 +188,37 @@ html , body {
 }
 
 .carousel-button {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
+    position: absolute; /* Position the buttons relative to the section */
+    top: 65%; /* Center vertically */
+    transform: translateY(-50%); /* Adjust for vertical centering */
     background-color: #003087;
     color: white;
     border: none;
     border-radius: 50%;
     width: 40px;
     height: 40px;
-    display: none; /* Hidden by default */
-    justify-content: center;
-    align-items: center;
     cursor: pointer;
-    z-index: 10;
+    z-index: 10; /* Ensure buttons appear above the cards */
 }
 
 .carousel-button.prev {
-    left: 10px;
+    left: 10px; /* Position the previous button on the left */
 }
 
 .carousel-button.next {
-    right: 10px;
+    right: 10px; /* Position the next button on the right */
 }
 
 .carousel-button:hover {
-    background-color: #002060;
+    background-color: #002060; /* Darken the button on hover */
 }
 
+.pricing-heading {
+    text-align: center;
+    font-size: 2rem;
+    color: #003087;
+    margin-bottom: 20px;
+}
 
 .hero-image-section {
     background-color: #f3f3f6; /* Light background for the hero section */
@@ -237,16 +240,15 @@ html , body {
     width: 45%;
 }
 
-.hero-text-group-left h2{
+.hero-text-group-left h3{
     font-weight: bold;
     color: #D3D3D3;
     font-weight: 500;
-    font-size: 36px;
-    padding-top: 35px;
-    margin-left: 50px;
+    font-size: 33px;
+    margin-top: -10px;
 }
 
-.hero-text-group-left ul{
+.hero-text-group-left p{
     color: #D3D3D3;
     font-weight: 500;
     font-size: 16.2px;
@@ -276,6 +278,28 @@ ul li { /* For unordered lists */
     color:#D3D3D3;
     font-weight: 500;
     font-size: 16.2px;
+    list-style: none; /* Remove default list styling */
+    padding: 0;
+    margin: 0;
+  }
+
+  .hero-text-group-right li {
+    display: flex; /* Use Flexbox to align items horizontally */
+    align-items: flex-start; /* Align the text with the top of the heading */
+    gap: 10px; /* Add spacing between the <h4> and the text */
+    margin-bottom: 5px; /* Add spacing between list items */
+  }
+
+  .hero-text-group-right h4 {
+    margin: 0; /* Remove default margin */
+    flex-shrink: 0; /* Prevent the <h4> from shrinking */
+    font-size: 1.1rem; /* Adjust font size if needed */
+    color: white; /* Optional: Add color for emphasis */
+  }
+
+  .hero-text-group-right li p {
+    margin: 0; /* Remove default margin for the text */
+    line-height: 1.5; /* Improve readability */
   }
 
   .about-us {
@@ -295,6 +319,7 @@ ul li { /* For unordered lists */
     color: #003087; /* Your primary color */
     margin-bottom: 20px;
     font-size: 2.5em;
+    margin-top: -15px;
 }
 
 .about-us p {
@@ -311,7 +336,7 @@ ul li { /* For unordered lists */
 .about-us-buttons {
     display: flex; /* Enable flexbox for horizontal arrangement */
     justify-content: center; /* Center the buttons horizontally */
-    margin-top: 30px; /* Add some space above the buttons */
+    margin-top: 20px; /* Add some space above the buttons */
 }
 
 .about-us-buttons button {
@@ -341,6 +366,12 @@ ul li { /* For unordered lists */
 
 .join-editor-button:hover {
     background-color: #001435;
+}
+
+.about-us-content h2 {
+    text-align: center; /* Center the heading */
+    color: #003087; /* Optional: Ensure consistent color */
+    margin-bottom: 20px; /* Add spacing below the heading */
 }
 
   footer {
@@ -574,26 +605,27 @@ hr {
 
 
     .pricing-carousel {
-        margin-top: -5px; /* Adjust margin for smaller screens */
-        margin-bottom: -5px;
-        display: flex;
-        overflow-x: auto; /* Enable horizontal scrolling */
-        scroll-snap-type: x mandatory; /* Enable snap scrolling */
+        display: block; /* Ensure elements stack vertically */
+        margin: 10px auto; /* Adjust margins for smaller screens */
+        padding: 0 15px; /* Add padding for better spacing */
+    }
+
+    .pricing-heading {
+        font-size: 1.8rem; /* Slightly smaller font size for mobile */
+        margin-bottom: 15px; /* Adjust spacing below the heading */
     }
 
     .carousel-wrapper {
-        gap: 10px; /* Reduce gap between cards on mobile */
+        display: flex;
+        overflow-x: auto; /* Enable horizontal scrolling */
+        scroll-behavior: smooth;
+        gap: 10px; /* Reduce gap between cards */
+        padding: 10px 0; /* Add padding for better spacing */
     }
 
     .pricing-card {
-        width: 60%; /* Make cards wider when in carousel */
-        flex-shrink: 0; /* Prevent cards from shrinking */  
-        flex: 0 0 89%; /* Adjust card size for smaller screens */
-        margin: 0 2.5px; /* Add spacing between cards on mobile */ 
-    }
-
-    .carousel-button {
-        display: flex; /* Show arrows only on mobile */
+        flex: 0 0 86.99%; /* Adjust card size for smaller screens */
+        margin: 0 10px; /* Add spacing between cards */
     }
 
     .hero-image-section {
@@ -602,6 +634,7 @@ hr {
     
 
     .hero-text-group-left {
+        margin-top: 13px;
        width: 100%;
     }
     .hero-text-group-left ul{
@@ -622,6 +655,67 @@ hr {
     .about-us-buttons button {
         margin: 10px 0; /* Add vertical margin when stacked */
         width: 80%; /* Make buttons wider on smaller screens */
+    }
+}
+
+/* Ensure carousel buttons are visible on mobile */
+@media (max-width: 768px) {
+    .carousel-button {
+        display: flex; /* Make the buttons visible */
+        justify-content: center; /* Center the button content */
+        align-items: center; /* Center the button content */
+    }
+
+    .carousel-button.prev {
+        left: 5px; /* Adjust position for smaller screens */
+    }
+
+    .carousel-button.next {
+        right: 5px; /* Adjust position for smaller screens */
+    }
+
+    .carousel-button {
+        width: 35px; /* Slightly smaller buttons for mobile */
+        height: 35px;
+    }
+}
+
+/* Hide carousel buttons on desktop */
+@media (min-width: 769px) {
+    .carousel-button {
+        display: none; /* Hide buttons on screens wider than 768px */
+    }
+}
+
+/* Style carousel buttons for mobile */
+@media (max-width: 768px) {
+    .carousel-button {
+        display: flex; /* Show buttons on mobile */
+        justify-content: center;
+        align-items: center;
+        position: absolute;
+        top: 65%; /* Center vertically */
+        transform: translateY(-50%);
+        background-color: #003087;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        cursor: pointer;
+        z-index: 10; /* Ensure buttons appear above the cards */
+    }
+
+    .carousel-button.prev {
+        left: 10px; /* Position the previous button on the left */
+    }
+
+    .carousel-button.next {
+        right: 10px; /* Position the next button on the right */
+    }
+
+    .carousel-button:hover {
+        background-color: #002060; /* Darken the button on hover */
     }
 }
 
