@@ -50,18 +50,23 @@ html , body {
     color: #003087; /* Highlight color on hover */
 }
 
+.auth-buttons {
+    display: flex; /* Enable flexbox for horizontal alignment */
+    justify-content: flex-end; /* Align buttons to the right */
+    align-items: center; /* Vertically align buttons */
+    gap: 10px; /* Add spacing between the buttons */
+}
+
 .auth-buttons button {
-    background-color: #003087;
-    color: white;
+    background-color: #003087; /* Button background color */
+    color: white; /* Button text color */
     border: none;
     padding: 10px 20px;
-    border-radius: 5px;
+    border-radius: 20px;
     cursor: pointer;
     font-weight: bold;
     font-size: 14px;
-    margin-left: 15px;
     transition: background-color 0.3s ease;
-    border-radius: 18px;
 }
 
 .auth-buttons button:hover {
@@ -189,7 +194,7 @@ html , body {
 
 .carousel-button {
     position: absolute; /* Position the buttons relative to the section */
-    top: 65%; /* Center vertically */
+    top: 65%; /* Restore the original vertical position */
     transform: translateY(-50%); /* Adjust for vertical centering */
     background-color: #003087;
     color: white;
@@ -202,11 +207,11 @@ html , body {
 }
 
 .carousel-button.prev {
-    left: 10px; /* Position the previous button on the left */
+    left: 10px; /* Restore the original left position */
 }
 
 .carousel-button.next {
-    right: 10px; /* Position the next button on the right */
+    right: 10px; /* Restore the original right position */
 }
 
 .carousel-button:hover {
@@ -333,39 +338,60 @@ ul li { /* For unordered lists */
     color: #555; /* Slightly darker color for emphasis */
 }
 
+/* About Us Buttons */
 .about-us-buttons {
     display: flex; /* Enable flexbox for horizontal arrangement */
     justify-content: center; /* Center the buttons horizontally */
-    margin-top: 20px; /* Add some space above the buttons */
+    margin-top: 20px; /* Add spacing above the buttons */
+    gap: 10px; /* Add spacing between the buttons */
+    flex-wrap: nowrap; /* Prevent wrapping to ensure horizontal stacking */
 }
 
-.about-us-buttons button {
-    padding: 12px 25px;
-    font-size: 1em;
+.hire-talent-button,
+.join-editor-button {
+    background-color: #003087; /* Button background color */
+    color: white; /* Button text color */
     border: none;
     border-radius: 5px;
+    padding: 8px 15px; /* Reduce padding for smaller buttons */
+    font-size: 0.9rem; /* Reduce font size */
     cursor: pointer;
     transition: background-color 0.3s ease;
+    width: auto; /* Allow buttons to adjust to their content */
 }
 
-.hire-talent-button {
-    background-color: #003087; /* Example button color */
-    color: white;
-    margin-right: 10px; /* Add space between the buttons */
-}
-
-.join-editor-button {
-    background-color: #003087; /* Example button color */
-    color: white;
-    margin-left: 10px; /* Add space between the buttons */
-}
-
-.hire-talent-button:hover {
-    background-color: #001435;
-}
-
+.hire-talent-button:hover,
 .join-editor-button:hover {
-    background-color: #001435;
+    background-color: #002060; /* Darker shade on hover */
+}
+
+/* Mobile View: Ensure buttons remain horizontal */
+@media (max-width: 768px) {
+    .about-us-buttons {
+        flex-direction: row; /* Keep buttons in a horizontal row */
+        align-items: center; /* Center the buttons vertically */
+        gap: 8px; /* Adjust spacing between buttons */
+    }
+
+    .hire-talent-button,
+    .join-editor-button {
+        padding: 6px 12px; /* Further reduce padding for smaller screens */
+        font-size: 0.8rem; /* Reduce font size for smaller screens */
+    }
+}
+
+/* Mobile View: Stack buttons vertically */
+@media (max-width: 768px) {
+    .about-us-buttons {
+        flex-direction: row; /* Keep buttons in a horizontal row */
+        align-items: center; /* Center the buttons vertically */
+        gap: 10px; /* Adjust spacing between buttons */
+    }
+
+    .hire-talent-button,
+    .join-editor-button {
+        width: auto; /* Allow buttons to adjust to their content */
+    }
 }
 
 .about-us-content h2 {
@@ -719,6 +745,99 @@ hr {
     }
 }
 
+/* Service Carousel Buttons */
+.service-carousel-button {
+    position: absolute; /* Position the buttons relative to the section */
+    top: 65%; /* Center vertically */
+    transform: translateY(-50%); /* Adjust for vertical centering */
+    background-color: #003087;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    z-index: 10; /* Ensure buttons appear above the cards */
+}
+
+.service-carousel-button.prev {
+    left: 10px; /* Position the previous button on the left */
+}
+
+.service-carousel-button.next {
+    right: 10px; /* Position the next button on the right */
+}
+
+.service-carousel-button:hover {
+    background-color: #002060; /* Darken the button on hover */
+}
+
+/* Mobile View: Show only one card at a time */
+@media (max-width: 768px) {
+    .services-carousel-wrapper {
+        padding: 0; /* Remove padding to prevent extra space */
+        margin: 0; /* Remove margins to align with the screen edges */
+        width: 98%; /* Ensure the wrapper spans the full width of the screen */
+        overflow: hidden; /* Prevent overflow beyond the screen */
+        box-sizing: border-box; /* Include padding and border in width calculations */
+    }
+
+    .services-carousel {
+        gap: 10px; /* Reduce gap between cards */
+        padding: 0; /* Remove padding to prevent extra space */
+        margin: 0; /* Remove margins to align with the screen edges */
+        width: 100%; /* Ensure the carousel spans the full width of the wrapper */
+        box-sizing: border-box; /* Include padding and border in width calculations */
+    }
+
+    .services-card {
+        flex: 0 0 98%; /* Make each card take the full width of the screen */
+        margin: 0; /* Remove margins to prevent extra space */
+    }
+
+    .services-carousel-button {
+        display: flex; /* Make the buttons visible */
+        justify-content: center; /* Center the button content */
+        align-items: center; /* Center the button content */
+        width: 35px; /* Slightly smaller buttons for mobile */
+        height: 35px;
+    }
+
+    .services-carousel-button.prev {
+        left: 5px; /* Adjust position for smaller screens */
+    }
+
+    .services-carousel-button.next {
+        right: 5px; /* Adjust position for smaller screens */
+    }
+}
+
+/* Mobile View: Reduce the width of service cards */
+@media (max-width: 768px) {
+    .services-card {
+        flex: 0 0 90%; /* Reduce the card width to 90% of the screen */
+        margin: 0 auto; /* Center the card horizontally */
+    }
+}
+
+/* Mobile View: Adjust the height of service cards */
+@media (max-width: 768px) {
+    .services-card {
+        flex: 0 0 90%; /* Keep the card width at 90% of the screen */
+        margin: 0 auto; /* Center the card horizontally */
+        padding: 12px 10px; /* Reduce padding to decrease height */
+        height: auto; /* Allow height to adjust dynamically */
+        min-height: 100px; /* Reduce the minimum height by half */
+    }
+}
+
+/* Hide carousel buttons on desktop */
+@media (min-width: 769px) {
+    .services-carousel-button {
+        display: none; /* Hide buttons on screens wider than 768px */
+    }
+}
+
 .testimonials {
     background-color: #f9f9f9;
     padding: 20px 20px;
@@ -829,4 +948,197 @@ hr {
     .testimonial-author {
         font-size: 0.8rem; /* Adjust font size for smaller screens */
     }
+}
+
+/* Services Section */
+.services-section {
+    display: block; /* Stack elements vertically */
+    text-align: center; /* Center-align the heading and content */
+    margin: 20px auto; /* Center the section and add vertical spacing */
+    padding: 0 10px; /* Add padding for better spacing */
+    max-width: 1200px; /* Limit the width of the section */
+    position: relative; /* Set relative positioning for the section */
+    overflow: hidden; /* Hide overflowing content */
+}
+
+/* Services Heading */
+.services-heading {
+    text-align: center;
+    font-size: 2rem;
+    margin-top: -3px;
+    margin-bottom: -10px;
+    color: #003087;
+    margin-bottom: 20px;
+}
+
+/* Services Carousel Wrapper */
+.services-carousel-wrapper {
+    display: flex;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    gap: 20px; /* Add spacing between the cards */
+    padding: 10px;
+    width: 100%;
+    position: relative; /* Set relative positioning for the section */
+    overflow: hidden; /* Hide overflowing content */
+}
+
+/* Services Carousel */
+.services-carousel {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 20px; /* Space between cards */
+    scroll-behavior: smooth;
+    padding: 10px 0; /* Add padding for better spacing */
+    width: 100%;
+}
+
+/* Services Card */
+.services-card {
+    flex: 45%; /* Desktop width for cards */
+    background-color: #f4f4f4;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-family: Helvetica, Arial, sans-serif;
+    color: #333;
+    height: auto; /* Match the height of pricing cards */
+}
+
+.services-card h3 {
+    font-size: 1.5rem;
+    color: #003087;
+    margin-bottom: 10px;
+}
+
+.services-card p {
+    font-size: 1rem;
+    margin: 5px 0;
+}
+
+/* Services Carousel Buttons */
+.services-carousel-button {
+    position: absolute; /* Position the buttons relative to the section */
+    top: 40%; /* Center vertically */
+    transform: translateY(-50%); /* Adjust for vertical centering */
+    background-color: #003087;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    z-index: 10; /* Ensure buttons appear above the cards */
+}
+
+.services-carousel-button.prev {
+    left: 1px; /* Position the previous button on the left */
+}
+
+.services-carousel-button.next {
+    right: 1px; /* Position the next button on the right */
+}
+
+.services-carousel-button:hover {
+    background-color: #002060; /* Darken the button on hover */
+}
+
+/* Mobile View: Show only one card at a time */
+@media (max-width: 768px) {
+    .services-carousel-wrapper {
+        padding: 0; /* Remove padding to prevent extra space */
+        margin: 0; /* Remove margins to align with the screen edges */
+        width: 100%; /* Ensure the wrapper spans the full width of the screen */
+        overflow: hidden; /* Prevent overflow beyond the screen */
+        box-sizing: border-box; /* Include padding and border in width calculations */
+    }
+
+    .services-carousel {
+        gap: 10px; /* Reduce gap between cards */
+        padding: 0; /* Remove padding to prevent extra space */
+        margin: 0; /* Remove margins to align with the screen edges */
+        width: 100%; /* Ensure the carousel spans the full width of the wrapper */
+        box-sizing: border-box; /* Include padding and border in width calculations */
+    }
+
+    .services-card {
+        flex: 0 0 100%; /* Make each card take the full width of the screen */
+        margin: 0; /* Remove margins to prevent extra space */
+    }
+
+    .services-carousel-button {
+        display: flex; /* Make the buttons visible */
+        justify-content: center; /* Center the button content */
+        align-items: center; /* Center the button content */
+        width: 35px; /* Slightly smaller buttons for mobile */
+        height: 35px;
+    }
+
+    .services-carousel-button.prev {
+        left: 5px; /* Adjust position for smaller screens */
+    }
+
+    .services-carousel-button.next {
+        right: 5px; /* Adjust position for smaller screens */
+    }
+}
+
+/* Mobile View: Reduce the width of service cards */
+@media (max-width: 768px) {
+    .services-card {
+        flex: 0 0 90%; /* Reduce the card width to 90% of the screen */
+        margin: 0 auto; /* Center the card horizontally */
+    }
+}
+
+/* Mobile View: Adjust the height of service cards */
+@media (max-width: 768px) {
+    .services-card {
+        flex: 0 0 90%; /* Keep the card width at 90% of the screen */
+        margin: 0 auto; /* Center the card horizontally */
+        padding: 12px 10px; /* Reduce padding to decrease height */
+        height: auto; /* Allow height to adjust dynamically */
+        min-height: 100px; /* Reduce the minimum height by half */
+    }
+}
+
+/* Hide carousel buttons on desktop */
+@media (min-width: 769px) {
+    .services-carousel-button {
+        display: none; /* Hide buttons on screens wider than 768px */
+    }
+}
+
+/* Start Now Button */
+.start-now-button {
+    background-color: #003087; /* Theme primary color */
+    color: white; /* Button text color */
+    border: none;
+    border-radius: 5px;
+    margin-top: 5px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    text-align: center;
+    width: 60%; /* Make the button span the full width of the card */
+}
+
+.start-now-button:hover {
+    background-color: #002060; /* Darker shade for hover effect */
+    transform: scale(1.05); /* Slightly enlarge button on hover */
+}
+
+.start-now-button:active {
+    background-color: #001040; /* Even darker shade for active state */
+    transform: scale(0.95); /* Slightly shrink button on click */
+}
+
+/* Ensure the link wrapping the button has no extra styles */
+a {
+    text-decoration: none; /* Remove underline from links */
+    display: block; /* Ensure the button takes up the full width */
 }

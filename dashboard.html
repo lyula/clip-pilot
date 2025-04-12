@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Dashboard</title>
+    <link rel="shortcut icon" href="images/main-logo.jpg" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="js/record.js"></script> <!-- Include the external record.js file -->
     <style>
@@ -55,9 +56,23 @@
             color: #ddd;
         }
 
+        /* Hamburger Menu */
+        .hamburger {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: white;
+            transition: transform 0.3s ease; /* Smooth animation */
+        }
+
+        /* Rotate hamburger into an X */
+        .hamburger.open {
+            transform: rotate(45deg); /* Rotate to form an X */
+            color: white; /* Optional: Change color to indicate close */
+        }
+
         /* Sidebar Styles */
         .sidebar {
-            width: 60px; /* Increased initial collapsed width on desktop */
+            width: 130px; /* Increased collapsed width by 70px (original was 60px) */
             height: 100vh;
             background-color: #00235f; /* Updated theme color */
             color: white;
@@ -73,7 +88,7 @@
         }
 
         .sidebar.expanded-desktop {
-            width: 220px;
+            width: 220px; /* Expanded width remains the same */
         }
 
         .sidebar.expanded-desktop a span {
@@ -252,13 +267,91 @@
 
         .project-form input[type="text"],
         .project-form input[type="file"],
-        .project-form textarea {
+        .project-form textarea,
+        .project-form select {
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
             font-size: 1rem;
             box-sizing: border-box;
             width: 100%; /* Ensure they take full width within their container */
+        }
+
+        /* Video Category Dropdown */
+        #video-category {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+        }
+
+        /* Go Live Button */
+        .go-live-button {
+            background-color: #003087; /* Theme primary color */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 10px; /* Add spacing above the button */
+            width: 100%; /* Make it full width for consistency */
+            text-align: center;
+        }
+
+        .go-live-button:hover {
+            background-color: #002060; /* Slightly darker shade for hover */
+        }
+
+        /* Go Live Button Visibility */
+        .go-live-button,
+        label[for="go-live-button"] {
+            display: none; /* Hide by default */
+        }
+
+        /* Show Go Live Button and Label on Mobile */
+        @media (max-width: 768px) {
+            .go-live-button,
+            label[for="go-live-button"] {
+                display: block; /* Show on mobile screens */
+                width: 100%; /* Ensure full width */
+            }
+        }
+
+        /* Uploaded Files List */
+        .uploaded-files-list {
+            list-style-type: none; /* Remove default list styling */
+            padding: 0;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #333;
+            max-width: 100%; /* Ensure the list stays within the container */
+            word-wrap: break-word; /* Break long words to prevent overflow */
+        }
+
+        .uploaded-files-list li {
+            background-color: #f4f4f9;
+            padding: 8px 10px;
+            margin-bottom: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px; /* Add spacing between file name and size */
+        }
+
+        .uploaded-files-list li span {
+            font-weight: bold;
+            color: #00235f;
+            max-width: 70%; /* Limit the width of the file name */
+            overflow: hidden;
+            text-overflow: ellipsis; /* Add ellipsis for long file names */
+            white-space: nowrap; /* Prevent wrapping */
         }
 
         /* Microphone and Submit Button Container */
@@ -276,6 +369,7 @@
             flex-direction: column;
             align-items: center;
             gap: 5px;
+            margin-bottom: -25px;
             width: 100%; /* Ensure full width for centering */
         }
 
@@ -325,6 +419,7 @@
             text-align: center;
             width: 100%; /* Full width on all screens initially */
             box-sizing: border-box;
+            font-size: 1rem; /* Match font size with Go Live button */
         }
 
         .submit-button:hover {
@@ -437,6 +532,30 @@
                 align-items: flex-start;
             }
         }
+
+        /* Center the project form on larger screens */
+        @media (min-width: 769px) {
+            .project-form {
+                max-width: 800px; /* Set a maximum width for the form */
+                margin: 0 auto; /* Center the form horizontally */
+            }
+
+            .content-header {
+                max-width: 800px; /* Match the max-width of the project form */
+                margin: 0 auto;/* Center horizontally */
+                padding: 15px 20px; /* Maintain padding */
+            }
+
+            .dashboard-section {
+                max-width: 800px; /* Match the max-width of the project form */
+                margin: 0 auto; /* Center horizontally */
+            }
+
+            .main-footer {
+                max-width: 800px; /* Match the max-width of the project form */
+                margin: 0 auto; /* Center horizontally */
+            }
+        }
     </style>
 </head>
 <body>
@@ -470,8 +589,23 @@
                     <input type="text" id="project-title" name="project-title" placeholder="Enter project title" required>
                 </div>
                 <div>
+                    <label for="video-category">Video Category</label>
+                    <select id="video-category" name="video-category" required>
+                        <option value="" disabled selected>Select a category</option>
+                        <option value="youtube-video">YouTube Video</option>
+                        <option value="youtube-short">YouTube Short</option>
+                        <option value="tiktok-video">TikTok Video</option>
+                        <option value="instagram-reel">Instagram Reel</option>
+                        <option value="documentary">Documentary</option>
+                        <option value="trailer">Trailer</option>
+                        <option value="corporate-video">Corporate Video</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div>
                     <label for="project-files">Upload Files</label>
-                    <input type="file" id="project-files" name="project-files" multiple required>
+                    <input type="file" id="project-files" name="project-files" multiple required accept="video/*">
+                    <ul id="uploaded-files-list" class="uploaded-files-list"></ul> <!-- List to display uploaded files -->
                 </div>
                 <div>
                     <label for="project-description">Project Instructions</label>
@@ -484,6 +618,10 @@
                             <i class="fas fa-microphone"></i>
                         </button>
                         <div id="audio-container"></div>
+                    </div>
+                    <div>
+                        <label for="go-live-button">Go Live</label>
+                        <button id="go-live-button" class="go-live-button">Start Live Recording</button>
                     </div>
                     <button class="submit-button" type="submit">Submit Project</button>
                 </div>
@@ -510,47 +648,176 @@
         const hamburger = document.querySelector('.hamburger');
         const sidebar = document.querySelector('.sidebar');
         const mainContent = document.querySelector('.main-content');
-        const microphoneTitle = document.querySelector('.microphone-title');
 
         hamburger.addEventListener('click', () => {
             if (window.innerWidth > 768) {
-                sidebar.classList.toggle('expanded-desktop');mainContent.classList.toggle('expanded-desktop');
-                isDesktopExpanded = !isDesktopExpanded;
-                adjustMicrophoneTitle();
+                sidebar.classList.toggle('expanded-desktop');
+                mainContent.classList.toggle('expanded-desktop');
             } else {
                 sidebar.classList.toggle('open');
                 mainContent.classList.toggle('collapsed');
-                adjustMicrophoneTitle();
+            }
+
+            // Toggle the icon between hamburger and X
+            if (hamburger.classList.contains('fa-bars')) {
+                hamburger.classList.remove('fa-bars');
+                hamburger.classList.add('fa-times'); // Change to X icon
+            } else {
+                hamburger.classList.remove('fa-times');
+                hamburger.classList.add('fa-bars'); // Change back to hamburger icon
             }
         });
 
-        function setInitialSidebarState() {
-            if (window.innerWidth > 768) {
-                sidebar.classList.remove('open'); // Ensure mobile class is not active
-                mainContent.classList.remove('collapsed'); // Ensure mobile class is not active
-                sidebar.classList.add('collapsed-desktop'); // Initially collapsed on desktop
-                mainContent.classList.add('collapsed-desktop');
-                adjustMicrophoneTitle();
-            } else {
-                sidebar.classList.remove('expanded-desktop'); // Ensure desktop class is not active
-                mainContent.classList.remove('expanded-desktop');
-                sidebar.classList.remove('open'); // Initially hidden on mobile
-                mainContent.classList.add('collapsed'); // Initially full width on mobile
-                adjustMicrophoneTitle();
-            }
-        }
+        const fileInput = document.getElementById('project-files');
+        const uploadedFilesList = document.getElementById('uploaded-files-list');
+        const goLiveButton = document.getElementById('go-live-button');
+        let isFirstUpload = true; // Track if this is the first upload
 
-        function adjustMicrophoneTitle() {
-            if (window.innerWidth > 768 && sidebar.classList.contains('expanded-desktop')) {
-                microphoneTitle.style.textAlign = 'left';
-            } else {
-                microphoneTitle.style.textAlign = 'center';
-            }
-        }
+        fileInput.addEventListener('change', (event) => {
+            const files = Array.from(event.target.files); // Convert FileList to an array
 
-        // Call on initial load and resize
-        setInitialSidebarState();
-        window.addEventListener('resize', setInitialSidebarState);
+            // Notify the user on the first upload
+            if (isFirstUpload) {
+                alert('Please upload your files in the chronological order that the edited video should take.');
+                isFirstUpload = false; // Set to false after the first notification
+            }
+
+            // Validate file types
+            files.forEach((file) => {
+                if (!file.type.startsWith('video/')) {
+                    alert(`Error: ${file.name} is not a valid video file. We only accept video formats.`);
+                    return;
+                }
+
+                // Add valid files to the top of the list
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `
+                    <span>${file.name}</span> (${(file.size / 1024).toFixed(2)} KB)
+                    <button class="delete-file-button">Delete</button>
+                `;
+                uploadedFilesList.prepend(listItem); // Add new files to the top
+
+                // Add event listener to the delete button
+                const deleteButton = listItem.querySelector('.delete-file-button');
+                deleteButton.addEventListener('click', () => {
+                    listItem.remove(); // Remove the file from the list
+                });
+            });
+
+            // Clear the file input to allow re-uploading the same files
+            fileInput.value = '';
+        });
+
+        // Handle "Go Live" button click
+        let mediaRecorder;
+        let recordedChunks = [];
+        let videoStream;
+
+        goLiveButton.addEventListener('click', async () => {
+            // Check if the browser supports getUserMedia
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                alert('Your browser does not support camera access. Please update your browser or use a modern browser.');
+                return;
+            }
+
+            // Notify the user about camera usage
+            const consent = confirm('We will use your camera to record footage. Do you consent?');
+            if (!consent) {
+                alert('Camera access denied. Unable to start live recording.');
+                return;
+            }
+
+            try {
+                // Request access to the user's camera
+                videoStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+
+                // Display the video stream in a video element
+                const videoElement = document.createElement('video');
+                videoElement.srcObject = videoStream;
+                videoElement.controls = false;
+                videoElement.autoplay = true;
+                videoElement.style.width = '100%';
+                videoElement.style.marginTop = '10px';
+                document.body.appendChild(videoElement);
+
+                // Initialize MediaRecorder to record the video
+                mediaRecorder = new MediaRecorder(videoStream);
+                recordedChunks = [];
+
+                // Collect recorded data
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) {
+                        recordedChunks.push(event.data);
+                    }
+                };
+
+                // Handle recording stop
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(recordedChunks, { type: 'video/webm' });
+                    const videoURL = URL.createObjectURL(blob);
+
+                    // Provide the recorded video for download
+                    const downloadLink = document.createElement('a');
+                    downloadLink.href = videoURL;
+                    downloadLink.download = 'recorded-video.webm';
+                    downloadLink.textContent = 'Download Recorded Video';
+                    downloadLink.style.display = 'block';
+                    downloadLink.style.marginTop = '10px';
+                    document.body.appendChild(downloadLink);
+
+                    // Stop the video stream
+                    videoStream.getTracks().forEach((track) => track.stop());
+                };
+
+                // Start recording
+                mediaRecorder.start();
+                alert('Recording started. You can switch cameras if needed.');
+
+                // Add a button to switch cameras
+                const switchCameraButton = document.createElement('button');
+                switchCameraButton.textContent = 'Switch Camera';
+                switchCameraButton.style.marginTop = '10px';
+                document.body.appendChild(switchCameraButton);
+
+                switchCameraButton.addEventListener('click', async () => {
+                    const currentVideoTrack = videoStream.getVideoTracks()[0];
+                    const constraints = {
+                        video: {
+                            facingMode: currentVideoTrack.getSettings().facingMode === 'user' ? { exact: 'environment' } : 'user',
+                        },
+                        audio: true,
+                    };
+
+                    // Stop the current video track
+                    currentVideoTrack.stop();
+
+                    // Get a new video stream with the switched camera
+                    const newStream = await navigator.mediaDevices.getUserMedia(constraints);
+                    const newVideoTrack = newStream.getVideoTracks()[0];
+                    videoStream.removeTrack(currentVideoTrack);
+                    videoStream.addTrack(newVideoTrack);
+
+                    // Update the video element with the new stream
+                    videoElement.srcObject = videoStream;
+                });
+
+                // Add a button to stop recording
+                const stopRecordingButton = document.createElement('button');
+                stopRecordingButton.textContent = 'Stop Recording';
+                stopRecordingButton.style.marginTop = '10px';
+                document.body.appendChild(stopRecordingButton);
+
+                stopRecordingButton.addEventListener('click', () => {
+                    mediaRecorder.stop();
+                    videoElement.remove();
+                    switchCameraButton.remove();
+                    stopRecordingButton.remove();
+                    alert('Recording stopped.');
+                });
+            } catch (error) {
+                alert('Error accessing camera: ' + error.message);
+            }
+        });
     </script>
 </body>
 </html>

@@ -43,34 +43,31 @@
            <h2 class="hero-heading-two">and Professional Edits</h2>
         </div>
     </section>
-    <section class="about-us">
-    <div class="about-us-content">
-        <h2>Our Services</h2>
-        <p>
-            At Clip-Pilot, we specialize in delivering high-quality video editing services tailored to your unique needs. Whether you're a content creator, a business, or an individual, we have the expertise to breathe life into your projects, delivering cinematic quality with every cut.
-        <p>
-            Our services include editing videos for:
-        </p>
-        <ul>
-            <li><strong>Social Media:</strong> Engaging content for Reels, TikTok, Shorts, Facebook, and more.</li>
-            <li><strong>YouTube:</strong> Professional edits for vlogs, tutorials, long-form videos, and trailers.</li>
-            <li><strong>Corporate:</strong> High-quality editing for presentations, training materials, and marketing videos.</li>
-            <li><strong>Documentaries:</strong> Skilled editing to craft compelling narratives.</li>
-            <li><strong>Advertising & Marketing:</strong> Attention-grabbing edited ads to promote your brand.</li>
-            <li><strong>Promotional:</strong> Editing for product demos, announcements, and events.</li>
-            <li><strong>Educational:</strong> Clear and concise editing for online learning materials.</li>
-            <li><strong>Event Coverage:</strong> Seamless editing of conferences, workshops, and live events.</li>
-            <li><strong>Personal Projects:</strong> Editing for vlogs, creative content, and more.</li>
-        </ul>
-        <p>
-            From social media content to corporate projects, our team of experienced editors ensures precision, creativity, and timely delivery. Let us help you create impactful video experiences that captivate your audience.
-        </p>
+    <section class="services-section">
+        <h2 class="services-heading">Our Services</h2>
+        <div class="services-carousel-wrapper">
+            <button class="services-carousel-button prev">&lt;</button>
+            <div class="services-carousel">
+                <div class="services-card">
+                    <h3>YouTube</h3>
+                    <p>Professional edits for vlogs, tutorials, long-form videos, and trailers.</p>
+                </div>
+                <div class="services-card">
+                    <h3>Social Media</h3>
+                    <p>Engaging content for Reels, TikTok, Shorts, Facebook, and more.</p>
+                </div>
+                <div class="services-card">
+                    <h3>Corporate</h3>
+                    <p>High-quality editing for presentations, training materials, and marketing videos.</p>
+                </div>
+            </div>
+            <button class="services-carousel-button next">&gt;</button>
+        </div>
         <div class="about-us-buttons">
             <a href="login.html"><button class="hire-talent-button">Hire Talent</button></a>
             <a href="editor_signup.html"><button class="join-editor-button">Join as Editor</button></a>
         </div>
-    </div>
-</section>
+    </section>
 
     <section class="hero-image-section">
         <div class="hero-text-group-left">
@@ -128,19 +125,25 @@
             <h3>Basic - $25</h3>
             <p>1-3 min video</p>
             <p>Simple cuts, captions</p>
-            <a href="login.html"><span class="price">Start Now</span></a>
+            <a href="login.html">
+                <button class="start-now-button">Start Now</button>
+            </a>
         </div>
         <div class="pricing-card">
             <h3>Standard - $50</h3>
             <p>3-7 min video</p>
             <p>More editing, music, transitions</p>
-            <a href="login.html"><span class="price">Start Now</span></a>
+            <a href="login.html">
+                <button class="start-now-button">Start Now</button>
+            </a>
         </div>
         <div class="pricing-card">
             <h3>Premium - $150</h3>
             <p>7+ min video</p>
             <p>Heavy editing, effects, voiceover</p>
-            <a href="login.html"><span class="price">Start Now</span></a>
+            <a href="login.html">
+                <button class="start-now-button">Start Now</button>
+            </a>
         </div>
     </div>
     <button class="carousel-button prev">&lt;</button>
@@ -439,6 +442,67 @@
             // Initial layout update
             updateTestimonialLayout();
         }
+
+        // --- Services Carousel Logic ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const servicesCarousel = document.querySelector('.services-carousel');
+            const servicesPrevButton = document.querySelector('.services-carousel-button.prev');
+            const servicesNextButton = document.querySelector('.services-carousel-button.next');
+            const servicesCards = document.querySelectorAll('.services-card');
+
+            let currentServiceIndex = 0;
+
+            function updateServicesCarousel() {
+                const cardWidth = servicesCards[0].offsetWidth; // Card width
+                servicesCarousel.scrollTo({
+                    left: currentServiceIndex * cardWidth,
+                    behavior: 'smooth',
+                });
+            }
+
+            function nextServiceCard() {
+                if (currentServiceIndex < servicesCards.length - 1) {
+                    currentServiceIndex++;
+                    updateServicesCarousel();
+                }
+            }
+
+            function prevServiceCard() {
+                if (currentServiceIndex > 0) {
+                    currentServiceIndex--;
+                    updateServicesCarousel();
+                }
+            }
+
+            servicesNextButton.addEventListener('click', nextServiceCard);
+            servicesPrevButton.addEventListener('click', prevServiceCard);
+
+            // Enable swipe functionality on mobile
+            let startX = 0;
+            let isDragging = false;
+
+            servicesCarousel.addEventListener('touchstart', (e) => {
+                startX = e.touches[0].clientX;
+                isDragging = true;
+            });
+
+            servicesCarousel.addEventListener('touchmove', (e) => {
+                if (!isDragging) return;
+                const diffX = startX - e.touches[0].clientX;
+
+                if (diffX > 50) {
+                    nextServiceCard();
+                    isDragging = false;
+                } else if (diffX < -50) {
+                    prevServiceCard();
+                    isDragging = false;
+                }
+            });
+
+            servicesCarousel.addEventListener('touchend', () => {
+                isDragging = false;
+            });
+        });
     </script>
 </body>
 </html>
