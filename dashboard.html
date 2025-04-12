@@ -100,6 +100,21 @@
             margin-bottom: 30px;
         }
 
+        /* Sidebar Title Styles */
+        .sidebar-title {
+            font-size: 1.5rem;
+            color: white;
+            text-align: center;
+            margin-bottom: 20px; /* Add spacing below the title */
+            display: none; /* Hidden by default for collapsed sidebar */
+        }
+
+        /* Show the title when the sidebar is expanded */
+        .sidebar.expanded-desktop .sidebar-title,
+        .sidebar.open .sidebar-title {
+            display: block; /* Show the title when expanded */
+        }
+
         .sidebar a {
             text-decoration: none;
             color: white;
@@ -425,13 +440,13 @@
 <body>
     <div class="main-header">
         <i class="fas fa-bars hamburger"></i>
-        <h1>Clip-Pilot</h1>
         <a href="index.html" class="logout"><i class="fas fa-sign-out-alt"></i></a>
     </div>
 
     <div class="sidebar collapsed-desktop">
+        <h1 class="sidebar-title">Clip-Pilot</h1> <!-- Added title -->
         <a href="#" class="active"><i class="fas fa-home"></i> <span>Dashboard</span></a>
-        <a href="#"><i class="fas fa-upload"></i> <span>Previous Project</span></a>
+        <a href="#"><i class="fas fa-upload"></i> <span>Previous Projects</span></a>
         <a href="#"><i class="fas fa-envelope"></i> <span>Messages</span></a>
         <a href="#"><i class="fas fa-cog"></i> <span>Settings</span></a>
         <a href="#"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a>
