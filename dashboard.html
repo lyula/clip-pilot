@@ -804,30 +804,30 @@
     
                     const recordingIndicator = document.createElement('div');
                     Object.assign(recordingIndicator.style, {
-                            position: 'absolute',
-                            top: '10px',
-                            left: '50%',
-                            transform: 'translateX(-50%)',
-                            color: 'red',
-                            fontWeight: 'bold',
-                            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                            padding: '5px 10px',
-                            borderRadius: '5px',
-                            animation: 'blink 1s infinite',
-                            zIndex: '10'
-                        });
-                        recordingIndicator.textContent = '● Recording - 00:00';
-                        liveContainer.appendChild(recordingIndicator);
-
-                        const style = document.createElement('style');
-                        style.innerHTML = `
-                            @keyframes blink {
-                                0% { opacity: 1; }
-                                50% { opacity: 0; }
-                                100% { opacity: 1; }
-                            }
-                        `;
-                        document.head.appendChild(style);
+                        position: 'absolute',
+                        top: '10px',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        color: 'red',
+                        fontWeight: 'bold',
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                        padding: '5px 10px',
+                        borderRadius: '5px',
+                        animation: 'blink 1s infinite',
+                        zIndex: '10'
+                    });
+                    recordingIndicator.textContent = '● Recording - 00:00';
+                    liveContainer.appendChild(recordingIndicator);
+    
+                    const style = document.createElement('style');
+                    style.innerHTML = `
+                        @keyframes blink {
+                            0% { opacity: 1; }
+                            50% { opacity: 0; }
+                            100% { opacity: 1; }
+                        }
+                    `;
+                    document.head.appendChild(style);
     
                     let startTime = Date.now();
                     const updateDuration = () => {
@@ -864,66 +864,76 @@
                     });
                     buttonContainer.appendChild(stopRecordingButton);
     
-                    // Create the switch camera button first
                     const switchCameraButton = document.createElement('button');
-                        switchCameraButton.innerHTML = '<i class="fas fa-sync-alt"></i>';
-                        Object.assign(switchCameraButton.style, {
-                            backgroundColor: '#003087',
-                            color: 'white',
-                            border: 'none',
-                            padding: '10px',
-                            borderRadius: '50%',
-                            cursor: 'pointer'
-                        });
-                        buttonContainer.appendChild(switchCameraButton);
-
-                        switchCameraButton.addEventListener('click', async () => {
+                    switchCameraButton.innerHTML = '<i class="fas fa-sync-alt"></i>';
+                    Object.assign(switchCameraButton.style, {
+                        backgroundColor: '#003087',
+                        color: 'white',
+                        border: 'none',
+                        padding: '10px',
+                        borderRadius: '50%',
+                        cursor: 'pointer'
+                    });
+                    buttonContainer.appendChild(switchCameraButton);
+    
+                    switchCameraButton.addEventListener('click', async () => {
                         try {
                             const devices = await navigator.mediaDevices.enumerateDevices();
                             const videoDevices = devices.filter((d) => d.kind === 'videoinput');
-
+    
                             if (videoDevices.length < 2) {
                                 alert('Only one camera available.');
                                 return;
                             }
-
+    
                             const currentTrack = videoStream.getVideoTracks()[0];
                             const currentId = currentTrack.getSettings().deviceId;
-                            const nextIndex = (videoDevices.findIndex(d => d.deviceId === currentId) + 1) % videoDevices.length;
+                            const currentIndex = videoDevices.findIndex(d => d.deviceId === currentId);
+                            const nextIndex = (currentIndex + 1) % videoDevices.length;
                             const nextDeviceId = videoDevices[nextIndex].deviceId;
-
-                            // Stop current video track (but keep audio)
+    
+                            // Stop the current video track
                             currentTrack.stop();
-
-                            // ⏱ Add delay for mobile devices to release the camera
+    
+                            // Wait briefly to ensure the camera is released
                             await new Promise(resolve => setTimeout(resolve, 300));
-
-                            // Request new video track from the next camera
+    
+                            // Get a new stream with the next camera
                             const newStream = await navigator.mediaDevices.getUserMedia({
-                                video: { deviceId: { exact: nextDeviceId } }
+                                video: { deviceId: { exact: nextDeviceId } },
+                                audio: videoStream.getAudioTracks()[0] ? { deviceId: videoStream.getAudioTracks()[0].getSettings().deviceId } : true
                             });
-
-                            const newVideoTrack = newStream.getVideoTracks()[0];
-
-                            // Remove old video track and add the new one to the existing stream
+    
+                            // Replace the video track in the existing stream
                             videoStream.removeTrack(currentTrack);
-                            videoStream.addTrack(newVideoTrack);
-
-                            // Update the video element (keep same stream)
+                            videoStream.addTrack(newStream.getVideoTracks()[0]);
+    
+                            // Keep audio track if it exists
+                            if (videoStream.getAudioTracks().length === 0 && newStream.getAudioTracks().length > 0) {
+                                videoStream.addTrack(newStream.getAudioTracks()[0]);
+                            }
+    
+                            // Update the video element
                             videoElement.srcObject = videoStream;
-
-                            // MediaRecorder continues using updated tracks from the same stream
-
+    
+                            // If recording, update MediaRecorder to use the new stream
+                            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                                mediaRecorder.stop();
+                                mediaRecorder = new MediaRecorder(videoStream);
+                                mediaRecorder.ondataavailable = (event) => {
+                                    if (event.data.size > 0) {
+                                        recordedChunks.push(event.data);
+                                    }
+                                };
+                                mediaRecorder.onstop = mediaRecorder.onstop; // Preserve the original onstop handler
+                                mediaRecorder.start();
+                            }
+    
                         } catch (err) {
                             alert('Error switching cameras: ' + err.message);
                             console.error(err);
                         }
                     });
-
-
-
-
-
     
                     const shareScreenButton = document.createElement('button');
                     shareScreenButton.textContent = 'Share Screen';
@@ -944,6 +954,9 @@
                             videoElement.srcObject = videoStream;
                             shareScreenButton.textContent = 'Share Screen';
                             isScreenSharing = false;
+                            if (screenStream) {
+                                screenStream.getTracks().forEach(track => track.stop());
+                            }
                         } else {
                             try {
                                 screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
@@ -970,68 +983,60 @@
                     };
     
                     mediaRecorder.onstop = () => {
-    clearInterval(durationInterval);
-    const blob = new Blob(recordedChunks, { type: 'video/webm' });
-    const videoURL = URL.createObjectURL(blob);
-
-    const username = 'username'; // Replace with dynamic value as needed
-    const date = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
-    const filename = `Clip-Pilot-media-${username}-${date}.webm`;
-    const fileSize = (blob.size / (1024 * 1024)).toFixed(2); // MB
-
-    const listItem = document.createElement('li');
-    listItem.innerHTML = `
-        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; position: relative;">
-            <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${filename}">
-                ${filename}
-            </span>
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <span style="font-size: 0.85em; color: #555;">${fileSize} MB</span>
-                <button class="menu-toggle-button" style="background: none; border: none; font-size: 20px; cursor: pointer;">⋮</button>
-            </div>
-        </div>
-        <div class="file-options-dropdown" style="display: none; position: absolute; right: 10px; top: 100%; margin-top: 5px; background: #f9f9f9; border: 1px solid #ccc; border-radius: 5px; padding: 10px; z-index: 10;">
-            <a href="${videoURL}" download="${filename}">
-                <button>Download</button>
-            </a>
-            <button class="delete-file-button">Delete</button>
-        </div>
-    `;
-    listItem.style.cssText = 'position: relative; padding: 10px; margin: 5px 0; border: 1px solid #ccc; border-radius: 5px; background-color: #f4f4f9;';
-    uploadedFilesList.prepend(listItem);
-
-    const dropdown = listItem.querySelector('.file-options-dropdown');
-    const toggleButton = listItem.querySelector('.menu-toggle-button');
-    const nextSibling = listItem.nextElementSibling;
-
-    toggleButton.addEventListener('click', () => {
-        // Toggle dropdown visibility
-        if (dropdown.style.display === 'block') {
-            dropdown.style.display = 'none';
-
-            // Reset the margin of the next sibling element
-            if (nextSibling) {
-                nextSibling.style.marginTop = '';
-            }
-        } else {
-            dropdown.style.display = 'block';
-
-            // Adjust margin of the next sibling element to avoid overlap
-            if (nextSibling) {
-                nextSibling.style.marginTop = `${dropdown.offsetHeight + 10}px`;
-            }
-        }
-    });
-
-    listItem.querySelector('.delete-file-button').addEventListener('click', () => listItem.remove());
-
-    videoStream.getTracks().forEach(track => track.stop());
-    liveContainer.remove();
-    isRecording = false;
-};
-
-
-
+                        clearInterval(durationInterval);
+                        const blob = new Blob(recordedChunks, { type: 'video/webm' });
+                        const videoURL = URL.createObjectURL(blob);
+    
+                        const username = 'username'; // Replace with dynamic value as needed
+                        const date = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
+                        const filename = `Clip-Pilot-media-${username}-${date}.webm`;
+                        const fileSize = (blob.size / (1024 * 1024)).toFixed(2); // MB
+    
+                        const listItem = document.createElement('li');
+                        listItem.innerHTML = `
+                            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; position: relative;">
+                                <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${filename}">
+                                    ${filename}
+                                </span>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <span style="font-size: 0.85em; color: #555;">${fileSize} MB</span>
+                                    <button class="menu-toggle-button" style="background: none; border: none; font-size: 20px; cursor: pointer;">⋮</button>
+                                </div>
+                            </div>
+                            <div class="file-options-dropdown" style="display: none; position: absolute; right: 10px; top: 100%; margin-top: 5px; background: #f9f9f9; border: 1px solid #ccc; border-radius: 5px; padding: 10px; z-index: 10;">
+                                <a href="${videoURL}" download="${filename}">
+                                    <button>Download</button>
+                                </a>
+                                <button class="delete-file-button">Delete</button>
+                            </div>
+                        `;
+                        listItem.style.cssText = 'position: relative; padding: 10px; margin: 5px 0; border: 1px solid #ccc; border-radius: 5px; background-color: #f4f4f9;';
+                        uploadedFilesList.prepend(listItem);
+    
+                        const dropdown = listItem.querySelector('.file-options-dropdown');
+                        const toggleButton = listItem.querySelector('.menu-toggle-button');
+                        const nextSibling = listItem.nextElementSibling;
+    
+                        toggleButton.addEventListener('click', () => {
+                            if (dropdown.style.display === 'block') {
+                                dropdown.style.display = 'none';
+                                if (nextSibling) {
+                                    nextSibling.style.marginTop = '';
+                                }
+                            } else {
+                                dropdown.style.display = 'block';
+                                if (nextSibling) {
+                                    nextSibling.style.marginTop = `${dropdown.offsetHeight + 10}px`;
+                                }
+                            }
+                        });
+    
+                        listItem.querySelector('.delete-file-button').addEventListener('click', () => listItem.remove());
+    
+                        videoStream.getTracks().forEach(track => track.stop());
+                        liveContainer.remove();
+                        isRecording = false;
+                    };
     
                     stopRecordingButton.addEventListener('click', () => {
                         mediaRecorder.stop();
