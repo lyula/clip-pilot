@@ -740,15 +740,17 @@
                 // Create a container for the live video and controls
                 const liveContainer = document.createElement('div');
                 liveContainer.style.position = 'fixed';
-                liveContainer.style.top = '10px';
+                liveContainer.style.top = '50%';
                 liveContainer.style.left = '50%';
-                liveContainer.style.transform = 'translateX(-50%)';
+                liveContainer.style.transform = 'translate(-50%, -50%)';
                 liveContainer.style.zIndex = '1000';
                 liveContainer.style.backgroundColor = 'white';
                 liveContainer.style.border = '3px solid #00235f';
                 liveContainer.style.borderRadius = '8px';
                 liveContainer.style.padding = '10px';
                 liveContainer.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
+                liveContainer.style.width = '80%';
+                liveContainer.style.maxWidth = '800px';
                 document.body.appendChild(liveContainer);
 
                 // Display the video stream in a video element
@@ -825,17 +827,39 @@
                     // Generate a file name
                     const username = 'user'; // Replace with the actual username
                     const date = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
-                    const fileName = `clip-pilot-${username}-${date}.webm`;
+                    const fileName = `clip-pilot-media-${username}-${date}.webm`;
 
                     // Create a styled list item for the recorded file
                     const listItem = document.createElement('li');
                     listItem.innerHTML = `
                         <span>${fileName}</span> (${(blob.size / 1024).toFixed(2)} KB)
-                        <button class="delete-file-button">Delete</button>
+                        <div class="file-options">
+                            <button class="options-button">⋮</button>
+                            <div class="options-menu" style="display: none;">
+                                <button class="download-file-button">Download</button>
+                                <button class="delete-file-button">Delete</button>
+                            </div>
+                        </div>
                     `;
                     uploadedFilesList.prepend(listItem);
 
-                    // Add event listener to the delete button
+                    // Add functionality to the options button
+                    const optionsButton = listItem.querySelector('.options-button');
+                    const optionsMenu = listItem.querySelector('.options-menu');
+                    optionsButton.addEventListener('click', () => {
+                        optionsMenu.style.display = optionsMenu.style.display === 'none' ? 'block' : 'none';
+                    });
+
+                    // Add functionality to the download button
+                    const downloadButton = listItem.querySelector('.download-file-button');
+                    downloadButton.addEventListener('click', () => {
+                        const a = document.createElement('a');
+                        a.href = videoURL;
+                        a.download = fileName;
+                        a.click();
+                    });
+
+                    // Add functionality to the delete button
                     const deleteButton = listItem.querySelector('.delete-file-button');
                     deleteButton.addEventListener('click', () => {
                         listItem.remove();
