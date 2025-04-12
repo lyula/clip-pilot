@@ -865,60 +865,66 @@
                     buttonContainer.appendChild(stopRecordingButton);
     
                     // Create the switch camera button first
-                            const switchCameraButton = document.createElement('button');
-                            switchCameraButton.innerHTML = '<i class="fas fa-sync-alt"></i>';
-                            Object.assign(switchCameraButton.style, {
-                                backgroundColor: '#003087',
-                                color: 'white',
-                                border: 'none',
-                                padding: '10px',
-                                borderRadius: '50%',
-                                cursor: 'pointer'
-                            });
-                            buttonContainer.appendChild(switchCameraButton);
+                    const switchCameraButton = document.createElement('button');
+                        switchCameraButton.innerHTML = '<i class="fas fa-sync-alt"></i>';
+                        Object.assign(switchCameraButton.style, {
+                            backgroundColor: '#003087',
+                            color: 'white',
+                            border: 'none',
+                            padding: '10px',
+                            borderRadius: '50%',
+                            cursor: 'pointer'
+                        });
+                        buttonContainer.appendChild(switchCameraButton);
 
-                            // Add event listener for switching camera
-                            switchCameraButton.addEventListener('click', async () => {
-                                try {
-                                    const devices = await navigator.mediaDevices.enumerateDevices();
-                                    const videoDevices = devices.filter((d) => d.kind === 'videoinput');
-                                    
-                                    if (videoDevices.length < 2) {
-                                        alert('Only one camera available.');
-                                        return;
-                                    }
+                        switchCameraButton.addEventListener('click', async () => {
+                            try {
+                                const devices = await navigator.mediaDevices.enumerateDevices();
+                                const videoDevices = devices.filter((d) => d.kind === 'videoinput');
 
-                                    const currentTrack = videoStream.getVideoTracks()[0];
-                                    const currentId = currentTrack.getSettings().deviceId;
-                                    const nextIndex = (videoDevices.findIndex(d => d.deviceId === currentId) + 1) % videoDevices.length;
-
-                                    // Get new video track (front/back)
-                                    const newVideoStream = await navigator.mediaDevices.getUserMedia({
-                                        video: { deviceId: { exact: videoDevices[nextIndex].deviceId } }
-                                    });
-
-                                    const newVideoTrack = newVideoStream.getVideoTracks()[0];
-
-                                    // Stop old track and replace it in the active stream
-                                    const oldVideoTrack = videoStream.getVideoTracks()[0];
-                                    oldVideoTrack.stop();
-
-                                    // If MediaRecorder is recording, keep the same stream and just update the track
-                                    videoStream.removeTrack(oldVideoTrack);
-                                    videoStream.addTrack(newVideoTrack);
-
-                                    const audioTracks = videoStream.getAudioTracks();
-                                    const newStream = new MediaStream([newVideoTrack, ...audioTracks]);
-
-                                    videoStream = newStream;
-                                    videoElement.srcObject = newStream;
-
-                                    // ✅ If you're using MediaRecorder, it will continue to record with new stream
-                                } catch (err) {
-                                    alert('Error switching cameras: ' + err.message);
-                                    console.error(err);
+                                if (videoDevices.length < 2) {
+                                    alert('Only one camera available.');
+                                    return;
                                 }
-                            });
+
+                                const currentTrack = videoStream.getVideoTracks()[0];
+                                const currentId = currentTrack.getSettings().deviceId;
+
+                                const nextIndex = (videoDevices.findIndex(d => d.deviceId === currentId) + 1) % videoDevices.length;
+                                const nextDeviceId = videoDevices[nextIndex].deviceId;
+
+                                // Stop current video track (but keep audio)
+                                currentTrack.stop();
+
+                                // 🔄 Wait a bit for hardware to release camera (especially on mobile)
+                                await new Promise(resolve => setTimeout(resolve, 300));
+
+                                // Get a new video stream from the new camera
+                                const newStream = await navigator.mediaDevices.getUserMedia({
+                                    video: { deviceId: { exact: nextDeviceId } },
+                                    audio: true // include audio to keep same recording stream
+                                });
+
+                                const newVideoTrack = newStream.getVideoTracks()[0];
+
+                                // Replace video track in the existing MediaStream
+                                videoStream.removeTrack(currentTrack);
+                                videoStream.addTrack(newVideoTrack);
+
+                                // Update video element
+                                const audioTracks = videoStream.getAudioTracks();
+                                const combinedStream = new MediaStream([newVideoTrack, ...audioTracks]);
+
+                                videoStream = combinedStream;
+                                videoElement.srcObject = combinedStream;
+
+                                // MediaRecorder will continue if it was already running
+                            } catch (err) {
+                                alert('Error switching cameras: ' + err.message);
+                                console.error(err);
+                            }
+                        });
+
 
 
 
