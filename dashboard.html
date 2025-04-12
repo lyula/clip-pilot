@@ -892,42 +892,27 @@
                             const nextIndex = (currentIndex + 1) % videoDevices.length;
                             const nextDeviceId = videoDevices[nextIndex].deviceId;
     
-                            // Stop the current video track
+                            // Stop the current video track but keep the stream alive
                             currentTrack.stop();
     
                             // Wait briefly to ensure the camera is released
                             await new Promise(resolve => setTimeout(resolve, 300));
     
-                            // Get a new stream with the next camera
+                            // Get a new video track from the next camera
                             const newStream = await navigator.mediaDevices.getUserMedia({
-                                video: { deviceId: { exact: nextDeviceId } },
-                                audio: videoStream.getAudioTracks()[0] ? { deviceId: videoStream.getAudioTracks()[0].getSettings().deviceId } : true
+                                video: { deviceId: { exact: nextDeviceId } }
                             });
+    
+                            const newVideoTrack = newStream.getVideoTracks()[0];
     
                             // Replace the video track in the existing stream
                             videoStream.removeTrack(currentTrack);
-                            videoStream.addTrack(newStream.getVideoTracks()[0]);
+                            videoStream.addTrack(newVideoTrack);
     
-                            // Keep audio track if it exists
-                            if (videoStream.getAudioTracks().length === 0 && newStream.getAudioTracks().length > 0) {
-                                videoStream.addTrack(newStream.getAudioTracks()[0]);
-                            }
-    
-                            // Update the video element
+                            // Update the video element with the new stream
                             videoElement.srcObject = videoStream;
     
-                            // If recording, update MediaRecorder to use the new stream
-                            if (mediaRecorder && mediaRecorder.state === 'recording') {
-                                mediaRecorder.stop();
-                                mediaRecorder = new MediaRecorder(videoStream);
-                                mediaRecorder.ondataavailable = (event) => {
-                                    if (event.data.size > 0) {
-                                        recordedChunks.push(event.data);
-                                    }
-                                };
-                                mediaRecorder.onstop = mediaRecorder.onstop; // Preserve the original onstop handler
-                                mediaRecorder.start();
-                            }
+                            // No need to restart MediaRecorder; it will automatically use the updated stream
     
                         } catch (err) {
                             alert('Error switching cameras: ' + err.message);
