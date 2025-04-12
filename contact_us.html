@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - Clip-Pilot</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS file -->
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+        .main-header {
+            background-color: #003087;
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .main-header h1 {
+            margin: 0;
+            font-size: 2rem;
+        }
+
+        .contact-container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px; /* Add padding to prevent content from touching the edges */
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .contact-info h2,
+        .contact-form h2 {
+            color: #003087;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .contact-info p {
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .contact-info ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .contact-info ul li {
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+
+        .contact-info ul li strong {
+            color: #003087;
+        }
+
+        .contact-form {
+            padding: 0 10px; /* Add padding to the form to move inputs away from the edges */
+        }
+
+        .contact-form form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .contact-form label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .contact-form input,
+        .contact-form textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            box-sizing: border-box; /* Ensure padding doesn't affect width */
+        }
+
+        .contact-form input:focus,
+        .contact-form textarea:focus {
+            border-color: #003087;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 48, 135, 0.5);
+        }
+
+        .submit-button {
+            background-color: #003087;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            max-width: 200px; /* Limit the width of the button */
+        }
+
+        .submit-button:hover {
+            background-color: #002060;
+        }
+
+        .main-footer {
+            text-align: center;
+            padding: 10px 0;
+            background-color: #e0e0e0;
+            color: #333; /* Dark gray text for contrast */
+            margin-top: 20px;
+            font-size: 0.9rem;
+            border-top: 1px solid #ddd; /* Subtle border for separation */
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <h1>Contact Us</h1>
+    </header>
+
+    <main class="contact-container">
+        <section class="contact-info">
+            <h2>Get in Touch</h2>
+            <p>If you have any questions or need assistance, feel free to reach out to us using the form below or through the provided contact details.</p>
+            <ul>
+                <li><strong>Email:</strong> support@clip-pilot.com</li>
+                <li><strong>Phone:</strong> +1 (555) 123-4567</li>
+                <li><strong>Address:</strong> 00100, Lower Kabete Rd, Nairobi</li>
+            </ul>
+        </section>
+
+        <section class="contact-form">
+            <h2>Contact Form</h2>
+            <form action="submit_contact.php" method="POST">
+                <div>
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" name="name" placeholder="Your Name" required>
+                </div>
+                <div>
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" placeholder="Your Email" required>
+                </div>
+                <div>
+                    <label for="message">Message:</label>
+                    <textarea id="message" name="message" rows="5" placeholder="Your Message" required></textarea>
+                </div>
+                <button type="submit" class="submit-button">Send Message</button>
+            </form>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        &copy; 2025 Clip-Pilot. All rights reserved.
+    </footer>
+</body>
+</html>
