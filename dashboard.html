@@ -737,17 +737,29 @@
                 // Request access to the user's camera
                 videoStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
 
-                // Display the video stream in a video element above the project form
+                // Create a container for the live video and controls
+                const liveContainer = document.createElement('div');
+                liveContainer.style.position = 'fixed';
+                liveContainer.style.top = '10px';
+                liveContainer.style.left = '50%';
+                liveContainer.style.transform = 'translateX(-50%)';
+                liveContainer.style.zIndex = '1000';
+                liveContainer.style.backgroundColor = 'white';
+                liveContainer.style.border = '3px solid #00235f';
+                liveContainer.style.borderRadius = '8px';
+                liveContainer.style.padding = '10px';
+                liveContainer.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
+                document.body.appendChild(liveContainer);
+
+                // Display the video stream in a video element
                 const videoElement = document.createElement('video');
                 videoElement.srcObject = videoStream;
                 videoElement.controls = false;
                 videoElement.autoplay = true;
                 videoElement.style.width = '100%';
-                videoElement.style.marginBottom = '10px';
-                videoElement.style.border = '3px solid #00235f'; // Add border color
                 videoElement.style.borderRadius = '5px';
                 videoElement.style.cursor = 'pointer'; // Indicate clickable for full-screen
-                document.querySelector('.project-form').prepend(videoElement);
+                liveContainer.appendChild(videoElement);
 
                 // Add a red blinking recording icon
                 const recordingIndicator = document.createElement('div');
@@ -756,7 +768,7 @@
                 recordingIndicator.style.fontWeight = 'bold';
                 recordingIndicator.style.marginBottom = '10px';
                 recordingIndicator.style.animation = 'blink 1s infinite'; // Blinking effect
-                document.querySelector('.project-form').prepend(recordingIndicator);
+                liveContainer.prepend(recordingIndicator);
 
                 // Add blinking animation for the recording icon
                 const style = document.createElement('style');
@@ -768,6 +780,30 @@
                     }
                 `;
                 document.head.appendChild(style);
+
+                // Add a button to stop recording
+                const stopRecordingButton = document.createElement('button');
+                stopRecordingButton.textContent = 'Stop Recording';
+                stopRecordingButton.style.marginTop = '10px';
+                stopRecordingButton.style.backgroundColor = '#003087';
+                stopRecordingButton.style.color = 'white';
+                stopRecordingButton.style.border = 'none';
+                stopRecordingButton.style.padding = '10px 20px';
+                stopRecordingButton.style.borderRadius = '5px';
+                stopRecordingButton.style.cursor = 'pointer';
+                liveContainer.appendChild(stopRecordingButton);
+
+                // Add a button to switch cameras
+                const switchCameraButton = document.createElement('button');
+                switchCameraButton.textContent = 'Switch Camera';
+                switchCameraButton.style.marginTop = '10px';
+                switchCameraButton.style.backgroundColor = '#003087';
+                switchCameraButton.style.color = 'white';
+                switchCameraButton.style.border = 'none';
+                switchCameraButton.style.padding = '10px 20px';
+                switchCameraButton.style.borderRadius = '5px';
+                switchCameraButton.style.cursor = 'pointer';
+                liveContainer.appendChild(switchCameraButton);
 
                 // Initialize MediaRecorder to record the video
                 mediaRecorder = new MediaRecorder(videoStream);
@@ -808,8 +844,7 @@
 
                     // Stop the video stream
                     videoStream.getTracks().forEach((track) => track.stop());
-                    videoElement.remove();
-                    recordingIndicator.remove();
+                    liveContainer.remove();
                     isRecording = false; // Allow new recordings
                 };
 
@@ -817,21 +852,8 @@
                 mediaRecorder.start();
                 alert('Recording started. Click "Stop Recording" to finish.');
 
-                // Add a button to stop recording
-                const stopRecordingButton = document.createElement('button');
-                stopRecordingButton.textContent = 'Stop Recording';
-                stopRecordingButton.style.marginTop = '10px';
-                stopRecordingButton.style.backgroundColor = '#003087';
-                stopRecordingButton.style.color = 'white';
-                stopRecordingButton.style.border = 'none';
-                stopRecordingButton.style.padding = '10px 20px';
-                stopRecordingButton.style.borderRadius = '5px';
-                stopRecordingButton.style.cursor = 'pointer';
-                document.querySelector('.form-actions').appendChild(stopRecordingButton);
-
                 stopRecordingButton.addEventListener('click', () => {
                     mediaRecorder.stop();
-                    stopRecordingButton.remove();
                 });
 
                 // Allow the video to go full-screen when clicked
@@ -843,6 +865,29 @@
                     } else if (videoElement.msRequestFullscreen) { // IE/Edge
                         videoElement.msRequestFullscreen();
                     }
+                });
+
+                // Handle camera switching
+                switchCameraButton.addEventListener('click', async () => {
+                    const currentVideoTrack = videoStream.getVideoTracks()[0];
+                    const constraints = {
+                        video: {
+                            facingMode: currentVideoTrack.getSettings().facingMode === 'user' ? { exact: 'environment' } : 'user',
+                        },
+                        audio: true,
+                    };
+
+                    // Stop the current video track
+                    currentVideoTrack.stop();
+
+                    // Get a new video stream with the switched camera
+                    const newStream = await navigator.mediaDevices.getUserMedia(constraints);
+                    const newVideoTrack = newStream.getVideoTracks()[0];
+                    videoStream.removeTrack(currentVideoTrack);
+                    videoStream.addTrack(newVideoTrack);
+
+                    // Update the video element with the new stream
+                    videoElement.srcObject = videoStream;
                 });
             } catch (error) {
                 alert('Error accessing camera: ' + error.message);
