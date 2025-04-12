@@ -744,9 +744,30 @@
                 videoElement.autoplay = true;
                 videoElement.style.width = '100%';
                 videoElement.style.marginBottom = '10px';
-                videoElement.style.border = '1px solid #ccc';
+                videoElement.style.border = '3px solid #00235f'; // Add border color
                 videoElement.style.borderRadius = '5px';
+                videoElement.style.cursor = 'pointer'; // Indicate clickable for full-screen
                 document.querySelector('.project-form').prepend(videoElement);
+
+                // Add a red blinking recording icon
+                const recordingIndicator = document.createElement('div');
+                recordingIndicator.textContent = '● Recording';
+                recordingIndicator.style.color = 'red';
+                recordingIndicator.style.fontWeight = 'bold';
+                recordingIndicator.style.marginBottom = '10px';
+                recordingIndicator.style.animation = 'blink 1s infinite'; // Blinking effect
+                document.querySelector('.project-form').prepend(recordingIndicator);
+
+                // Add blinking animation for the recording icon
+                const style = document.createElement('style');
+                style.innerHTML = `
+                    @keyframes blink {
+                        0% { opacity: 1; }
+                        50% { opacity: 0; }
+                        100% { opacity: 1; }
+                    }
+                `;
+                document.head.appendChild(style);
 
                 // Initialize MediaRecorder to record the video
                 mediaRecorder = new MediaRecorder(videoStream);
@@ -788,6 +809,7 @@
                     // Stop the video stream
                     videoStream.getTracks().forEach((track) => track.stop());
                     videoElement.remove();
+                    recordingIndicator.remove();
                     isRecording = false; // Allow new recordings
                 };
 
@@ -810,6 +832,17 @@
                 stopRecordingButton.addEventListener('click', () => {
                     mediaRecorder.stop();
                     stopRecordingButton.remove();
+                });
+
+                // Allow the video to go full-screen when clicked
+                videoElement.addEventListener('click', () => {
+                    if (videoElement.requestFullscreen) {
+                        videoElement.requestFullscreen();
+                    } else if (videoElement.webkitRequestFullscreen) { // Safari
+                        videoElement.webkitRequestFullscreen();
+                    } else if (videoElement.msRequestFullscreen) { // IE/Edge
+                        videoElement.msRequestFullscreen();
+                    }
                 });
             } catch (error) {
                 alert('Error accessing camera: ' + error.message);
