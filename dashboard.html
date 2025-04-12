@@ -709,11 +709,23 @@
                     return;
                 }
 
-                // Add valid files to the top of the list
+                // Adjust the styles for the file options menu
                 const listItem = document.createElement('li');
+                listItem.style.display = 'flex';
+                listItem.style.justifyContent = 'space-between'; // Space between file name and buttons
+                listItem.style.alignItems = 'center';
+                listItem.style.padding = '10px'; // Add padding for better spacing
+                listItem.style.margin = '5px 0'; // Add margin between list items
+                listItem.style.border = '1px solid #ccc';
+                listItem.style.borderRadius = '5px';
+                listItem.style.backgroundColor = '#f4f4f9'; // Background color for better visibility
+
                 listItem.innerHTML = `
-                    <span>${file.name}</span> (${(file.size / 1024).toFixed(2)} KB)
-                    <button class="delete-file-button">Delete</button>
+                    <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${file.name}</span>
+                    <div class="file-options" style="display: flex; gap: 10px; justify-content: flex-end; align-items: center;">
+                        <button class="download-file-button" style="padding: 5px 10px; border: none; background-color: #003087; color: white; border-radius: 5px; cursor: pointer;">Download</button>
+                        <button class="delete-file-button" style="padding: 5px 10px; border: none; background-color: #d9534f; color: white; border-radius: 5px; cursor: pointer;">Delete</button>
+                    </div>
                 `;
                 uploadedFilesList.prepend(listItem); // Add new files to the top
 
@@ -760,18 +772,21 @@
 
                     // Create a container for the live video and controls
                     const liveContainer = document.createElement('div');
-                    liveContainer.style.position = 'fixed';
+                    liveContainer.style.position = 'fixed'; // Fixed to center it on the screen
                     liveContainer.style.top = '50%';
                     liveContainer.style.left = '50%';
-                    liveContainer.style.transform = 'translate(-50%, -50%)';
-                    liveContainer.style.zIndex = '1000';
-                    liveContainer.style.backgroundColor = 'white';
-                    liveContainer.style.border = '3px solid #00235f';
+                    liveContainer.style.transform = 'translate(-50%, -50%)'; // Center the container
+                    liveContainer.style.width = 'clamp(300px, 70%, 90vw)'; // Responsive width with min and max
+                    liveContainer.style.height = '75vh'; // Ensure it takes up 75% of the viewport height
+                    liveContainer.style.border = '1px solid #00235f'; // Updated border to 1px solid with theme color
                     liveContainer.style.borderRadius = '8px';
-                    liveContainer.style.padding = '10px';
-                    liveContainer.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
-                    liveContainer.style.width = '80%'; // Keep the original width
-                    liveContainer.style.height = '80vh'; // Adjust height to 80% of the visible screen
+                    liveContainer.style.backgroundColor = 'white';
+                    liveContainer.style.boxShadow = '0 8px 16px rgba(0, 0, 0, 0.2)'; // More pronounced shadow
+                    liveContainer.style.padding = '0'; // Remove internal padding to align the video
+                    liveContainer.style.display = 'flex'; // For potential internal layout (video, controls)
+                    liveContainer.style.flexDirection = 'column'; // Stack video and controls vertically
+                    liveContainer.style.alignItems = 'center'; // Center items horizontally within the container
+                    liveContainer.style.zIndex = '1000'; // Ensure it appears above other elements
                     document.body.appendChild(liveContainer);
 
                     // Display the video stream in a video element
@@ -779,46 +794,23 @@
                     videoElement.srcObject = videoStream;
                     videoElement.controls = false;
                     videoElement.autoplay = true;
-                    videoElement.style.width = '100%';
-                    videoElement.style.height = '100%'; // Ensure the video fills the container
-                    videoElement.style.borderRadius = '5px';
-                    videoElement.style.cursor = 'pointer'; // Indicate clickable for full-screen
+                    videoElement.style.width = '100%'; // Take up the full width of the live container
+                    videoElement.style.height = 'calc(100% - 60px)'; // Leave space for the buttons at the bottom
+                    videoElement.style.borderRadius = '8px 8px 0 0'; // Match the top border radius of the container
+                    videoElement.style.objectFit = 'cover'; // Ensure the video fills the container
                     liveContainer.appendChild(videoElement);
 
-                    // Add a red blinking recording icon with duration
-                    const recordingIndicator = document.createElement('div');
-                    recordingIndicator.style.color = 'red';
-                    recordingIndicator.style.fontWeight = 'bold';
-                    recordingIndicator.style.marginBottom = '10px';
-                    recordingIndicator.style.animation = 'blink 1s infinite'; // Blinking effect
-                    liveContainer.prepend(recordingIndicator);
-
-                    // Add blinking animation for the recording icon
-                    const style = document.createElement('style');
-                    style.innerHTML = `
-                        @keyframes blink {
-                            0% { opacity: 1; }
-                            50% { opacity: 0; }
-                            100% { opacity: 1; }
-                        }
-                    `;
-                    document.head.appendChild(style);
-
-                    // Track recording duration
-                    let startTime = Date.now();
-                    const updateDuration = () => {
-                        const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
-                        const minutes = Math.floor(elapsedTime / 60).toString().padStart(2, '0');
-                        const seconds = (elapsedTime % 60).toString().padStart(2, '0');
-                        recordingIndicator.textContent = `● Recording - ${minutes}:${seconds}`;
-                    };
-                    const durationInterval = setInterval(updateDuration, 1000);
-
-                    // Add a container for buttons
+                    // Add a container for buttons and the timer below the video
                     const buttonContainer = document.createElement('div');
                     buttonContainer.style.display = 'flex';
-                    buttonContainer.style.justifyContent = 'space-between';
+                    buttonContainer.style.justifyContent = 'space-between'; // Space between buttons and timer
+                    buttonContainer.style.alignItems = 'center'; // Align buttons and timer vertically
                     buttonContainer.style.gap = '10px'; // Add horizontal spacing
+                    buttonContainer.style.padding = '10px'; // Add padding around the buttons
+                    buttonContainer.style.margin = '0 10px'; // Add margin on the left and right inside the live container
+                    buttonContainer.style.width = 'calc(100% - 20px)'; // Ensure it fits inside the live container with margins
+                    buttonContainer.style.backgroundColor = '#f4f4f9'; // Add a background color for the button area
+                    buttonContainer.style.boxSizing = 'border-box'; // Include padding and margin in width calculation
                     liveContainer.appendChild(buttonContainer);
 
                     // Add a button to stop recording
@@ -854,6 +846,35 @@
                     shareScreenButton.style.cursor = 'pointer';
                     buttonContainer.appendChild(shareScreenButton);
 
+                    // Add the recording timer to the right of the buttons
+                    const recordingIndicator = document.createElement('div');
+                    recordingIndicator.style.color = 'red';
+                    recordingIndicator.style.fontWeight = 'bold';
+                    recordingIndicator.style.marginLeft = 'auto'; // Push the timer to the right
+                    recordingIndicator.style.animation = 'blink 1s infinite'; // Blinking effect
+                    buttonContainer.appendChild(recordingIndicator);
+
+                    // Add blinking animation for the recording icon
+                    const style = document.createElement('style');
+                    style.innerHTML = `
+                        @keyframes blink {
+                            0% { opacity: 1; }
+                            50% { opacity: 0; }
+                            100% { opacity: 1; }
+                        }
+                    `;
+                    document.head.appendChild(style);
+
+                    // Track recording duration
+                    let startTime = Date.now();
+                    const updateDuration = () => {
+                        const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+                        const minutes = Math.floor(elapsedTime / 60).toString().padStart(2, '0');
+                        const seconds = (elapsedTime % 60).toString().padStart(2, '0');
+                        recordingIndicator.textContent = `● Recording - ${minutes}:${seconds}`;
+                    };
+                    const durationInterval = setInterval(updateDuration, 1000);
+
                     // Initialize MediaRecorder to record the video
                     mediaRecorder = new MediaRecorder(videoStream);
                     recordedChunks = [];
@@ -879,24 +900,23 @@
 
                         // Create a styled list item for the recorded file
                         const listItem = document.createElement('li');
+                        listItem.style.display = 'flex';
+                        listItem.style.justifyContent = 'space-between'; // Space between file name and buttons
+                        listItem.style.alignItems = 'center';
+                        listItem.style.padding = '10px'; // Add padding for better spacing
+                        listItem.style.margin = '5px 0'; // Add margin between list items
+                        listItem.style.border = '1px solid #ccc';
+                        listItem.style.borderRadius = '5px';
+                        listItem.style.backgroundColor = '#f4f4f9'; // Background color for better visibility
+
                         listItem.innerHTML = `
-                            <span>${fileName}</span> (${(blob.size / 1024).toFixed(2)} KB)
-                            <div class="file-options">
-                                <button class="options-button" style="border: none; background: none; cursor: pointer;">⋮</button>
-                                <div class="options-menu" style="display: none; position: absolute; background: white; border: 1px solid #ccc; border-radius: 5px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
-                                    <button class="download-file-button" style="display: block; width: 100%; padding: 5px; border: none; background: none; cursor: pointer;">Download</button>
-                                    <button class="delete-file-button" style="display: block; width: 100%; padding: 5px; border: none; background: none; cursor: pointer;">Delete</button>
-                                </div>
+                            <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${fileName}</span>
+                            <div class="file-options" style="display: flex; gap: 10px; justify-content: flex-end; align-items: center;">
+                                <button class="download-file-button" style="padding: 5px 10px; border: none; background-color: #003087; color: white; border-radius: 5px; cursor: pointer;">Download</button>
+                                <button class="delete-file-button" style="padding: 5px 10px; border: none; background-color: #d9534f; color: white; border-radius: 5px; cursor: pointer;">Delete</button>
                             </div>
                         `;
                         uploadedFilesList.prepend(listItem);
-
-                        // Add functionality to the options button
-                        const optionsButton = listItem.querySelector('.options-button');
-                        const optionsMenu = listItem.querySelector('.options-menu');
-                        optionsButton.addEventListener('click', () => {
-                            optionsMenu.style.display = optionsMenu.style.display === 'none' ? 'block' : 'none';
-                        });
 
                         // Add functionality to the download button
                         const downloadButton = listItem.querySelector('.download-file-button');
@@ -939,51 +959,88 @@
                         }
                     });
 
-                    // Handle camera switching
-                    switchCameraButton.addEventListener('click', async () => {
-                        const currentVideoTrack = videoStream.getVideoTracks()[0];
-                        const devices = await navigator.mediaDevices.enumerateDevices();
-                        const videoDevices = devices.filter((device) => device.kind === 'videoinput');
+                    // Add functionality to the Share Screen button
+                    let isScreenSharing = false; // Track whether screen sharing is active
+                    let screenStream; // Store the active screen-sharing stream
 
-                        if (videoDevices.length < 2) {
-                            alert('Error: Only one camera is available on this device.');
-                            return;
+                    shareScreenButton.addEventListener('click', async () => {
+                        if (isScreenSharing) {
+                            // Stop screen sharing and revert to the original camera stream
+                            videoElement.srcObject = videoStream; // Revert back to the original camera stream
+                            shareScreenButton.textContent = 'Share Screen'; // Update button text
+                            isScreenSharing = false; // Update state
+                            screenStream = null; // Clear the screen-sharing stream
+                        } else {
+                            try {
+                                // Request screen sharing
+                                screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+
+                                // Replace the video stream with the screen stream
+                                videoElement.srcObject = screenStream;
+                                shareScreenButton.textContent = 'Stop Sharing Screen'; // Update button text
+                                isScreenSharing = true; // Update state
+
+                                // Handle when the screen sharing stops
+                                screenStream.getVideoTracks()[0].addEventListener('ended', () => {
+                                    videoElement.srcObject = videoStream; // Revert back to the original camera stream
+                                    shareScreenButton.textContent = 'Share Screen'; // Update button text
+                                    isScreenSharing = false; // Update state
+                                    screenStream = null; // Clear the screen-sharing stream
+                                });
+                            } catch (error) {
+                                alert('Error accessing screen sharing: ' + error.message);
+                            }
                         }
-
-                        const constraints = {
-                            video: {
-                                facingMode: currentVideoTrack.getSettings().facingMode === 'user' ? { exact: 'environment' } : 'user',
-                            },
-                            audio: true,
-                        };
-
-                        // Stop the current video track
-                        currentVideoTrack.stop();
-
-                        // Get a new video stream with the switched camera
-                        const newStream = await navigator.mediaDevices.getUserMedia(constraints);
-                        const newVideoTrack = newStream.getVideoTracks()[0];
-                        videoStream.removeTrack(currentVideoTrack);
-                        videoStream.addTrack(newVideoTrack);
-
-                        // Update the video element with the new stream
-                        videoElement.srcObject = videoStream;
                     });
 
-                    // Handle screen sharing
-                    shareScreenButton.addEventListener('click', async () => {
+                    // Add functionality to the Switch Camera button
+                    switchCameraButton.addEventListener('click', async () => {
                         try {
-                            const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
-                            videoElement.srcObject = screenStream;
+                            // Get the list of video input devices (cameras)
+                            const devices = await navigator.mediaDevices.enumerateDevices();
+                            const videoDevices = devices.filter((device) => device.kind === 'videoinput');
 
-                            // Move the live video to the bottom-right corner
-                            liveContainer.style.position = 'absolute';
-                            liveContainer.style.bottom = '10px';
-                            liveContainer.style.right = '10px';
-                            liveContainer.style.width = '300px';
-                            liveContainer.style.height = '200px';
+                            if (videoDevices.length < 2) {
+                                alert('Error: Only one camera is available on this device.');
+                                return;
+                            }
+
+                            // Get the current video track
+                            const currentVideoTrack = videoStream.getVideoTracks()[0];
+
+                            // Find the next camera in the list
+                            const currentDeviceId = currentVideoTrack.getSettings().deviceId;
+                            const currentIndex = videoDevices.findIndex((device) => device.deviceId === currentDeviceId);
+                            const nextIndex = (currentIndex + 1) % videoDevices.length;
+                            const nextDeviceId = videoDevices[nextIndex].deviceId;
+
+                            // Get a new video stream with the next camera
+                            const newStream = await navigator.mediaDevices.getUserMedia({
+                                video: { deviceId: { exact: nextDeviceId } },
+                                audio: true,
+                            });
+
+                            // Replace the video stream with the new stream
+                            videoStream = newStream;
+                            videoElement.srcObject = videoStream;
+
+                            // Stop the current video track only after the new stream is successfully set
+                            currentVideoTrack.stop();
                         } catch (error) {
-                            alert('Error accessing screen sharing: ' + error.message);
+                            alert('Error switching cameras: ' + error.message);
+
+                            // Revert to the appropriate stream
+                            try {
+                                if (isScreenSharing) {
+                                    // If screen sharing is active, reuse the current screen-sharing stream
+                                    videoElement.srcObject = screenStream; // Reuse the existing screen-sharing stream
+                                } else {
+                                    // Otherwise, revert to the live camera stream
+                                    videoElement.srcObject = videoStream;
+                                }
+                            } catch (revertError) {
+                                alert('Error reverting to the previous stream: ' + revertError.message);
+                            }
                         }
                     });
                 } catch (error) {
@@ -991,6 +1048,75 @@
                 }
             });
         });
+
+        // Add functionality to handle audio recording
+        const audioContainer = document.getElementById('audio-container');
+
+        const createAudioControls = (audioBlob, fileName) => {
+            const audioWrapper = document.createElement('div'); // Wrapper for audio and buttons
+            audioWrapper.style.marginBottom = '30px'; // Add spacing below the audio controls to avoid overlap
+
+            const audioElement = document.createElement('audio');
+            audioElement.src = URL.createObjectURL(audioBlob);
+            audioElement.controls = true;
+            audioElement.style.width = '100%'; // Make the audio player responsive
+
+            const buttonWrapper = document.createElement('div');
+            buttonWrapper.style.display = 'flex';
+            buttonWrapper.style.gap = '10px'; // Add spacing between buttons
+            buttonWrapper.style.marginTop = '10px'; // Add spacing above the buttons
+
+            const downloadButton = document.createElement('button');
+            downloadButton.textContent = 'Download';
+            downloadButton.style.padding = '5px 10px';
+            downloadButton.style.border = 'none';
+            downloadButton.style.backgroundColor = '#003087';
+            downloadButton.style.color = 'white';
+            downloadButton.style.borderRadius = '5px';
+            downloadButton.style.cursor = 'pointer';
+            downloadButton.addEventListener('click', () => {
+                const a = document.createElement('a');
+                a.href = audioElement.src;
+                a.download = fileName;
+                a.click();
+            });
+
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Delete';
+            deleteButton.style.padding = '5px 10px';
+            deleteButton.style.border = 'none';
+            deleteButton.style.backgroundColor = '#d9534f';
+            deleteButton.style.color = 'white';
+            deleteButton.style.borderRadius = '5px';
+            deleteButton.style.cursor = 'pointer';
+            deleteButton.addEventListener('click', () => {
+                audioContainer.removeChild(audioWrapper); // Remove the entire wrapper
+
+                // Check if there are no more audio files and reset the Go Live heading margin
+                if (audioContainer.children.length === 0) {
+                    const goLiveHeading = document.querySelector('.go-live-button');
+                    if (goLiveHeading) {
+                        goLiveHeading.style.marginTop = '0'; // Reset margin
+                    }
+                }
+            });
+
+            buttonWrapper.appendChild(downloadButton);
+            buttonWrapper.appendChild(deleteButton);
+
+            audioWrapper.appendChild(audioElement);
+            audioWrapper.appendChild(buttonWrapper);
+
+            audioContainer.appendChild(audioWrapper);
+
+            // Apply margin to the Go Live heading if this is the first audio file
+            if (audioContainer.children.length === 1) {
+                const goLiveHeading = document.querySelector('.go-live-button');
+                if (goLiveHeading) {
+                    goLiveHeading.style.marginTop = '5px'; // Add margin
+                }
+            }
+        };
     </script>
 </body>
 </html>
