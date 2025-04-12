@@ -794,6 +794,7 @@
                     videoElement.srcObject = videoStream;
                     videoElement.controls = false;
                     videoElement.autoplay = true;
+                    videoElement.muted = true; // Mute the video to disable live audio output
                     videoElement.style.width = '100%'; // Take up the full width of the live container
                     videoElement.style.height = 'calc(100% - 60px)'; // Leave space for the buttons at the bottom
                     videoElement.style.borderRadius = '8px 8px 0 0'; // Match the top border radius of the container
@@ -824,35 +825,16 @@
                     stopRecordingButton.style.cursor = 'pointer';
                     buttonContainer.appendChild(stopRecordingButton);
 
-                    // Add an icon to switch cameras
-                    const switchCameraButton = document.createElement('button');
-                    switchCameraButton.innerHTML = '<i class="fas fa-sync-alt"></i>'; // Use Font Awesome icon
-                    switchCameraButton.style.backgroundColor = '#003087';
-                    switchCameraButton.style.color = 'white';
-                    switchCameraButton.style.border = 'none';
-                    switchCameraButton.style.padding = '10px 20px';
-                    switchCameraButton.style.borderRadius = '5px';
-                    switchCameraButton.style.cursor = 'pointer';
-                    buttonContainer.appendChild(switchCameraButton);
-
-                    // Add a button to share the screen
-                    const shareScreenButton = document.createElement('button');
-                    shareScreenButton.textContent = 'Share Screen';
-                    shareScreenButton.style.backgroundColor = '#003087';
-                    shareScreenButton.style.color = 'white';
-                    shareScreenButton.style.border = 'none';
-                    shareScreenButton.style.padding = '10px 20px';
-                    shareScreenButton.style.borderRadius = '5px';
-                    shareScreenButton.style.cursor = 'pointer';
-                    buttonContainer.appendChild(shareScreenButton);
-
-                    // Add the recording timer to the right of the buttons
+                    // Add the recording indicator to the bottom-left of the live container
                     const recordingIndicator = document.createElement('div');
+                    recordingIndicator.style.position = 'absolute';
+                    recordingIndicator.style.bottom = '10px'; // Position 10px from the bottom
+                    recordingIndicator.style.left = '10px'; // Position 10px from the left
                     recordingIndicator.style.color = 'red';
                     recordingIndicator.style.fontWeight = 'bold';
-                    recordingIndicator.style.marginLeft = 'auto'; // Push the timer to the right
                     recordingIndicator.style.animation = 'blink 1s infinite'; // Blinking effect
-                    buttonContainer.appendChild(recordingIndicator);
+                    recordingIndicator.textContent = '● Recording';
+                    liveContainer.appendChild(recordingIndicator);
 
                     // Add blinking animation for the recording icon
                     const style = document.createElement('style');
@@ -864,16 +846,6 @@
                         }
                     `;
                     document.head.appendChild(style);
-
-                    // Track recording duration
-                    let startTime = Date.now();
-                    const updateDuration = () => {
-                        const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
-                        const minutes = Math.floor(elapsedTime / 60).toString().padStart(2, '0');
-                        const seconds = (elapsedTime % 60).toString().padStart(2, '0');
-                        recordingIndicator.textContent = `● Recording - ${minutes}:${seconds}`;
-                    };
-                    const durationInterval = setInterval(updateDuration, 1000);
 
                     // Initialize MediaRecorder to record the video
                     mediaRecorder = new MediaRecorder(videoStream);
@@ -889,50 +861,8 @@
 
                     // Handle recording stop
                     mediaRecorder.onstop = () => {
-                        clearInterval(durationInterval); // Stop updating the duration
                         const blob = new Blob(recordedChunks, { type: 'video/webm' });
                         const videoURL = URL.createObjectURL(blob);
-
-                        // Generate a file name
-                        const username = 'user'; // Replace with the actual username
-                        const date = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
-                        const fileName = `clip-pilot-media-${username}-${date}.webm`;
-
-                        // Create a styled list item for the recorded file
-                        const listItem = document.createElement('li');
-                        listItem.style.display = 'flex';
-                        listItem.style.justifyContent = 'space-between'; // Space between file name and buttons
-                        listItem.style.alignItems = 'center';
-                        listItem.style.padding = '10px'; // Add padding for better spacing
-                        listItem.style.margin = '5px 0'; // Add margin between list items
-                        listItem.style.border = '1px solid #ccc';
-                        listItem.style.borderRadius = '5px';
-                        listItem.style.backgroundColor = '#f4f4f9'; // Background color for better visibility
-
-                        listItem.innerHTML = `
-                            <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${fileName}</span>
-                            <div class="file-options" style="display: flex; gap: 10px; justify-content: flex-end; align-items: center;">
-                                <button class="download-file-button" style="padding: 5px 10px; border: none; background-color: #003087; color: white; border-radius: 5px; cursor: pointer;">Download</button>
-                                <button class="delete-file-button" style="padding: 5px 10px; border: none; background-color: #d9534f; color: white; border-radius: 5px; cursor: pointer;">Delete</button>
-                            </div>
-                        `;
-                        uploadedFilesList.prepend(listItem);
-
-                        // Add functionality to the download button
-                        const downloadButton = listItem.querySelector('.download-file-button');
-                        downloadButton.addEventListener('click', () => {
-                            const a = document.createElement('a');
-                            a.href = videoURL;
-                            a.download = fileName;
-                            a.click();
-                        });
-
-                        // Add functionality to the delete button
-                        const deleteButton = listItem.querySelector('.delete-file-button');
-                        deleteButton.addEventListener('click', () => {
-                            listItem.remove();
-                            isRecording = false; // Allow new recordings after deletion
-                        });
 
                         // Stop the video stream
                         videoStream.getTracks().forEach((track) => track.stop());
@@ -946,102 +876,6 @@
 
                     stopRecordingButton.addEventListener('click', () => {
                         mediaRecorder.stop();
-                    });
-
-                    // Allow the video to go full-screen when clicked
-                    videoElement.addEventListener('click', () => {
-                        if (videoElement.requestFullscreen) {
-                            videoElement.requestFullscreen();
-                        } else if (videoElement.webkitRequestFullscreen) { // Safari
-                            videoElement.webkitRequestFullscreen();
-                        } else if (videoElement.msRequestFullscreen) { // IE/Edge
-                            videoElement.msRequestFullscreen();
-                        }
-                    });
-
-                    // Add functionality to the Share Screen button
-                    let isScreenSharing = false; // Track whether screen sharing is active
-                    let screenStream; // Store the active screen-sharing stream
-
-                    shareScreenButton.addEventListener('click', async () => {
-                        if (isScreenSharing) {
-                            // Stop screen sharing and revert to the original camera stream
-                            videoElement.srcObject = videoStream; // Revert back to the original camera stream
-                            shareScreenButton.textContent = 'Share Screen'; // Update button text
-                            isScreenSharing = false; // Update state
-                            screenStream = null; // Clear the screen-sharing stream
-                        } else {
-                            try {
-                                // Request screen sharing
-                                screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
-
-                                // Replace the video stream with the screen stream
-                                videoElement.srcObject = screenStream;
-                                shareScreenButton.textContent = 'Stop Sharing Screen'; // Update button text
-                                isScreenSharing = true; // Update state
-
-                                // Handle when the screen sharing stops
-                                screenStream.getVideoTracks()[0].addEventListener('ended', () => {
-                                    videoElement.srcObject = videoStream; // Revert back to the original camera stream
-                                    shareScreenButton.textContent = 'Share Screen'; // Update button text
-                                    isScreenSharing = false; // Update state
-                                    screenStream = null; // Clear the screen-sharing stream
-                                });
-                            } catch (error) {
-                                alert('Error accessing screen sharing: ' + error.message);
-                            }
-                        }
-                    });
-
-                    // Add functionality to the Switch Camera button
-                    switchCameraButton.addEventListener('click', async () => {
-                        try {
-                            // Get the list of video input devices (cameras)
-                            const devices = await navigator.mediaDevices.enumerateDevices();
-                            const videoDevices = devices.filter((device) => device.kind === 'videoinput');
-
-                            if (videoDevices.length < 2) {
-                                alert('Error: Only one camera is available on this device.');
-                                return;
-                            }
-
-                            // Get the current video track
-                            const currentVideoTrack = videoStream.getVideoTracks()[0];
-
-                            // Find the next camera in the list
-                            const currentDeviceId = currentVideoTrack.getSettings().deviceId;
-                            const currentIndex = videoDevices.findIndex((device) => device.deviceId === currentDeviceId);
-                            const nextIndex = (currentIndex + 1) % videoDevices.length;
-                            const nextDeviceId = videoDevices[nextIndex].deviceId;
-
-                            // Get a new video stream with the next camera
-                            const newStream = await navigator.mediaDevices.getUserMedia({
-                                video: { deviceId: { exact: nextDeviceId } },
-                                audio: true,
-                            });
-
-                            // Replace the video stream with the new stream
-                            videoStream = newStream;
-                            videoElement.srcObject = videoStream;
-
-                            // Stop the current video track only after the new stream is successfully set
-                            currentVideoTrack.stop();
-                        } catch (error) {
-                            alert('Error switching cameras: ' + error.message);
-
-                            // Revert to the appropriate stream
-                            try {
-                                if (isScreenSharing) {
-                                    // If screen sharing is active, reuse the current screen-sharing stream
-                                    videoElement.srcObject = screenStream; // Reuse the existing screen-sharing stream
-                                } else {
-                                    // Otherwise, revert to the live camera stream
-                                    videoElement.srcObject = videoStream;
-                                }
-                            } catch (revertError) {
-                                alert('Error reverting to the previous stream: ' + revertError.message);
-                            }
-                        }
                     });
                 } catch (error) {
                     alert('Error accessing camera: ' + error.message);
