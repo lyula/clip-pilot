@@ -934,29 +934,66 @@
                     };
     
                     mediaRecorder.onstop = () => {
-                        clearInterval(durationInterval);
-                        const blob = new Blob(recordedChunks, { type: 'video/webm' });
-                        const videoURL = URL.createObjectURL(blob);
+    clearInterval(durationInterval);
+    const blob = new Blob(recordedChunks, { type: 'video/webm' });
+    const videoURL = URL.createObjectURL(blob);
 
-                        const username = 'username'; // Replace with dynamic value as needed
-                        const date = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
-                        const filename = `Clip-Pilot-media-${username}-${date}.webm`;
+    const username = 'username'; // Replace with dynamic value as needed
+    const date = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
+    const filename = `Clip-Pilot-media-${username}-${date}.webm`;
+    const fileSize = (blob.size / (1024 * 1024)).toFixed(2); // MB
 
-                        const listItem = document.createElement('li');
-                        listItem.innerHTML = `
-                            <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${filename}</span>
-                            <div class="file-options" style="display: flex; gap: 10px; justify-content: flex-end; align-items: center;">
-                                <a href="${videoURL}" download="${filename}" style="padding: 5px 10px; background-color: #003087; color: white; border-radius: 5px; text-decoration: none;">Download</a>
-                                <button class="delete-file-button" style="padding: 5px 10px; background-color: #d9534f; color: white; border: none; border-radius: 5px; cursor: pointer;">Delete</button>
-                            </div>`;
-                        listItem.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 10px; margin: 5px 0; border: 1px solid #ccc; border-radius: 5px; background-color: #f4f4f9;';
-                        uploadedFilesList.prepend(listItem);
-                        listItem.querySelector('.delete-file-button').addEventListener('click', () => listItem.remove());
+    const listItem = document.createElement('li');
+    listItem.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; position: relative;">
+            <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${filename}">
+                ${filename}
+            </span>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 0.85em; color: #555;">${fileSize} MB</span>
+                <button class="menu-toggle-button" style="background: none; border: none; font-size: 20px; cursor: pointer;">⋮</button>
+            </div>
+        </div>
+        <div class="file-options-dropdown" style="display: none; position: absolute; right: 10px; top: 100%; margin-top: 5px; background: #f9f9f9; border: 1px solid #ccc; border-radius: 5px; padding: 10px; z-index: 10;">
+            <a href="${videoURL}" download="${filename}">
+                <button>Download</button>
+            </a>
+            <button class="delete-file-button">Delete</button>
+        </div>
+    `;
+    listItem.style.cssText = 'position: relative; padding: 10px; margin: 5px 0; border: 1px solid #ccc; border-radius: 5px; background-color: #f4f4f9;';
+    uploadedFilesList.prepend(listItem);
 
-                        videoStream.getTracks().forEach(track => track.stop());
-                        liveContainer.remove();
-                        isRecording = false;
-                    };
+    const dropdown = listItem.querySelector('.file-options-dropdown');
+    const toggleButton = listItem.querySelector('.menu-toggle-button');
+    const nextSibling = listItem.nextElementSibling;
+
+    toggleButton.addEventListener('click', () => {
+        // Toggle dropdown visibility
+        if (dropdown.style.display === 'block') {
+            dropdown.style.display = 'none';
+
+            // Reset the margin of the next sibling element
+            if (nextSibling) {
+                nextSibling.style.marginTop = '';
+            }
+        } else {
+            dropdown.style.display = 'block';
+
+            // Adjust margin of the next sibling element to avoid overlap
+            if (nextSibling) {
+                nextSibling.style.marginTop = `${dropdown.offsetHeight + 10}px`;
+            }
+        }
+    });
+
+    listItem.querySelector('.delete-file-button').addEventListener('click', () => listItem.remove());
+
+    videoStream.getTracks().forEach(track => track.stop());
+    liveContainer.remove();
+    isRecording = false;
+};
+
 
 
     
