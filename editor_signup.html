@@ -9,7 +9,7 @@
         /* Existing CSS */
         .container {
             max-width: 500px;
-            margin: 50px auto;
+            margin: 20px auto; /* Reduced margin-top from 50px to 20px */
             background-color: white;
             padding: 20px;
             border-radius: 8px;
@@ -102,6 +102,26 @@
             background-position: 5px center;
             background-size: auto 20px;
         }
+
+        /* Multi-select dropdown styling */
+        select[multiple] {
+            height: auto;
+            min-height: 40px; /* Collapsed height */
+            max-height: 40px; /* Default collapsed height */
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: white;
+            overflow-y: hidden; /* Hide scroll initially */
+            cursor: pointer;
+            transition: max-height 0.3s ease; /* Smooth transition for expand/collapse */
+        }
+
+        /* Expanded dropdown */
+        select[multiple]:focus {
+            outline: none; /* Remove focus outline */
+        }
     </style>
 </head>
 <body>
@@ -149,6 +169,20 @@
 
             <label for="tools">Preferred Editing Tools</label>
             <textarea id="tools" name="tools" rows="3" placeholder="List your preferred editing tools (e.g., Adobe Premiere, Final Cut Pro)" required></textarea>
+
+            <!-- Updated Input for Content Types -->
+            <label for="content-types">Types of Content You Edit</label>
+            <select id="content-types" name="content-types[]" multiple required>
+                <option value="youtube-videos">YouTube Videos</option>
+                <option value="corporate-videos">Corporate Videos</option>
+                <option value="social-media-content">Social Media Content</option>
+                <option value="documentaries">Documentaries</option>
+                <option value="trailers">Trailers</option>
+                <option value="short-films">Short Films</option>
+                <option value="music-videos">Music Videos</option>
+                <option value="other">Other</option>
+            </select>
+            <small style="color: #666;">Hold down the Ctrl (Windows) or Command (Mac) key to select multiple options.</small>
 
             <div class="terms">
                 <input type="checkbox" id="terms" name="terms" required>
@@ -222,6 +256,22 @@
         document.addEventListener('click', (e) => {
             if (!countryInput.contains(e.target) && !countriesList.contains(e.target)) {
                 countriesList.style.display = 'none';
+            }
+        });
+
+        // New JavaScript for content types dropdown toggle
+        const contentTypesSelect = document.getElementById('content-types');
+
+        // Add an event listener to toggle the dropdown height
+        contentTypesSelect.addEventListener('click', () => {
+            if (contentTypesSelect.style.maxHeight === '150px') {
+                // Collapse the dropdown
+                contentTypesSelect.style.maxHeight = '40px';
+                contentTypesSelect.style.overflowY = 'hidden';
+            } else {
+                // Expand the dropdown
+                contentTypesSelect.style.maxHeight = '150px';
+                contentTypesSelect.style.overflowY = 'auto';
             }
         });
     </script>

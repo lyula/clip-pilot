@@ -712,8 +712,14 @@
         let mediaRecorder;
         let recordedChunks = [];
         let videoStream;
+        let isRecording = false; // Prevent multiple recordings
 
         goLiveButton.addEventListener('click', async () => {
+            if (isRecording) {
+                alert('Please submit the existing recorded file before starting a new recording.');
+                return;
+            }
+
             // Check if the browser supports getUserMedia
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
                 alert('Your browser does not support camera access. Please update your browser or use a modern browser.');
@@ -731,18 +737,21 @@
                 // Request access to the user's camera
                 videoStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
 
-                // Display the video stream in a video element
+                // Display the video stream in a video element above the project form
                 const videoElement = document.createElement('video');
                 videoElement.srcObject = videoStream;
                 videoElement.controls = false;
                 videoElement.autoplay = true;
                 videoElement.style.width = '100%';
-                videoElement.style.marginTop = '10px';
-                document.body.appendChild(videoElement);
+                videoElement.style.marginBottom = '10px';
+                videoElement.style.border = '1px solid #ccc';
+                videoElement.style.borderRadius = '5px';
+                document.querySelector('.project-form').prepend(videoElement);
 
                 // Initialize MediaRecorder to record the video
                 mediaRecorder = new MediaRecorder(videoStream);
                 recordedChunks = [];
+                isRecording = true;
 
                 // Collect recorded data
                 mediaRecorder.ondataavailable = (event) => {
@@ -756,63 +765,51 @@
                     const blob = new Blob(recordedChunks, { type: 'video/webm' });
                     const videoURL = URL.createObjectURL(blob);
 
-                    // Provide the recorded video for download
-                    const downloadLink = document.createElement('a');
-                    downloadLink.href = videoURL;
-                    downloadLink.download = 'recorded-video.webm';
-                    downloadLink.textContent = 'Download Recorded Video';
-                    downloadLink.style.display = 'block';
-                    downloadLink.style.marginTop = '10px';
-                    document.body.appendChild(downloadLink);
+                    // Generate a file name
+                    const username = 'user'; // Replace with the actual username
+                    const date = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
+                    const fileName = `clip-pilot-${username}-${date}.webm`;
+
+                    // Create a styled list item for the recorded file
+                    const listItem = document.createElement('li');
+                    listItem.innerHTML = `
+                        <span>${fileName}</span> (${(blob.size / 1024).toFixed(2)} KB)
+                        <button class="delete-file-button">Delete</button>
+                    `;
+                    uploadedFilesList.prepend(listItem);
+
+                    // Add event listener to the delete button
+                    const deleteButton = listItem.querySelector('.delete-file-button');
+                    deleteButton.addEventListener('click', () => {
+                        listItem.remove();
+                        isRecording = false; // Allow new recordings after deletion
+                    });
 
                     // Stop the video stream
                     videoStream.getTracks().forEach((track) => track.stop());
+                    videoElement.remove();
+                    isRecording = false; // Allow new recordings
                 };
 
                 // Start recording
                 mediaRecorder.start();
-                alert('Recording started. You can switch cameras if needed.');
-
-                // Add a button to switch cameras
-                const switchCameraButton = document.createElement('button');
-                switchCameraButton.textContent = 'Switch Camera';
-                switchCameraButton.style.marginTop = '10px';
-                document.body.appendChild(switchCameraButton);
-
-                switchCameraButton.addEventListener('click', async () => {
-                    const currentVideoTrack = videoStream.getVideoTracks()[0];
-                    const constraints = {
-                        video: {
-                            facingMode: currentVideoTrack.getSettings().facingMode === 'user' ? { exact: 'environment' } : 'user',
-                        },
-                        audio: true,
-                    };
-
-                    // Stop the current video track
-                    currentVideoTrack.stop();
-
-                    // Get a new video stream with the switched camera
-                    const newStream = await navigator.mediaDevices.getUserMedia(constraints);
-                    const newVideoTrack = newStream.getVideoTracks()[0];
-                    videoStream.removeTrack(currentVideoTrack);
-                    videoStream.addTrack(newVideoTrack);
-
-                    // Update the video element with the new stream
-                    videoElement.srcObject = videoStream;
-                });
+                alert('Recording started. Click "Stop Recording" to finish.');
 
                 // Add a button to stop recording
                 const stopRecordingButton = document.createElement('button');
                 stopRecordingButton.textContent = 'Stop Recording';
                 stopRecordingButton.style.marginTop = '10px';
-                document.body.appendChild(stopRecordingButton);
+                stopRecordingButton.style.backgroundColor = '#003087';
+                stopRecordingButton.style.color = 'white';
+                stopRecordingButton.style.border = 'none';
+                stopRecordingButton.style.padding = '10px 20px';
+                stopRecordingButton.style.borderRadius = '5px';
+                stopRecordingButton.style.cursor = 'pointer';
+                document.querySelector('.form-actions').appendChild(stopRecordingButton);
 
                 stopRecordingButton.addEventListener('click', () => {
                     mediaRecorder.stop();
-                    videoElement.remove();
-                    switchCameraButton.remove();
                     stopRecordingButton.remove();
-                    alert('Recording stopped.');
                 });
             } catch (error) {
                 alert('Error accessing camera: ' + error.message);
