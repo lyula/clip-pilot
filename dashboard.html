@@ -878,52 +878,48 @@
                         buttonContainer.appendChild(switchCameraButton);
 
                         switchCameraButton.addEventListener('click', async () => {
-                            try {
-                                const devices = await navigator.mediaDevices.enumerateDevices();
-                                const videoDevices = devices.filter((d) => d.kind === 'videoinput');
+                        try {
+                            const devices = await navigator.mediaDevices.enumerateDevices();
+                            const videoDevices = devices.filter((d) => d.kind === 'videoinput');
 
-                                if (videoDevices.length < 2) {
-                                    alert('Only one camera available.');
-                                    return;
-                                }
-
-                                const currentTrack = videoStream.getVideoTracks()[0];
-                                const currentId = currentTrack.getSettings().deviceId;
-
-                                const nextIndex = (videoDevices.findIndex(d => d.deviceId === currentId) + 1) % videoDevices.length;
-                                const nextDeviceId = videoDevices[nextIndex].deviceId;
-
-                                // Stop current video track (but keep audio)
-                                currentTrack.stop();
-
-                                // 🔄 Wait a bit for hardware to release camera (especially on mobile)
-                                await new Promise(resolve => setTimeout(resolve, 300));
-
-                                // Get a new video stream from the new camera
-                                const newStream = await navigator.mediaDevices.getUserMedia({
-                                    video: { deviceId: { exact: nextDeviceId } },
-                                    audio: true // include audio to keep same recording stream
-                                });
-
-                                const newVideoTrack = newStream.getVideoTracks()[0];
-
-                                // Replace video track in the existing MediaStream
-                                videoStream.removeTrack(currentTrack);
-                                videoStream.addTrack(newVideoTrack);
-
-                                // Update video element
-                                const audioTracks = videoStream.getAudioTracks();
-                                const combinedStream = new MediaStream([newVideoTrack, ...audioTracks]);
-
-                                videoStream = combinedStream;
-                                videoElement.srcObject = combinedStream;
-
-                                // MediaRecorder will continue if it was already running
-                            } catch (err) {
-                                alert('Error switching cameras: ' + err.message);
-                                console.error(err);
+                            if (videoDevices.length < 2) {
+                                alert('Only one camera available.');
+                                return;
                             }
-                        });
+
+                            const currentTrack = videoStream.getVideoTracks()[0];
+                            const currentId = currentTrack.getSettings().deviceId;
+                            const nextIndex = (videoDevices.findIndex(d => d.deviceId === currentId) + 1) % videoDevices.length;
+                            const nextDeviceId = videoDevices[nextIndex].deviceId;
+
+                            // Stop current video track (but keep audio)
+                            currentTrack.stop();
+
+                            // ⏱ Add delay for mobile devices to release the camera
+                            await new Promise(resolve => setTimeout(resolve, 300));
+
+                            // Request new video track from the next camera
+                            const newStream = await navigator.mediaDevices.getUserMedia({
+                                video: { deviceId: { exact: nextDeviceId } }
+                            });
+
+                            const newVideoTrack = newStream.getVideoTracks()[0];
+
+                            // Remove old video track and add the new one to the existing stream
+                            videoStream.removeTrack(currentTrack);
+                            videoStream.addTrack(newVideoTrack);
+
+                            // Update the video element (keep same stream)
+                            videoElement.srcObject = videoStream;
+
+                            // MediaRecorder continues using updated tracks from the same stream
+
+                        } catch (err) {
+                            alert('Error switching cameras: ' + err.message);
+                            console.error(err);
+                        }
+                    });
+
 
 
 
