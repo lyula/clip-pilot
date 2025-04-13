@@ -702,46 +702,56 @@
         const goLiveButtonDesktop = document.getElementById('go-live-button-desktop');
         let isFirstUpload = true;
     
-        fileInput.addEventListener('change', (event) => {
-            const files = Array.from(event.target.files);
-            if (isFirstUpload) {
-                alert('Please upload your files in the chronological order that the edited video should take.');
-                isFirstUpload = false;
-            }
-    
-            files.forEach((file) => {
-                if (!file.type.startsWith('video/')) {
-                    alert(`Error: ${file.name} is not a valid video file. We only accept video formats.`);
-                    return;
+                fileInput.addEventListener('change', (event) => {
+                const files = Array.from(event.target.files);
+                if (isFirstUpload) {
+                    alert('Please upload your files in the chronological order that the edited video should take.');
+                    isFirstUpload = false;
                 }
-    
-                const listItem = document.createElement('li');
-                listItem.style.display = 'flex';
-                listItem.style.justifyContent = 'space-between';
-                listItem.style.alignItems = 'center';
-                listItem.style.padding = '10px';
-                listItem.style.margin = '5px 0';
-                listItem.style.border = '1px solid #ccc';
-                listItem.style.borderRadius = '5px';
-                listItem.style.backgroundColor = '#f4f4f9';
-    
-                listItem.innerHTML = `
-                    <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${file.name}</span>
-                    <div class="file-options" style="display: flex; gap: 10px; justify-content: flex-end; align-items: center;">
-                        <button class="download-file-button" style="padding: 5px 10px; border: none; background-color: #003087; color: white; border-radius: 5px; cursor: pointer;">Download</button>
-                        <button class="delete-file-button" style="padding: 5px 10px; border: none; background-color: #d9534f; color: white; border-radius: 5px; cursor: pointer;">Delete</button>
-                    </div>
-                `;
-                uploadedFilesList.prepend(listItem);
-    
-                const deleteButton = listItem.querySelector('.delete-file-button');
-                deleteButton.addEventListener('click', () => {
-                    listItem.remove();
+
+                files.forEach((file) => {
+                    if (!file.type.startsWith('video/')) {
+                        alert(`Error: ${file.name} is not a valid video file. We only accept video formats.`);
+                        return;
+                    }
+
+                    const listItem = document.createElement('li');
+                    listItem.style.display = 'flex';
+                    listItem.style.justifyContent = 'space-between';
+                    listItem.style.alignItems = 'center';
+                    listItem.style.padding = '10px';
+                    listItem.style.margin = '5px 0';
+                    listItem.style.border = '1px solid #ccc';
+                    listItem.style.borderRadius = '5px';
+                    listItem.style.backgroundColor = '#f4f4f9';
+
+                    // Calculate file size in a human-readable format
+                    let fileSize;
+                    if (file.size / (1024 * 1024 * 1024) >= 1) {
+                        fileSize = (file.size / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
+                    } else if (file.size / (1024 * 1024) >= 1) {
+                        fileSize = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+                    } else {
+                        fileSize = (file.size / 1024).toFixed(2) + ' KB';
+                    }
+
+                    listItem.innerHTML = `
+                        <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${file.name}</span>
+                        <div class="file-options" style="display: flex; gap: 10px; justify-content: flex-end; align-items: center;">
+                            <span style="padding: 5px 10px; color: #333; font-size: 0.9rem;">${fileSize}</span>
+                            <button class="delete-file-button" style="padding: 5px 10px; border: none; background-color: #d9534f; color: white; border-radius: 5px; cursor: pointer;">Delete</button>
+                        </div>
+                    `;
+                    uploadedFilesList.prepend(listItem);
+
+                    const deleteButton = listItem.querySelector('.delete-file-button');
+                    deleteButton.addEventListener('click', () => {
+                        listItem.remove();
+                    });
                 });
+
+                fileInput.value = '';
             });
-    
-            fileInput.value = '';
-        });
     
         let mediaRecorder;
         let recordedChunks = [];
