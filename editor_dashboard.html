@@ -738,8 +738,6 @@ fileInput.addEventListener('change', (event) => {
             videoWrapper = document.createElement('div');
             videoWrapper.id = 'video-wrapper';
             videoWrapper.style.position = 'fixed';
-            videoWrapper.style.top = '20px';
-            videoWrapper.style.left = '20px';
             videoWrapper.style.zIndex = '9999';
             videoWrapper.style.display = 'none';
             videoWrapper.style.cursor = 'move';
@@ -747,6 +745,7 @@ fileInput.addEventListener('change', (event) => {
             videoWrapper.style.borderRadius = '10px';
             videoWrapper.style.boxShadow = '0 8px 16px rgba(0,0,0,0.3)';
             videoWrapper.style.padding = '10px';
+            videoWrapper.style.transition = 'all 0.3s ease';
 
             const closeButton = document.createElement('button');
             closeButton.textContent = '✖';
@@ -811,7 +810,7 @@ fileInput.addEventListener('change', (event) => {
 
             document.addEventListener('mouseup', () => {
                 isDragging = false;
-                videoWrapper.style.transition = 'all 0.2s ease';
+                videoWrapper.style.transition = 'all 0.3s ease';
             });
         }
 
@@ -821,6 +820,20 @@ fileInput.addEventListener('change', (event) => {
             const videoURL = URL.createObjectURL(file);
             videoPlayer.src = videoURL;
             videoWrapper.style.display = 'block';
+
+            // Center the video wrapper after it's visible
+            requestAnimationFrame(() => {
+                const wrapperRect = videoWrapper.getBoundingClientRect();
+                const screenWidth = window.innerWidth;
+                const screenHeight = window.innerHeight;
+
+                const left = Math.max(0, (screenWidth - wrapperRect.width) / 2);
+                const top = Math.max(0, (screenHeight - wrapperRect.height) / 2);
+
+                videoWrapper.style.left = `${left}px`;
+                videoWrapper.style.top = `${top}px`;
+            });
+
             videoPlayer.play();
 
             // Picture-in-Picture
@@ -851,6 +864,7 @@ fileInput.addEventListener('change', (event) => {
 
     fileInput.value = '';
 });
+
 
 
     </script>
