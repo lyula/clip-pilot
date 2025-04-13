@@ -54,12 +54,13 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
             mediaRecorder.onstop = () => {
-                // Wrap the audio player, download button, and delete button
+                // Wrap the audio player and buttons
                 const audioWrapper = document.createElement('div');
                 audioWrapper.style.display = 'flex';
                 audioWrapper.style.flexDirection = 'column'; // Default to column layout
                 audioWrapper.style.alignItems = 'flex-start';
-                audioWrapper.style.marginTop = '10px';
+                audioWrapper.style.marginTop = '5px';
+                audioWrapper.style.marginBottom = '20px';
 
                 const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
                 const audioUrl = URL.createObjectURL(audioBlob);
@@ -80,26 +81,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 buttonWrapper.style.gap = '10px'; // Add spacing between buttons
                 buttonWrapper.style.marginTop = '10px';
 
-                // Create a download button
-                const downloadButton = document.createElement('a');
-                downloadButton.href = audioUrl;
-                downloadButton.download = `recording-${audioCount + 1}.wav`;
-                downloadButton.textContent = 'Download';
-                downloadButton.style.backgroundColor = '#003087'; // Theme color
-                downloadButton.style.color = '#fff'; // White text
-                downloadButton.style.padding = '8px 12px';
-                downloadButton.style.borderRadius = '5px';
-                downloadButton.style.textDecoration = 'none';
-                downloadButton.style.fontSize = '0.9rem';
-                downloadButton.style.fontWeight = 'bold';
-                downloadButton.style.transition = 'background-color 0.3s ease';
+                // Create a keep button
+                const keepButton = document.createElement('button');
+                keepButton.textContent = 'Keep';
+                keepButton.style.backgroundColor = '#003087'; // Theme color
+                keepButton.style.color = '#fff'; // White text
+                keepButton.style.padding = '8px 12px';
+                keepButton.style.borderRadius = '5px';
+                keepButton.style.border = 'none';
+                keepButton.style.cursor = 'pointer';
+                keepButton.style.fontSize = '0.9rem';
+                keepButton.style.fontWeight = 'bold';
+                keepButton.style.transition = 'background-color 0.3s ease';
 
-                // Add hover effect
-                downloadButton.addEventListener('mouseover', () => {
-                    downloadButton.style.backgroundColor = '#002060'; // Darker shade on hover
+                // Add hover effect for keep button
+                keepButton.addEventListener('mouseover', () => {
+                    keepButton.style.backgroundColor = '#002060'; // Darker shade on hover
                 });
-                downloadButton.addEventListener('mouseout', () => {
-                    downloadButton.style.backgroundColor = '#003087'; // Reset to theme color
+                keepButton.addEventListener('mouseout', () => {
+                    keepButton.style.backgroundColor = '#003087'; // Reset to theme color
+                });
+
+                // Hide both buttons when keep is clicked
+                keepButton.addEventListener('click', () => {
+                    buttonWrapper.style.display = 'none';
                 });
 
                 // Create a delete button
@@ -129,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 // Append buttons to the button wrapper
-                buttonWrapper.appendChild(downloadButton);
+                buttonWrapper.appendChild(keepButton);
                 buttonWrapper.appendChild(deleteButton);
 
                 // Append the audio player and button wrapper to the audio wrapper
