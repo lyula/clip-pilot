@@ -688,10 +688,19 @@ fileInput.addEventListener('change', (event) => {
         listItem.style.border = '1px solid #ccc';
         listItem.style.borderRadius = '5px';
         listItem.style.backgroundColor = '#f4f4f9';
+        listItem.style.gap = '10px';
 
         const fileSize = (file.size / (1024 * 1024)).toFixed(2); // in MB
 
-        // Create a link for the filename
+        // Thumbnail preview
+        const thumbnail = document.createElement('img');
+        thumbnail.style.width = '80px';
+        thumbnail.style.height = '60px';
+        thumbnail.style.objectFit = 'fill'; // Changed from 'cover' to 'fill' to force full fit
+        thumbnail.style.borderRadius = '5px';
+        generateThumbnail(file, thumbnail);
+
+        // File link
         const fileLink = document.createElement('a');
         fileLink.href = '#';
         fileLink.textContent = file.name;
@@ -704,7 +713,7 @@ fileInput.addEventListener('change', (event) => {
         fileLink.style.textDecoration = 'underline';
         fileLink.style.cursor = 'pointer';
 
-        // Show size on the right
+        // File size
         const fileSizeLabel = document.createElement('span');
         fileSizeLabel.textContent = `${fileSize} MB`;
         fileSizeLabel.style.marginLeft = '15px';
@@ -726,18 +735,20 @@ fileInput.addEventListener('change', (event) => {
         deleteButton.style.borderRadius = '5px';
         deleteButton.style.cursor = 'pointer';
 
+        listItem.appendChild(thumbnail);
         listItem.appendChild(fileLink);
         listItem.appendChild(fileSizeLabel);
         fileOptions.appendChild(deleteButton);
         listItem.appendChild(fileOptions);
-
         uploadedFilesList.prepend(listItem);
 
-        // Video player setup
         if (!videoPlayer) {
             videoWrapper = document.createElement('div');
             videoWrapper.id = 'video-wrapper';
             videoWrapper.style.position = 'fixed';
+            videoWrapper.style.left = '50%';
+            videoWrapper.style.top = '50%';
+            videoWrapper.style.transform = 'translate(-50%, -50%)';
             videoWrapper.style.zIndex = '9999';
             videoWrapper.style.display = 'none';
             videoWrapper.style.cursor = 'move';
@@ -745,7 +756,6 @@ fileInput.addEventListener('change', (event) => {
             videoWrapper.style.borderRadius = '10px';
             videoWrapper.style.boxShadow = '0 8px 16px rgba(0,0,0,0.3)';
             videoWrapper.style.padding = '10px';
-            videoWrapper.style.transition = 'all 0.3s ease';
 
             const closeButton = document.createElement('button');
             closeButton.textContent = '✖';
@@ -777,7 +787,7 @@ fileInput.addEventListener('change', (event) => {
             videoWrapper.appendChild(videoPlayer);
             document.body.appendChild(videoWrapper);
 
-            // Drag functionality
+            // Drag support for desktop
             let isDragging = false, offsetX = 0, offsetY = 0;
 
             videoWrapper.addEventListener('mousedown', (e) => {
@@ -792,8 +802,6 @@ fileInput.addEventListener('change', (event) => {
                 if (isDragging) {
                     let newLeft = e.clientX - offsetX;
                     let newTop = e.clientY - offsetY;
-
-                    // Prevent overflow
                     const wrapperRect = videoWrapper.getBoundingClientRect();
                     const screenWidth = window.innerWidth;
                     const screenHeight = window.innerHeight;
@@ -805,38 +813,52 @@ fileInput.addEventListener('change', (event) => {
 
                     videoWrapper.style.left = `${newLeft}px`;
                     videoWrapper.style.top = `${newTop}px`;
+                    videoWrapper.style.transform = 'none';
                 }
             });
 
             document.addEventListener('mouseup', () => {
                 isDragging = false;
-                videoWrapper.style.transition = 'all 0.3s ease';
+                videoWrapper.style.transition = 'all 0.2s ease';
+            });
+
+            // Mobile touch support
+            let touchStartX = 0, touchStartY = 0;
+
+            videoWrapper.addEventListener('touchstart', (e) => {
+                const touch = e.touches[0];
+                touchStartX = touch.clientX - videoWrapper.getBoundingClientRect().left;
+                touchStartY = touch.clientY - videoWrapper.getBoundingClientRect().top;
+                videoWrapper.style.transition = 'none';
+            });
+
+            videoWrapper.addEventListener('touchmove', (e) => {
+                const touch = e.touches[0];
+                let newLeft = touch.clientX - touchStartX;
+                let newTop = touch.clientY - touchStartY;
+                const wrapperRect = videoWrapper.getBoundingClientRect();
+                const screenWidth = window.innerWidth;
+                const screenHeight = window.innerHeight;
+
+                if (newLeft + wrapperRect.width > screenWidth) newLeft = screenWidth - wrapperRect.width;
+                if (newTop + wrapperRect.height > screenHeight) newTop = screenHeight - wrapperRect.height;
+                if (newLeft < 0) newLeft = 0;
+                if (newTop < 0) newTop = 0;
+
+                videoWrapper.style.left = `${newLeft}px`;
+                videoWrapper.style.top = `${newTop}px`;
+                videoWrapper.style.transform = 'none';
             });
         }
 
-        // Play video on filename click
+        // Play video
         fileLink.addEventListener('click', (e) => {
             e.preventDefault();
             const videoURL = URL.createObjectURL(file);
             videoPlayer.src = videoURL;
             videoWrapper.style.display = 'block';
-
-            // Center the video wrapper after it's visible
-            requestAnimationFrame(() => {
-                const wrapperRect = videoWrapper.getBoundingClientRect();
-                const screenWidth = window.innerWidth;
-                const screenHeight = window.innerHeight;
-
-                const left = Math.max(0, (screenWidth - wrapperRect.width) / 2);
-                const top = Math.max(0, (screenHeight - wrapperRect.height) / 2);
-
-                videoWrapper.style.left = `${left}px`;
-                videoWrapper.style.top = `${top}px`;
-            });
-
             videoPlayer.play();
 
-            // Picture-in-Picture
             videoPlayer.addEventListener('enterpictureinpicture', () => {
                 videoWrapper.style.display = 'none';
             });
@@ -845,7 +867,6 @@ fileInput.addEventListener('change', (event) => {
                 videoWrapper.style.display = 'block';
             });
 
-            // Fullscreen with "f" key
             document.addEventListener('keydown', (event) => {
                 if (event.key === 'f') {
                     if (!document.fullscreenElement) {
@@ -864,6 +885,47 @@ fileInput.addEventListener('change', (event) => {
 
     fileInput.value = '';
 });
+
+// Optimized function to generate a thumbnail (updated to fit full image)
+function generateThumbnail(file, imgElement) {
+    const video = document.createElement('video');
+    video.preload = 'metadata';
+    video.src = URL.createObjectURL(file);
+    video.muted = true;
+    video.playsInline = true;
+
+    video.addEventListener('loadedmetadata', () => {
+        video.currentTime = 1;
+    });
+
+    video.addEventListener('seeked', () => {
+        const aspectRatio = video.videoWidth / video.videoHeight;
+        const displayWidth = 80; // Target display width
+        const displayHeight = 60; // Target display height
+        const scaleFactor = 2; // Increase resolution for better quality
+
+        let canvasWidth = displayWidth * scaleFactor;
+        let canvasHeight = displayHeight * scaleFactor;
+
+        const canvas = document.createElement('canvas');
+        canvas.width = canvasWidth;
+        canvas.height = canvasHeight;
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+
+        // Enable high-quality image scaling
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+
+        // Scale the video to fit the canvas exactly, ignoring aspect ratio if necessary
+        ctx.drawImage(video, 0, 0, canvasWidth, canvasHeight);
+
+        // Convert to data URL with high quality
+        imgElement.src = canvas.toDataURL('image/jpeg', 0.95);
+
+        URL.revokeObjectURL(video.src);
+    });
+}
+
 
 
 

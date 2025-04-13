@@ -700,126 +700,288 @@
         });
     
         const fileInput = document.getElementById('project-files');
-            const uploadedFilesList = document.getElementById('uploaded-files-list');
-            const goLiveButtonMobile = document.getElementById('go-live-button-mobile');
-            const goLiveButtonDesktop = document.getElementById('go-live-button-desktop');
-            let isFirstUpload = true;
+        const uploadedFilesList = document.getElementById('uploaded-files-list');
+        const goLiveButtonMobile = document.getElementById('go-live-button-mobile');
+        const goLiveButtonDesktop = document.getElementById('go-live-button-desktop');
+        let isFirstUpload = true;
 
-            fileInput.addEventListener('change', (event) => {
-                const files = Array.from(event.target.files);
-                if (isFirstUpload) {
-                    alert('Please upload your files in the chronological order that the edited video should take.');
-                    isFirstUpload = false;
+        let videoWrapper;
+        let videoPlayer;
+
+        fileInput.addEventListener('change', (event) => {
+            const files = Array.from(event.target.files);
+            if (isFirstUpload) {
+                alert('Please upload your files in the chronological order that the edited video should take.');
+                isFirstUpload = false;
+            }
+
+            files.forEach((file) => {
+                if (!file.type.startsWith('video/')) {
+                    alert(`Error: ${file.name} is not a valid video file. We only accept video formats.`);
+                    return;
                 }
 
-                files.forEach((file) => {
-                    if (!file.type.startsWith('video/')) {
-                        alert(`Error: ${file.name} is not a valid video file. We only accept video formats.`);
-                        return;
-                    }
+                const listItem = document.createElement('li');
+                listItem.style.display = 'flex';
+                listItem.style.justifyContent = 'space-between';
+                listItem.style.alignItems = 'center';
+                listItem.style.padding = '10px';
+                listItem.style.margin = '5px 0';
+                listItem.style.border = '1px solid #ccc';
+                listItem.style.borderRadius = '5px';
+                listItem.style.backgroundColor = '#f4f4f9';
+                listItem.style.gap = '10px';
 
-                    const listItem = document.createElement('li');
-                    listItem.style.display = 'flex';
-                    listItem.style.justifyContent = 'space-between';
-                    listItem.style.alignItems = 'center';
-                    listItem.style.padding = '10px';
-                    listItem.style.margin = '5px 0';
-                    listItem.style.border = '1px solid #ccc';
-                    listItem.style.borderRadius = '5px';
-                    listItem.style.backgroundColor = '#f4f4f9';
+                // Calculate file size in a human-readable format
+                let fileSize;
+                if (file.size / (1024 * 1024 * 1024) >= 1) {
+                    fileSize = (file.size / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
+                } else if (file.size / (1024 * 1024) >= 1) {
+                    fileSize = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+                } else {
+                    fileSize = (file.size / 1024).toFixed(2) + ' KB';
+                }
 
-                    // Calculate file size in a human-readable format
-                    let fileSize;
-                    if (file.size / (1024 * 1024 * 1024) >= 1) {
-                        fileSize = (file.size / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
-                    } else if (file.size / (1024 * 1024) >= 1) {
-                        fileSize = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
-                    } else {
-                        fileSize = (file.size / 1024).toFixed(2) + ' KB';
-                    }
+                // Thumbnail preview
+                const thumbnail = document.createElement('img');
+                thumbnail.style.width = '80px';
+                thumbnail.style.height = '60px';
+                thumbnail.style.objectFit = 'fill'; // Matches the latest editor dashboard setting
+                thumbnail.style.borderRadius = '5px';
+                generateThumbnail(file, thumbnail);
 
-                    listItem.innerHTML = `
-                        <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;" class="video-filename" title="${file.name}">${file.name}</span>
-                        <div class="file-options" style="display: flex; gap: 10px; justify-content: flex-end; align-items: center;">
-                            <span style="padding: 5px 10px; color: #333; font-size: 0.9rem;">${fileSize}</span>
-                            <button class="delete-file-button" style="padding: 5px 10px; border: none; background-color: #d9534f; color: white; border-radius: 5px; cursor: pointer;">Delete</button>
-                        </div>
-                    `;
-                    uploadedFilesList.prepend(listItem);
+                // File link (filename)
+                const fileLink = document.createElement('span');
+                fileLink.className = 'video-filename';
+                fileLink.textContent = file.name;
+                fileLink.title = file.name;
+                fileLink.style.flex = '1';
+                fileLink.style.overflow = 'hidden';
+                fileLink.style.textOverflow = 'ellipsis';
+                fileLink.style.whiteSpace = 'nowrap';
+                fileLink.style.cursor = 'pointer';
+                fileLink.style.color = '#007bff';
+                fileLink.style.textDecoration = 'underline';
 
-                    const filenameElement = listItem.querySelector('.video-filename');
-                    filenameElement.addEventListener('click', () => {
-                        // Create full-screen video player
-                        const playerContainer = document.createElement('div');
-                        Object.assign(playerContainer.style, {
-                            position: 'fixed',
-                            top: '0',
-                            left: '0',
-                            width: '100vw',
-                            height: '100vh',
-                            backgroundColor: 'black',
-                            zIndex: '2000',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                        });
-                        document.body.appendChild(playerContainer);
+                // File size
+                const fileSizeLabel = document.createElement('span');
+                fileSizeLabel.textContent = fileSize;
+                fileSizeLabel.style.padding = '5px 10px';
+                fileSizeLabel.style.color = '#333';
+                fileSizeLabel.style.fontSize = '0.9rem';
 
-                        const playerVideo = document.createElement('video');
-                        playerVideo.src = URL.createObjectURL(file);
-                        playerVideo.controls = true;
-                        playerVideo.autoplay = true;
-                        Object.assign(playerVideo.style, {
-                            width: '100%',
-                            height: 'calc(100% - 60px)',
-                            objectFit: 'contain'
-                        });
-                        playerContainer.appendChild(playerVideo);
+                // File options (delete button)
+                const fileOptions = document.createElement('div');
+                fileOptions.className = 'file-options';
+                fileOptions.style.display = 'flex';
+                fileOptions.style.gap = '10px';
+                fileOptions.style.justifyContent = 'flex-end';
+                fileOptions.style.alignItems = 'center';
 
-                        const playerButtonContainer = document.createElement('div');
-                        Object.assign(playerButtonContainer.style, {
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            gap: '10px',
-                            padding: '10px',
-                            width: '100%',
-                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                            boxSizing: 'border-box'
-                        });
-                        playerContainer.appendChild(playerButtonContainer);
+                const deleteButton = document.createElement('button');
+                deleteButton.className = 'delete-file-button';
+                deleteButton.textContent = 'Delete';
+                deleteButton.style.padding = '5px 10px';
+                deleteButton.style.border = 'none';
+                deleteButton.style.backgroundColor = '#d9534f';
+                deleteButton.style.color = 'white';
+                deleteButton.style.borderRadius = '5px';
+                deleteButton.style.cursor = 'pointer';
 
-                        const closeButton = document.createElement('button');
-                        closeButton.innerHTML = '<i class="fas fa-times"></i>';
-                        Object.assign(closeButton.style, {
-                            backgroundColor: '#d9534f',
-                            color: 'white',
-                            border: 'none',
-                            padding: '10px',
-                            borderRadius: '50%',
-                            cursor: 'pointer'
-                        });
-                        playerButtonContainer.appendChild(closeButton);
+                fileOptions.appendChild(fileSizeLabel);
+                fileOptions.appendChild(deleteButton);
 
-                        closeButton.addEventListener('click', () => {
-                            document.body.removeChild(playerContainer);
-                        });
+                // Append elements to list item
+                listItem.appendChild(thumbnail);
+                listItem.appendChild(fileLink);
+                listItem.appendChild(fileOptions);
+                uploadedFilesList.prepend(listItem);
 
-                        // Enter full-screen mode automatically
-                        playerContainer.requestFullscreen().catch(err => {
-                            console.error('Error entering full-screen mode for player:', err);
-                        });
+                // Video player setup (only once)
+                if (!videoPlayer) {
+                    videoWrapper = document.createElement('div');
+                    videoWrapper.id = 'video-wrapper';
+                    videoWrapper.style.position = 'fixed';
+                    videoWrapper.style.left = '50%';
+                    videoWrapper.style.top = '50%';
+                    videoWrapper.style.transform = 'translate(-50%, -50%)';
+                    videoWrapper.style.zIndex = '9999';
+                    videoWrapper.style.display = 'none';
+                    videoWrapper.style.cursor = 'move';
+                    videoWrapper.style.background = '#000';
+                    videoWrapper.style.borderRadius = '10px';
+                    videoWrapper.style.boxShadow = '0 8px 16px rgba(0,0,0,0.3)';
+                    videoWrapper.style.padding = '10px';
+
+                    const closeButton = document.createElement('button');
+                    closeButton.textContent = '✖';
+                    closeButton.style.position = 'absolute';
+                    closeButton.style.top = '5px';
+                    closeButton.style.right = '8px';
+                    closeButton.style.background = 'rgba(255, 255, 255, 0.2)';
+                    closeButton.style.border = 'none';
+                    closeButton.style.color = 'white';
+                    closeButton.style.fontSize = '16px';
+                    closeButton.style.cursor = 'pointer';
+                    closeButton.style.zIndex = '10000';
+                    closeButton.addEventListener('click', () => {
+                        videoPlayer.pause();
+                        videoWrapper.style.display = 'none';
                     });
 
-                    const deleteButton = listItem.querySelector('.delete-file-button');
-                    deleteButton.addEventListener('click', () => {
-                        listItem.remove();
+                    videoPlayer = document.createElement('video');
+                    videoPlayer.id = 'video-player';
+                    videoPlayer.controls = true;
+                    videoPlayer.style.maxWidth = '90vw';
+                    videoPlayer.style.maxHeight = '70vh';
+                    videoPlayer.style.width = 'auto';
+                    videoPlayer.style.height = 'auto';
+                    videoPlayer.style.borderRadius = '8px';
+                    videoPlayer.style.display = 'block';
+
+                    videoWrapper.appendChild(closeButton);
+                    videoWrapper.appendChild(videoPlayer);
+                    document.body.appendChild(videoWrapper);
+
+                    // Drag support for desktop
+                    let isDragging = false, offsetX = 0, offsetY = 0;
+
+                    videoWrapper.addEventListener('mousedown', (e) => {
+                        if (e.target === closeButton) return;
+                        isDragging = true;
+                        offsetX = e.clientX - videoWrapper.getBoundingClientRect().left;
+                        offsetY = e.clientY - videoWrapper.getBoundingClientRect().top;
+                        videoWrapper.style.transition = 'none';
+                    });
+
+                    document.addEventListener('mousemove', (e) => {
+                        if (isDragging) {
+                            let newLeft = e.clientX - offsetX;
+                            let newTop = e.clientY - offsetY;
+                            const wrapperRect = videoWrapper.getBoundingClientRect();
+                            const screenWidth = window.innerWidth;
+                            const screenHeight = window.innerHeight;
+
+                            if (newLeft + wrapperRect.width > screenWidth) newLeft = screenWidth - wrapperRect.width;
+                            if (newTop + wrapperRect.height > screenHeight) newTop = screenHeight - wrapperRect.height;
+                            if (newLeft < 0) newLeft = 0;
+                            if (newTop < 0) newTop = 0;
+
+                            videoWrapper.style.left = `${newLeft}px`;
+                            videoWrapper.style.top = `${newTop}px`;
+                            videoWrapper.style.transform = 'none';
+                        }
+                    });
+
+                    document.addEventListener('mouseup', () => {
+                        isDragging = false;
+                        videoWrapper.style.transition = 'all 0.2s ease';
+                    });
+
+                    // Mobile touch support
+                    let touchStartX = 0, touchStartY = 0;
+
+                    videoWrapper.addEventListener('touchstart', (e) => {
+                        const touch = e.touches[0];
+                        touchStartX = touch.clientX - videoWrapper.getBoundingClientRect().left;
+                        touchStartY = touch.clientY - videoWrapper.getBoundingClientRect().top;
+                        videoWrapper.style.transition = 'none';
+                    });
+
+                    videoWrapper.addEventListener('touchmove', (e) => {
+                        const touch = e.touches[0];
+                        let newLeft = touch.clientX - touchStartX;
+                        let newTop = touch.clientY - touchStartY;
+                        const wrapperRect = videoWrapper.getBoundingClientRect();
+                        const screenWidth = window.innerWidth;
+                        const screenHeight = window.innerHeight;
+
+                        if (newLeft + wrapperRect.width > screenWidth) newLeft = screenWidth - wrapperRect.width;
+                        if (newTop + wrapperRect.height > screenHeight) newTop = screenHeight - wrapperRect.height;
+                        if (newLeft < 0) newLeft = 0;
+                        if (newTop < 0) newTop = 0;
+
+                        videoWrapper.style.left = `${newLeft}px`;
+                        videoWrapper.style.top = `${newTop}px`;
+                        videoWrapper.style.transform = 'none';
+                    });
+                }
+
+                // Play video (mimic editor dashboard behavior)
+                fileLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const videoURL = URL.createObjectURL(file);
+                    videoPlayer.src = videoURL;
+                    videoWrapper.style.display = 'block';
+                    videoPlayer.play();
+
+                    videoPlayer.addEventListener('enterpictureinpicture', () => {
+                        videoWrapper.style.display = 'none';
+                    });
+
+                    videoPlayer.addEventListener('leavepictureinpicture', () => {
+                        videoWrapper.style.display = 'block';
+                    });
+
+                    document.addEventListener('keydown', (event) => {
+                        if (event.key === 'f') {
+                            if (!document.fullscreenElement) {
+                                videoPlayer.requestFullscreen();
+                            } else {
+                                document.exitFullscreen();
+                            }
+                        }
                     });
                 });
 
-                fileInput.value = '';
-         });
+                // Delete functionality
+                deleteButton.addEventListener('click', () => {
+                    listItem.remove();
+                });
+            });
+
+            fileInput.value = '';
+        });
+
+        // Function to generate thumbnail (matches editor dashboard)
+        function generateThumbnail(file, imgElement) {
+            const video = document.createElement('video');
+            video.preload = 'metadata';
+            video.src = URL.createObjectURL(file);
+            video.muted = true;
+            video.playsInline = true;
+
+            video.addEventListener('loadedmetadata', () => {
+                video.currentTime = 1;
+            });
+
+            video.addEventListener('seeked', () => {
+                const aspectRatio = video.videoWidth / video.videoHeight;
+                const displayWidth = 80; // Target display width
+                const displayHeight = 60; // Target display height
+                const scaleFactor = 2; // Increase resolution for better quality
+
+                let canvasWidth = displayWidth * scaleFactor;
+                let canvasHeight = displayHeight * scaleFactor;
+
+                const canvas = document.createElement('canvas');
+                canvas.width = canvasWidth;
+                canvas.height = canvasHeight;
+                const ctx = canvas.getContext('2d', { willReadFrequently: true });
+
+                // Enable high-quality image scaling
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
+
+                // Scale the video to fit the canvas exactly, ignoring aspect ratio if necessary
+                ctx.drawImage(video, 0, 0, canvasWidth, canvasHeight);
+
+                // Convert to data URL with high quality
+                imgElement.src = canvas.toDataURL('image/jpeg', 0.95);
+
+                URL.revokeObjectURL(video.src);
+            });
+        }
     
         let mediaRecorder;
         let recordedChunks = [];
