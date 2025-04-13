@@ -606,6 +606,7 @@
                     <input type="file" id="project-files" name="project-files" required accept="video/*">
                     <ul id="uploaded-files-list" class="uploaded-files-list"></ul>
                 </div>
+
                 <div>
                     <label for="project-description">Editing Feedback</label>
                     <textarea id="project-description" name="project-description" rows="4" placeholder="Provide your editing feedback and any additional notes" required></textarea>
@@ -664,42 +665,194 @@
         });
 
         const fileInput = document.getElementById('project-files');
-        const uploadedFilesList = document.getElementById('uploaded-files-list');
+const uploadedFilesList = document.getElementById('uploaded-files-list');
 
-        fileInput.addEventListener('change', (event) => {
-            const files = Array.from(event.target.files);
-            files.forEach((file) => {
-                if (!file.type.startsWith('video/')) {
-                    alert(`Error: ${file.name} is not a valid video file.`);
-                    return;
-                }
+let videoWrapper;
+let videoPlayer;
 
-                const listItem = document.createElement('li');
-                listItem.style.display = 'flex';
-                listItem.style.justifyContent = 'space-between';
-                listItem.style.alignItems = 'center';
-                listItem.style.padding = '10px';
-                listItem.style.margin = '5px 0';
-                listItem.style.border = '1px solid #ccc';
-                listItem.style.borderRadius = '5px';
-                listItem.style.backgroundColor = '#f4f4f9';
+fileInput.addEventListener('change', (event) => {
+    const files = Array.from(event.target.files);
 
-                listItem.innerHTML = `
-                    <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${file.name}</span>
-                    <div class="file-options" style="display: flex; gap: 10px;">
-                        <button class="delete-file-button" style="padding: 5px 10px; border: none; background-color: #d9534f; color: white; border-radius: 5px; cursor: pointer;">Delete</button>
-                    </div>
-                `;
-                uploadedFilesList.prepend(listItem);
+    files.forEach((file) => {
+        if (!file.type.startsWith('video/')) {
+            alert(`Error: ${file.name} is not a valid video file.`);
+            return;
+        }
 
-                const deleteButton = listItem.querySelector('.delete-file-button');
-                deleteButton.addEventListener('click', () => {
-                    listItem.remove();
-                });
+        const listItem = document.createElement('li');
+        listItem.style.display = 'flex';
+        listItem.style.justifyContent = 'space-between';
+        listItem.style.alignItems = 'center';
+        listItem.style.padding = '10px';
+        listItem.style.margin = '5px 0';
+        listItem.style.border = '1px solid #ccc';
+        listItem.style.borderRadius = '5px';
+        listItem.style.backgroundColor = '#f4f4f9';
+
+        const fileSize = (file.size / (1024 * 1024)).toFixed(2); // in MB
+
+        // Create a link for the filename
+        const fileLink = document.createElement('a');
+        fileLink.href = '#';
+        fileLink.textContent = file.name;
+        fileLink.title = file.name;
+        fileLink.style.flex = '1';
+        fileLink.style.overflow = 'hidden';
+        fileLink.style.textOverflow = 'ellipsis';
+        fileLink.style.whiteSpace = 'nowrap';
+        fileLink.style.color = '#007bff';
+        fileLink.style.textDecoration = 'underline';
+        fileLink.style.cursor = 'pointer';
+
+        // Show size on the right
+        const fileSizeLabel = document.createElement('span');
+        fileSizeLabel.textContent = `${fileSize} MB`;
+        fileSizeLabel.style.marginLeft = '15px';
+        fileSizeLabel.style.fontSize = '0.9em';
+        fileSizeLabel.style.color = '#555';
+
+        const fileOptions = document.createElement('div');
+        fileOptions.className = 'file-options';
+        fileOptions.style.display = 'flex';
+        fileOptions.style.gap = '10px';
+
+        const deleteButton = document.createElement('button');
+        deleteButton.className = 'delete-file-button';
+        deleteButton.textContent = 'Delete';
+        deleteButton.style.padding = '5px 10px';
+        deleteButton.style.border = 'none';
+        deleteButton.style.backgroundColor = '#d9534f';
+        deleteButton.style.color = 'white';
+        deleteButton.style.borderRadius = '5px';
+        deleteButton.style.cursor = 'pointer';
+
+        listItem.appendChild(fileLink);
+        listItem.appendChild(fileSizeLabel);
+        fileOptions.appendChild(deleteButton);
+        listItem.appendChild(fileOptions);
+
+        uploadedFilesList.prepend(listItem);
+
+        // Video player setup
+        if (!videoPlayer) {
+            videoWrapper = document.createElement('div');
+            videoWrapper.id = 'video-wrapper';
+            videoWrapper.style.position = 'fixed';
+            videoWrapper.style.top = '20px';
+            videoWrapper.style.left = '20px';
+            videoWrapper.style.zIndex = '9999';
+            videoWrapper.style.display = 'none';
+            videoWrapper.style.cursor = 'move';
+            videoWrapper.style.background = '#000';
+            videoWrapper.style.borderRadius = '10px';
+            videoWrapper.style.boxShadow = '0 8px 16px rgba(0,0,0,0.3)';
+            videoWrapper.style.padding = '10px';
+
+            const closeButton = document.createElement('button');
+            closeButton.textContent = '✖';
+            closeButton.style.position = 'absolute';
+            closeButton.style.top = '5px';
+            closeButton.style.right = '8px';
+            closeButton.style.background = 'rgba(255, 255, 255, 0.2)';
+            closeButton.style.border = 'none';
+            closeButton.style.color = 'white';
+            closeButton.style.fontSize = '16px';
+            closeButton.style.cursor = 'pointer';
+            closeButton.style.zIndex = '10000';
+            closeButton.addEventListener('click', () => {
+                videoPlayer.pause();
+                videoWrapper.style.display = 'none';
             });
 
-            fileInput.value = '';
+            videoPlayer = document.createElement('video');
+            videoPlayer.id = 'video-player';
+            videoPlayer.controls = true;
+            videoPlayer.style.maxWidth = '90vw';
+            videoPlayer.style.maxHeight = '70vh';
+            videoPlayer.style.width = 'auto';
+            videoPlayer.style.height = 'auto';
+            videoPlayer.style.borderRadius = '8px';
+            videoPlayer.style.display = 'block';
+
+            videoWrapper.appendChild(closeButton);
+            videoWrapper.appendChild(videoPlayer);
+            document.body.appendChild(videoWrapper);
+
+            // Drag functionality
+            let isDragging = false, offsetX = 0, offsetY = 0;
+
+            videoWrapper.addEventListener('mousedown', (e) => {
+                if (e.target === closeButton) return;
+                isDragging = true;
+                offsetX = e.clientX - videoWrapper.getBoundingClientRect().left;
+                offsetY = e.clientY - videoWrapper.getBoundingClientRect().top;
+                videoWrapper.style.transition = 'none';
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (isDragging) {
+                    let newLeft = e.clientX - offsetX;
+                    let newTop = e.clientY - offsetY;
+
+                    // Prevent overflow
+                    const wrapperRect = videoWrapper.getBoundingClientRect();
+                    const screenWidth = window.innerWidth;
+                    const screenHeight = window.innerHeight;
+
+                    if (newLeft + wrapperRect.width > screenWidth) newLeft = screenWidth - wrapperRect.width;
+                    if (newTop + wrapperRect.height > screenHeight) newTop = screenHeight - wrapperRect.height;
+                    if (newLeft < 0) newLeft = 0;
+                    if (newTop < 0) newTop = 0;
+
+                    videoWrapper.style.left = `${newLeft}px`;
+                    videoWrapper.style.top = `${newTop}px`;
+                }
+            });
+
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+                videoWrapper.style.transition = 'all 0.2s ease';
+            });
+        }
+
+        // Play video on filename click
+        fileLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            const videoURL = URL.createObjectURL(file);
+            videoPlayer.src = videoURL;
+            videoWrapper.style.display = 'block';
+            videoPlayer.play();
+
+            // Picture-in-Picture
+            videoPlayer.addEventListener('enterpictureinpicture', () => {
+                videoWrapper.style.display = 'none';
+            });
+
+            videoPlayer.addEventListener('leavepictureinpicture', () => {
+                videoWrapper.style.display = 'block';
+            });
+
+            // Fullscreen with "f" key
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'f') {
+                    if (!document.fullscreenElement) {
+                        videoPlayer.requestFullscreen();
+                    } else {
+                        document.exitFullscreen();
+                    }
+                }
+            });
         });
+
+        deleteButton.addEventListener('click', () => {
+            listItem.remove();
+        });
+    });
+
+    fileInput.value = '';
+});
+
+
     </script>
 </body>
 </html>
