@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor Dashboard</title>
+    <link rel="shortcut icon" href="images/main-logo.jpg" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="js/record.js"></script>
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #00235f;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Main Header Styles */
+        .main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #00235f;
+            color: white;
+            padding: 15px 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1100;
+        }
+
+        .main-header h1 {
+            font-size: 1.5rem;
+            margin: 0;
+        }
+
+        .main-header .hamburger {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: white;
+        }
+
+        .main-header .logout {
+            color: white;
+            font-size: 1.5rem;
+            text-decoration: none;
+            margin-right: 40px;
+        }
+
+        .main-header .logout:hover {
+            color: #ddd;
+        }
+
+        /* Hamburger Menu */
+        .hamburger {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: white;
+            transition: transform 0.3s ease;
+        }
+
+        .hamburger.open {
+            transform: rotate(45deg);
+            color: white;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 130px;
+            height: 100vh;
+            background-color: #00235f;
+            color: white;
+            position: fixed;
+            top: 60px;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            padding-top: 20px;
+            transition: width 0.3s ease, left 0.3s ease;
+            z-index: 1000;
+            overflow-x: hidden;
+        }
+
+        .sidebar.expanded-desktop {
+            width: 220px;
+        }
+
+        .sidebar.expanded-desktop a span {
+            display: inline;
+        }
+
+        .sidebar.open {
+            left: -220px;
+            width: 220px;
+            overflow-x: visible;
+        }
+
+        .sidebar.open.expanded-desktop {
+            left: 0;
+        }
+
+        .sidebar.open a span {
+            display: inline;
+            white-space: normal;
+        }
+
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .sidebar-title {
+            font-size: 1.5rem;
+            color: white;
+            text-align: center;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .sidebar.expanded-desktop .sidebar-title,
+        .sidebar.open .sidebar-title {
+            display: block;
+        }
+
+        .sidebar a {
+            text-decoration: none;
+            color: white;
+            padding: 10px 15px;
+            margin: 5px 0;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .sidebar a i {
+            font-size: 1.2rem;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .sidebar a span {
+            white-space: nowrap;
+            display: none;
+        }
+
+        .sidebar a:hover {
+            background-color: #003080;
+        }
+
+        .sidebar a.active {
+            background-color: #003080;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            margin-left: 60px;
+            padding: 20px;
+            margin-top: 80px;
+            transition: margin-left 0.3s ease;
+            flex-grow: 1;
+        }
+
+        .main-content.collapsed {
+            margin-left: 0;
+        }
+
+        .main-content.expanded-desktop {
+            margin-left: 220px;
+        }
+
+        /* Content Header Styles for Editors */
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            padding: 15px 20px;
+            background-color: white;
+            border-bottom: 1px solid #ddd;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .content-header .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        @media (max-width: 769px) {
+            .content-header .user-info {
+                margin-left: 0;
+            }
+        }
+
+        .content-header .user-info img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+        }
+
+        .content-header .user-info h4 {
+            font-size: 1.5rem;
+            color: #00235f;
+            margin: 0;
+        }
+
+        /* Payment Section */
+        .payment-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: 20px;
+        }
+
+        .payment-section h1 {
+            font-size: 1.4rem;
+            color: #00235f;
+            font-weight: bold;
+            margin: 0 0 15px 15px;
+            text-align: left;
+        }
+
+        .payment-section .clipilot-content {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .payment-section .balance-info {
+            font-size: 1.2rem;
+            color: #00235f;
+            font-weight: bold;
+        }
+
+        .payment-section .transfer-button {
+            background-color: #003087;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-size: 1rem;
+            font-weight: bold;
+            width: 100%;
+            max-width: 200px;
+        }
+
+        .payment-section .transfer-button:hover {
+            background-color: #00235f;
+        }
+
+        /* Dashboard Section for Editors */
+        .dashboard-section {
+            margin-top: 20px;
+            margin-bottom: 40px; /* Space above footer */
+        }
+
+        .dashboard-section h2 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: #00235f;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .card h3 {
+            margin: 0 0 10px;
+            font-size: 1.1rem;
+            color: #00235f;
+        }
+
+        .card p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* Project Form Styles for Editors */
+        .project-form {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .project-form > div {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+
+        .project-form label {
+            font-weight: bold;
+            color: #00235f;
+            margin-bottom: 5px;
+        }
+
+        .project-form input[type="text"],
+        .project-form input[type="file"],
+        .project-form textarea,
+        .project-form select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        #video-category {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+        }
+
+        .submit-button {
+            background-color: #003087;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+            width: 100%;
+            text-align: center;
+            box-sizing: border-box;
+            display: block;
+        }
+
+        .submit-button:hover {
+            background-color: #002060;
+        }
+
+        .uploaded-files-list {
+            padding: 0;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #333;
+            max-width: 100%;
+            word-wrap: break-word;
+        }
+
+        .uploaded-files-list li {
+            background-color: #f4f4f9;
+            padding: 8px 10px;
+            margin-bottom: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .uploaded-files-list li span {
+            font-weight: bold;
+            color: #00235f;
+            max-width: 70%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .form-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .main-footer {
+            background-color: #e0e0e0;
+            color: #333;
+            height: 5vh;
+            text-align: center;
+            padding: 10px 0;
+            border-radius: 5px;
+            position: relative;
+            z-index: 900;
+            margin-top: 30px;
+            font-size: 0.9rem;
+            border-top: 1px solid #ccc;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                left: -220px;
+                width: 220px;
+                overflow-x: visible;
+            }
+
+            .sidebar.open {
+                left: 0;
+            }
+
+            .sidebar a span {
+                display: inline;
+                white-space: normal;
+            }
+
+            .main-content {
+                margin-left: 0 !important;
+                padding-top: 60px;
+                margin-top: 25px;
+            }
+
+            .content-header {
+                margin-bottom: 5px;
+            }
+
+            .main-header .hamburger {
+                display: block;
+            }
+
+            .form-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .submit-button {
+                margin-left: 0;
+            }
+
+            .payment-section {
+                padding: 10px;
+            }
+
+            .payment-section .clipilot-content {
+                align-items: center;
+            }
+
+            .payment-section .transfer-button {
+                max-width: 100%;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .form-actions {
+                flex-direction: row;
+                align-items: flex-start;
+            }
+
+            .project-form {
+                max-width: 800px;
+                margin: 0 auto;
+            }
+
+            .content-header {
+                max-width: 800px;
+                margin: 0 auto;
+                padding: 15px 5px;
+                border-radius: 8px;
+            }
+
+            .payment-section {
+                max-width: 800px;
+                margin: 20px auto;
+                padding: 15px 5px;
+            }
+
+            .dashboard-section {
+                max-width: 800px;
+                margin: 0 auto;
+            }
+
+            .main-footer {
+                max-width: 800px;
+                margin: 0 auto;
+            }
+        }
+
+        .audio-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-top: 10px;
+        }
+
+        .button-wrapper {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .audio-wrapper {
+                flex-direction: column;
+            }
+
+            .button-wrapper {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-header">
+        <i class="fas fa-bars hamburger"></i>
+        <a href="index.html" class="logout"><i class="fas fa-sign-out-alt"></i></a>
+    </div>
+
+    <div class="sidebar collapsed-desktop">
+        <h1 class="sidebar-title">Clip-Pilot</h1>
+        <a href="#" class="active"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+        <a href="#"><i class="fas fa-video"></i> <span>Current Edits</span></a>
+        <a href="#"><i class="fas fa-history"></i> <span>Edit History</span></a>
+        <a href="#"><i class="fas fa-envelope"></i> <span>Messages</span></a>
+        <a href="#"><i class="fas fa-cog"></i> <span>Settings</span></a>
+        <a href="#"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a>
+    </div>
+
+    <div class="main-content collapsed-desktop">
+        <div class="content-header">
+            <div class="user-info">
+                <img src="images/my-image.jpeg" alt="User Avatar">
+                <h4>Hey, Editor</h4>
+            </div>
+        </header>
+        </div>
+
+        <div class="payment-section">
+            <h1>My Balance</h1>
+            <div class="clipilot-content">
+                <span class="balance-info"><h2>$1,500.00 USD</h2></span>
+                <button class="transfer-button">Transfer Funds</button>
+            </div>
+        </div>
+
+        <div class="dashboard-section">
+            <h2>Current Editing Projects</h2>
+            <div class="card">
+                <h3>Project: Social Media Ad</h3>
+                <p>Status: In Progress</p>
+                <p>Deadline: April 20, 2025</p>
+                <p>Tools Required: Adobe Premiere, After Effects</p>
+            </div>
+            <div class="card">
+                <h3>Project: Corporate Video</h3>
+                <p>Status: Pending Review</p>
+                <p>Deadline: April 18, 2025</p>
+                <p>Tools Required: Final Cut Pro, Color Grading</p>
+            </div>
+        </div>
+
+        <div class="dashboard-section">
+            <h2>Upload Edited Video</h2>
+            <form class="project-form">
+                <div>
+                    <label for="project-title">Project Title</label>
+                    <input type="text" id="project-title" name="project-title" placeholder="Enter project title" required>
+                </div>
+                <div>
+                    <label for="video-category">Video Type</label>
+                    <select id="video-category" name="video-category" required>
+                        <option value="" disabled selected>Select a type</option>
+                        <option value="social-media">Social Media Ad</option>
+                        <option value="corporate">Corporate Video</option>
+                        <option value="documentary">Documentary</option>
+                        <option value="trailer">Trailer</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="project-files">Upload Edited Video</label>
+                    <input type="file" id="project-files" name="project-files" required accept="video/*">
+                    <ul id="uploaded-files-list" class="uploaded-files-list"></ul>
+                </div>
+                <div>
+                    <label for="project-description">Editing Feedback</label>
+                    <textarea id="project-description" name="project-description" rows="4" placeholder="Provide your editing feedback and any additional notes" required></textarea>
+                </div>
+                <div class="form-actions">
+                    <button class="submit-button" type="submit">Submit Edited Video</button>
+                </div>
+            </form>
+        </div>
+
+        <footer class="main-footer">
+            © 2025 Clip-Pilot. All rights reserved.
+        </footer>
+    </div>
+
+    <script>
+        // JavaScript for sidebar toggling and file upload
+        const hamburger = document.querySelector('.hamburger');
+        const sidebar = document.querySelector('.sidebar');
+        const mainContent = document.querySelector('.main-content');
+
+        hamburger.addEventListener('click', () => {
+            if (window.innerWidth > 768) {
+                sidebar.classList.toggle('expanded-desktop');
+                mainContent.classList.toggle('expanded-desktop');
+            } else {
+                sidebar.classList.toggle('open');
+                mainContent.classList.toggle('collapsed');
+            }
+
+            if (hamburger.classList.contains('fa-bars')) {
+                hamburger.classList.remove('fa-bars');
+                hamburger.classList.add('fa-times');
+            } else {
+                hamburger.classList.remove('fa-times');
+                hamburger.classList.add('fa-bars');
+            }
+        });
+
+        const fileInput = document.getElementById('project-files');
+        const uploadedFilesList = document.getElementById('uploaded-files-list');
+
+        fileInput.addEventListener('change', (event) => {
+            const files = Array.from(event.target.files);
+            files.forEach((file) => {
+                if (!file.type.startsWith('video/')) {
+                    alert(`Error: ${file.name} is not a valid video file.`);
+                    return;
+                }
+
+                const listItem = document.createElement('li');
+                listItem.style.display = 'flex';
+                listItem.style.justifyContent = 'space-between';
+                listItem.style.alignItems = 'center';
+                listItem.style.padding = '10px';
+                listItem.style.margin = '5px 0';
+                listItem.style.border = '1px solid #ccc';
+                listItem.style.borderRadius = '5px';
+                listItem.style.backgroundColor = '#f4f4f9';
+
+                listItem.innerHTML = `
+                    <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${file.name}</span>
+                    <div class="file-options" style="display: flex; gap: 10px;">
+                        <button class="delete-file-button" style="padding: 5px 10px; border: none; background-color: #d9534f; color: white; border-radius: 5px; cursor: pointer;">Delete</button>
+                    </div>
+                `;
+                uploadedFilesList.prepend(listItem);
+
+                const deleteButton = listItem.querySelector('.delete-file-button');
+                deleteButton.addEventListener('click', () => {
+                    listItem.remove();
+                });
+            });
+
+            fileInput.value = '';
+        });
+    </script>
+</body>
+</html>
