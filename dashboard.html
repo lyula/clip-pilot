@@ -663,10 +663,12 @@
             <div class="card">
                 <h3>Project: Social Media Ad</h3>
                 <p>Status: In Progress</p>
+                <p>Order No: c-p1130-ddd/mmm/yyy</p>
             </div>
             <div class="card">
                 <h3>Project: Corporate Video</h3>
                 <p>Status: Completed</p>
+                <p>Order No: c-p1113-ddd/mmm/yyy</p>
             </div>
         </div>
         <footer class="main-footer">
@@ -698,12 +700,12 @@
         });
     
         const fileInput = document.getElementById('project-files');
-        const uploadedFilesList = document.getElementById('uploaded-files-list');
-        const goLiveButtonMobile = document.getElementById('go-live-button-mobile');
-        const goLiveButtonDesktop = document.getElementById('go-live-button-desktop');
-        let isFirstUpload = true;
-    
-                fileInput.addEventListener('change', (event) => {
+            const uploadedFilesList = document.getElementById('uploaded-files-list');
+            const goLiveButtonMobile = document.getElementById('go-live-button-mobile');
+            const goLiveButtonDesktop = document.getElementById('go-live-button-desktop');
+            let isFirstUpload = true;
+
+            fileInput.addEventListener('change', (event) => {
                 const files = Array.from(event.target.files);
                 if (isFirstUpload) {
                     alert('Please upload your files in the chronological order that the edited video should take.');
@@ -737,13 +739,78 @@
                     }
 
                     listItem.innerHTML = `
-                        <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${file.name}</span>
+                        <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;" class="video-filename" title="${file.name}">${file.name}</span>
                         <div class="file-options" style="display: flex; gap: 10px; justify-content: flex-end; align-items: center;">
                             <span style="padding: 5px 10px; color: #333; font-size: 0.9rem;">${fileSize}</span>
                             <button class="delete-file-button" style="padding: 5px 10px; border: none; background-color: #d9534f; color: white; border-radius: 5px; cursor: pointer;">Delete</button>
                         </div>
                     `;
                     uploadedFilesList.prepend(listItem);
+
+                    const filenameElement = listItem.querySelector('.video-filename');
+                    filenameElement.addEventListener('click', () => {
+                        // Create full-screen video player
+                        const playerContainer = document.createElement('div');
+                        Object.assign(playerContainer.style, {
+                            position: 'fixed',
+                            top: '0',
+                            left: '0',
+                            width: '100vw',
+                            height: '100vh',
+                            backgroundColor: 'black',
+                            zIndex: '2000',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        });
+                        document.body.appendChild(playerContainer);
+
+                        const playerVideo = document.createElement('video');
+                        playerVideo.src = URL.createObjectURL(file);
+                        playerVideo.controls = true;
+                        playerVideo.autoplay = true;
+                        Object.assign(playerVideo.style, {
+                            width: '100%',
+                            height: 'calc(100% - 60px)',
+                            objectFit: 'contain'
+                        });
+                        playerContainer.appendChild(playerVideo);
+
+                        const playerButtonContainer = document.createElement('div');
+                        Object.assign(playerButtonContainer.style, {
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            gap: '10px',
+                            padding: '10px',
+                            width: '100%',
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            boxSizing: 'border-box'
+                        });
+                        playerContainer.appendChild(playerButtonContainer);
+
+                        const closeButton = document.createElement('button');
+                        closeButton.innerHTML = '<i class="fas fa-times"></i>';
+                        Object.assign(closeButton.style, {
+                            backgroundColor: '#d9534f',
+                            color: 'white',
+                            border: 'none',
+                            padding: '10px',
+                            borderRadius: '50%',
+                            cursor: 'pointer'
+                        });
+                        playerButtonContainer.appendChild(closeButton);
+
+                        closeButton.addEventListener('click', () => {
+                            document.body.removeChild(playerContainer);
+                        });
+
+                        // Enter full-screen mode automatically
+                        playerContainer.requestFullscreen().catch(err => {
+                            console.error('Error entering full-screen mode for player:', err);
+                        });
+                    });
 
                     const deleteButton = listItem.querySelector('.delete-file-button');
                     deleteButton.addEventListener('click', () => {
@@ -752,7 +819,7 @@
                 });
 
                 fileInput.value = '';
-            });
+         });
     
         let mediaRecorder;
         let recordedChunks = [];
@@ -765,22 +832,22 @@
                     alert('Please submit the existing recorded file before starting a new recording.');
                     return;
                 }
-    
+
                 if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
                     alert('Your browser does not support camera access. Please update your browser or use a modern browser.');
                     return;
                 }
-    
+
                 const consent = confirm('We will use your camera to record footage. Do you consent?');
                 if (!consent) {
                     alert('Camera access denied. Unable to start live recording.');
                     return;
                 }
-    
+
                 try {
                     videoStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
                     if (!videoStream) throw new Error('Failed to access camera and microphone.');
-    
+
                     const liveContainer = document.createElement('div');
                     Object.assign(liveContainer.style, {
                         position: 'fixed',
@@ -800,7 +867,7 @@
                         zIndex: '1000'
                     });
                     document.body.appendChild(liveContainer);
-    
+
                     const videoElement = document.createElement('video');
                     videoElement.srcObject = videoStream;
                     Object.assign(videoElement.style, {
@@ -812,7 +879,7 @@
                     videoElement.autoplay = true;
                     videoElement.muted = true;
                     liveContainer.appendChild(videoElement);
-    
+
                     const recordingIndicator = document.createElement('div');
                     Object.assign(recordingIndicator.style, {
                         position: 'absolute',
@@ -829,7 +896,7 @@
                     });
                     recordingIndicator.textContent = '● Recording - 00:00';
                     liveContainer.appendChild(recordingIndicator);
-    
+
                     const style = document.createElement('style');
                     style.innerHTML = `
                         @keyframes blink {
@@ -839,7 +906,7 @@
                         }
                     `;
                     document.head.appendChild(style);
-    
+
                     let startTime = Date.now();
                     const updateDuration = () => {
                         const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
@@ -848,7 +915,7 @@
                         recordingIndicator.textContent = `● Recording - ${minutes}:${seconds}`;
                     };
                     const durationInterval = setInterval(updateDuration, 1000);
-    
+
                     const buttonContainer = document.createElement('div');
                     Object.assign(buttonContainer.style, {
                         display: 'flex',
@@ -862,7 +929,7 @@
                         boxSizing: 'border-box'
                     });
                     liveContainer.appendChild(buttonContainer);
-    
+
                     const stopRecordingButton = document.createElement('button');
                     stopRecordingButton.textContent = 'Stop Recording';
                     Object.assign(stopRecordingButton.style, {
@@ -874,7 +941,7 @@
                         cursor: 'pointer'
                     });
                     buttonContainer.appendChild(stopRecordingButton);
-    
+
                     const switchCameraButton = document.createElement('button');
                     switchCameraButton.innerHTML = '<i class="fas fa-sync-alt"></i>';
                     Object.assign(switchCameraButton.style, {
@@ -886,51 +953,83 @@
                         cursor: 'pointer'
                     });
                     buttonContainer.appendChild(switchCameraButton);
-    
+
+                    // Add full-screen button for all devices
+                    const fullscreenButton = document.createElement('button');
+                    fullscreenButton.innerHTML = '<i class="fas fa-expand"></i>';
+                    Object.assign(fullscreenButton.style, {
+                        backgroundColor: '#003087',
+                        color: 'white',
+                        border: 'none',
+                        padding: '10px',
+                        borderRadius: '50%',
+                        cursor: 'pointer'
+                    });
+                    buttonContainer.appendChild(fullscreenButton);
+
+                    fullscreenButton.addEventListener('click', () => {
+                        if (!document.fullscreenElement) {
+                            liveContainer.requestFullscreen().catch(err => {
+                                alert('Error entering full-screen mode: ' + err.message);
+                            });
+                        } else {
+                            document.exitFullscreen();
+                        }
+                    });
+
+                    // Update icon when full-screen state changes
+                    document.addEventListener('fullscreenchange', () => {
+                        if (document.fullscreenElement) {
+                            fullscreenButton.innerHTML = '<i class="fas fa-compress"></i>';
+                        } else {
+                            fullscreenButton.innerHTML = '<i class="fas fa-expand"></i>';
+                        }
+                    });
+
                     switchCameraButton.addEventListener('click', async () => {
                         try {
                             const devices = await navigator.mediaDevices.enumerateDevices();
                             const videoDevices = devices.filter((d) => d.kind === 'videoinput');
-    
+
                             if (videoDevices.length < 2) {
                                 alert('Only one camera available.');
                                 return;
                             }
-    
+
                             const currentTrack = videoStream.getVideoTracks()[0];
                             const currentId = currentTrack.getSettings().deviceId;
                             const currentIndex = videoDevices.findIndex(d => d.deviceId === currentId);
                             const nextIndex = (currentIndex + 1) % videoDevices.length;
                             const nextDeviceId = videoDevices[nextIndex].deviceId;
-    
+
                             // Stop the current video track but keep the stream alive
                             currentTrack.stop();
-    
+
                             // Wait briefly to ensure the camera is released
                             await new Promise(resolve => setTimeout(resolve, 300));
-    
+
                             // Get a new video track from the next camera
                             const newStream = await navigator.mediaDevices.getUserMedia({
                                 video: { deviceId: { exact: nextDeviceId } }
                             });
-    
+
                             const newVideoTrack = newStream.getVideoTracks()[0];
-    
+
                             // Replace the video track in the existing stream
                             videoStream.removeTrack(currentTrack);
                             videoStream.addTrack(newVideoTrack);
-    
+
                             // Update the video element with the new stream
                             videoElement.srcObject = videoStream;
-    
+
                             // No need to restart MediaRecorder; it will automatically use the updated stream
-    
+
                         } catch (err) {
                             alert('Error switching cameras: ' + err.message);
                             console.error(err);
                         }
                     });
-    
+
                     const shareScreenButton = document.createElement('button');
                     shareScreenButton.textContent = 'Share Screen';
                     Object.assign(shareScreenButton.style, {
@@ -942,7 +1041,7 @@
                         cursor: 'pointer'
                     });
                     buttonContainer.appendChild(shareScreenButton);
-    
+
                     let isScreenSharing = false;
                     let screenStream;
                     shareScreenButton.addEventListener('click', async () => {
@@ -969,7 +1068,7 @@
                             }
                         }
                     });
-    
+
                     recordedChunks = [];
                     mediaRecorder = new MediaRecorder(videoStream);
                     mediaRecorder.ondataavailable = (event) => {
@@ -977,21 +1076,21 @@
                             recordedChunks.push(event.data);
                         }
                     };
-    
+
                     mediaRecorder.onstop = () => {
                         clearInterval(durationInterval);
                         const blob = new Blob(recordedChunks, { type: 'video/webm' });
                         const videoURL = URL.createObjectURL(blob);
-    
+
                         const username = 'username'; // Replace with dynamic value as needed
                         const date = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
                         const filename = `Clip-Pilot-media-${username}-${date}.webm`;
                         const fileSize = (blob.size / (1024 * 1024)).toFixed(2); // MB
-    
+
                         const listItem = document.createElement('li');
                         listItem.innerHTML = `
                             <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; position: relative;">
-                                <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${filename}">
+                                <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;" title="${filename}" class="video-filename">
                                     ${filename}
                                 </span>
                                 <div style="display: flex; align-items: center; gap: 10px;">
@@ -1008,11 +1107,76 @@
                         `;
                         listItem.style.cssText = 'position: relative; padding: 10px; margin: 5px 0; border: 1px solid #ccc; border-radius: 5px; background-color: #f4f4f9;';
                         uploadedFilesList.prepend(listItem);
-    
+
+                        const filenameElement = listItem.querySelector('.video-filename');
+                        filenameElement.addEventListener('click', () => {
+                            // Create full-screen video player
+                            const playerContainer = document.createElement('div');
+                            Object.assign(playerContainer.style, {
+                                position: 'fixed',
+                                top: '0',
+                                left: '0',
+                                width: '100vw',
+                                height: '100vh',
+                                backgroundColor: 'black',
+                                zIndex: '2000',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                            });
+                            document.body.appendChild(playerContainer);
+
+                            const playerVideo = document.createElement('video');
+                            playerVideo.src = videoURL;
+                            playerVideo.controls = true;
+                            playerVideo.autoplay = true;
+                            Object.assign(playerVideo.style, {
+                                width: '100%',
+                                height: 'calc(100% - 60px)',
+                                objectFit: 'contain'
+                            });
+                            playerContainer.appendChild(playerVideo);
+
+                            const playerButtonContainer = document.createElement('div');
+                            Object.assign(playerButtonContainer.style, {
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                gap: '10px',
+                                padding: '10px',
+                                width: '100%',
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                boxSizing: 'border-box'
+                            });
+                            playerContainer.appendChild(playerButtonContainer);
+
+                            const closeButton = document.createElement('button');
+                            closeButton.innerHTML = '<i class="fas fa-times"></i>';
+                            Object.assign(closeButton.style, {
+                                backgroundColor: '#d9534f',
+                                color: 'white',
+                                border: 'none',
+                                padding: '10px',
+                                borderRadius: '50%',
+                                cursor: 'pointer'
+                            });
+                            playerButtonContainer.appendChild(closeButton);
+
+                            closeButton.addEventListener('click', () => {
+                                document.body.removeChild(playerContainer);
+                            });
+
+                            // Enter full-screen mode automatically
+                            playerContainer.requestFullscreen().catch(err => {
+                                console.error('Error entering full-screen mode for player:', err);
+                            });
+                        });
+
                         const dropdown = listItem.querySelector('.file-options-dropdown');
                         const toggleButton = listItem.querySelector('.menu-toggle-button');
                         const nextSibling = listItem.nextElementSibling;
-    
+
                         toggleButton.addEventListener('click', () => {
                             if (dropdown.style.display === 'block') {
                                 dropdown.style.display = 'none';
@@ -1026,25 +1190,25 @@
                                 }
                             }
                         });
-    
+
                         listItem.querySelector('.delete-file-button').addEventListener('click', () => listItem.remove());
-    
+
                         videoStream.getTracks().forEach(track => track.stop());
                         liveContainer.remove();
                         isRecording = false;
                     };
-    
+
                     stopRecordingButton.addEventListener('click', () => {
                         mediaRecorder.stop();
                     });
-    
+
                     mediaRecorder.start();
                     isRecording = true;
                 } catch (error) {
                     alert('Error starting live recording: ' + error.message);
                 }
             });
-        });
+});
     </script>
     
 </body>
