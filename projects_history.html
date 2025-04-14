@@ -48,7 +48,7 @@
             color: white;
             font-size: 1.5rem;
             text-decoration: none;
-            margin-right: 40px;
+            margin-right: 20px;
         }
 
         .main-header .logout:hover {
@@ -250,6 +250,24 @@
             background-color: #002060;
         }
 
+        /* Show All Button Styles */
+        .show-all {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #003087;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .show-all:hover {
+            background-color: #002060;
+        }
+
         /* Footer Styles */
         .main-footer {
             background-color: #e0e0e0;
@@ -337,7 +355,6 @@
             <div class="card">
                 <h3>Project: Corporate Video</h3>
                 <p>Order No: c-p1113-ddd/mmm/yyy</p>
-                <p>Editor: John Smith</p>
                 <p>Status: Completed</p>
                 <p>Completed On: April 10, 2025</p>
                 <a href="#view-final">View Final Output</a>
@@ -345,7 +362,6 @@
             <div class="card">
                 <h3>Project: Product Promo</h3>
                 <p>Order No: c-p1105-ddd/mmm/yyy</p>
-                <p>Editor: Sarah Lee</p>
                 <p>Status: Completed</p>
                 <p>Completed On: March 25, 2025</p>
                 <a href="#view-final">View Final Output</a>
@@ -353,11 +369,60 @@
             <div class="card">
                 <h3>Project: Event Recap</h3>
                 <p>Order No: c-p1098-ddd/mmm/yyy</p>
-                <p>Editor: Michael Brown</p>
                 <p>Status: Completed</p>
                 <p>Completed On: March 15, 2025</p>
                 <a href="#view-final">View Final Output</a>
             </div>
+            <div class="card">
+                <h3>Project: Training Video</h3>
+                <p>Order No: c-p1090-ddd/mmm/yyy</p>
+                <p>Status: Completed</p>
+                <p>Completed On: March 5, 2025</p>
+                <a href="#view-final">View Final Output</a>
+            </div>
+            <div class="card">
+                <h3>Project: Social Media Ad</h3>
+                <p>Order No: c-p1085-ddd/mmm/yyy</p>
+                <p>Status: Completed</p>
+                <p>Completed On: February 25, 2025</p>
+                <a href="#view-final">View Final Output</a>
+            </div>
+            <div class="card">
+                <h3>Project: Webinar Recording</h3>
+                <p>Order No: c-p1080-ddd/mmm/yyy</p>
+                <p>Status: Completed</p>
+                <p>Completed On: February 15, 2025</p>
+                <a href="#view-final">View Final Output</a>
+            </div>
+            <div class="card">
+                <h3>Project: Product Launch</h3>
+                <p>Order No: c-p1075-ddd/mmm/yyy</p>
+                <p>Status: Completed</p>
+                <p>Completed On: February 5, 2025</p>
+                <a href="#view-final">View Final Output</a>
+            </div>
+            <div class="card">
+                <h3>Project: Internal Presentation</h3>
+                <p>Order No: c-p1070-ddd/mmm/yyy</p>
+                <p>Status: Completed</p>
+                <p>Completed On: January 25, 2025</p>
+                <a href="#view-final">View Final Output</a>
+            </div>
+            <div class="card">
+                <h3>Project: Customer Testimonial</h3>
+                <p>Order No: c-p1065-ddd/mmm/yyy</p>
+                <p>Status: Completed</p>
+                <p>Completed On: January 15, 2025</p>
+                <a href="#view-final">View Final Output</a>
+            </div>
+            <div class="card">
+                <h3>Project: Marketing Campaign</h3>
+                <p>Order No: c-p1060-ddd/mmm/yyy</p>
+                <p>Status: Completed</p>
+                <p>Completed On: January 5, 2025</p>
+                <a href="#view-final">View Final Output</a>
+            </div>
+            <button class="show-all">Show All</button>
         </div>
         <footer class="main-footer">
             © 2025 Clip-Pilot. All rights reserved.
@@ -384,6 +449,32 @@
             } else {
                 hamburger.classList.remove('fa-times');
                 hamburger.classList.add('fa-bars');
+            }
+        });
+
+        // Show All functionality
+        const cards = document.querySelectorAll('.card');
+        const showAllButton = document.querySelector('.show-all');
+
+        if (cards.length > 5) {
+            // Hide cards beyond the first 5
+            for (let i = 5; i < cards.length; i++) {
+                cards[i].style.display = 'none';
+            }
+        }
+
+        showAllButton.addEventListener('click', () => {
+            const hiddenCards = Array.from(cards).filter(card => card.style.display === 'none');
+            if (hiddenCards.length > 0) {
+                // Show all hidden cards
+                hiddenCards.forEach(card => card.style.display = 'block');
+                showAllButton.textContent = 'Show Less';
+            } else {
+                // Hide cards beyond the first 5
+                for (let i = 5; i < cards.length; i++) {
+                    cards[i].style.display = 'none';
+                }
+                showAllButton.textContent = 'Show All';
             }
         });
     </script>
