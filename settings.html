@@ -49,7 +49,7 @@
             color: white;
             font-size: 1.5rem;
             text-decoration: none;
-            margin-right: 50px; /* Adjusted margin to align with other pages */
+            margin-right: 50px;
             display: flex;
             align-items: center;
         }
@@ -65,7 +65,7 @@
             background-color: #00235f;
             color: white;
             position: fixed;
-            top: 60px;
+            top: 55px;
             left: 0;
             display: flex;
             flex-direction: column;
@@ -161,15 +161,32 @@
             border-radius: 8px;
             padding: 20px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            max-width: 800px; /* Matches the footer width */
+            max-width: 800px;
             margin: 50px auto;
         }
 
-        .settings-container h2 {
-            text-align: left;
+        /* Settings Header */
+        .settings-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             margin-bottom: 20px;
+        }
+
+        .settings-header h2 {
             font-size: 1.8rem;
             color: #00235f;
+            margin: 0;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .settings-header img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
         }
 
         .user-details h3 {
@@ -204,6 +221,7 @@
             font-size: 1rem;
             background-color: #f9f9f9;
             color: #333;
+            width: 100%;
         }
 
         .input-wrapper input:read-only {
@@ -238,6 +256,14 @@
             background-color: #002060;
         }
 
+        /* Profile Picture Responsiveness */
+        #current-profile-picture {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
         /* Footer Styles */
         .main-footer {
             background-color: #e0e0e0;
@@ -248,15 +274,63 @@
             border-top: 1px solid #ccc;
             font-size: 0.9rem;
             width: 100%;
-            max-width: 800px; /* Matches the settings container width */
+            max-width: 800px;
             margin: 0 auto;
         }
 
         /* Responsive Design */
         @media (max-width: 768px) {
+            .settings-header {
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+                gap: 10px;
+            }
+
+            .settings-header img {
+                width: 40px;
+                height: 40px;
+            }
+
+            .settings-header h2 {
+                text-align: left;
+                margin: 0;
+                font-size: 1.5rem;
+            }
+
+            #current-profile-picture {
+                width: 40px;
+                height: 40px;
+            }
+
+            .input-wrapper {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .setting-item {
+                display: flex;
+                align-items: center;
+                flex-direction: row;
+            }
+
+            .setting-item label {
+                margin-left: 10px;
+                flex: 1;
+                text-align: left;
+            }
+
+            .input-wrapper {
+                flex-direction: row;
+                align-items: center;
+                gap: 10px;
+            }
+
             .sidebar {
                 width: 0;
                 left: -130px;
+                margin-top: -5px;
             }
 
             .main-content {
@@ -292,6 +366,9 @@
     </style>
 </head>
 <body>
+    <noscript>
+        <p style="color: red; text-align: center;">JavaScript is disabled. Please enable it to update your profile picture.</p>
+    </noscript>
     <div class="main-header">
         <i class="fas fa-bars hamburger"></i>
         <a href="index.html" class="logout"><i class="fas fa-sign-out-alt"></i></a>
@@ -309,28 +386,38 @@
 
     <div class="main-content collapsed-desktop">
         <div class="settings-container">
-            <h2>Settings</h2>
+            <div class="settings-header">
+                <h2><i class="fas fa-cog"></i> Settings</h2>
+                <img id="current-profile-picture" src="images/my-image.jpeg" alt="Current Profile Picture">
+            </div>
             <!-- User Details Section -->
             <div class="user-details">
                 <h3>Profile Information</h3>
                 <div class="setting-item">
+                    <label for="profile-picture">Profile Picture:</label>
+                    <div class="input-wrapper">
+                        <!-- Input for updating the profile picture -->
+                        <input type="file" id="profile-picture" accept="image/jpeg,image/png" aria-label="Upload profile picture">
+                    </div>
+                </div>
+                <div class="setting-item">
                     <label for="username">Username:</label>
                     <div class="input-wrapper">
-                        <input type="text" id="username" value="JohnDoe123" readonly>
+                        <input type="text" id="username" value="zack254" readonly>
                         <i class="fas fa-edit edit-icon" onclick="enableEdit('username')"></i>
                     </div>
                 </div>
                 <div class="setting-item">
                     <label for="email">Email:</label>
                     <div class="input-wrapper">
-                        <input type="email" id="email" value="johndoe@example.com" readonly>
+                        <input type="email" id="email" value="sacredlyula@example.com" readonly>
                         <i class="fas fa-edit edit-icon" onclick="enableEdit('email')"></i>
                     </div>
                 </div>
                 <div class="setting-item">
                     <label for="phone">Phone:</label>
                     <div class="input-wrapper">
-                        <input type="tel" id="phone" value="+1234567890" readonly>
+                        <input type="tel" id="phone" value="+254773079574" readonly>
                         <i class="fas fa-edit edit-icon" onclick="enableEdit('phone')"></i>
                     </div>
                 </div>
@@ -344,6 +431,16 @@
     </div>
 
     <script>
+        // Store initial input values
+        const initialValues = {
+            username: document.getElementById('username').value,
+            email: document.getElementById('email').value,
+            phone: document.getElementById('phone').value
+        };
+
+        // Track profile picture changes
+        let profilePictureChanged = false;
+
         // Sidebar toggle functionality
         const hamburger = document.querySelector('.hamburger');
         const sidebar = document.querySelector('.sidebar');
@@ -378,12 +475,62 @@
         // Save changes and disable editing
         function saveChanges() {
             const inputs = document.querySelectorAll('.input-wrapper input');
+            const currentValues = {
+                username: document.getElementById('username').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value
+            };
+
+            // Check for changes
+            const hasChanges = (
+                currentValues.username !== initialValues.username ||
+                currentValues.email !== initialValues.email ||
+                currentValues.phone !== initialValues.phone ||
+                profilePictureChanged
+            );
+
+            if (!hasChanges) {
+                alert('No changes detected.');
+                return;
+            }
+
+            // Proceed with saving if changes exist
             inputs.forEach((input) => {
                 input.setAttribute('readonly', true);
                 input.style.backgroundColor = '#e9ecef';
             });
+            // Note: Profile picture changes are client-side only; backend saving requires additional logic
             alert('Changes saved successfully!');
         }
+
+        // Update the existing profile picture
+        const profilePictureInput = document.getElementById('profile-picture');
+        profilePictureInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                // Validate file type and size
+                const validTypes = ['image/jpeg', 'image/png'];
+                if (!validTypes.includes(file.type)) {
+                    alert('Please upload a JPEG or PNG image.');
+                    return;
+                }
+                if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                    alert('Image size must be less than 5MB.');
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const currentImage = document.getElementById('current-profile-picture');
+                        currentImage.src = e.target.result;
+                        profilePictureChanged = true; // Flag profile picture change
+                    } catch (error) {
+                        alert('Error loading image. Please try again.');
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        });
     </script>
 </body>
 </html>
