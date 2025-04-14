@@ -592,12 +592,12 @@
 
     <div class="sidebar collapsed-desktop">
         <h1 class="sidebar-title">Clip-Pilot</h1> <!-- Added title -->
-        <a href="#" class="active"><i class="fas fa-home"></i> <span>Dashboard</span></a>
-        <a href="#"><i class="fas fa-video"></i> <span>In Progress</span></a>
-        <a href="#"><i class="fas fa-history"></i> <span>Projects History</span></a>
-        <a href="#"><i class="fas fa-envelope"></i> <span>Messages</span></a>
-        <a href="#"><i class="fas fa-cog"></i> <span>Settings</span></a>
-        <a href="#"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a>
+        <a href="dashboard.html" class="active"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+        <a href="progress.html"><i class="fas fa-video"></i> <span>In Progress</span></a>
+        <a href="projects_history.html"><i class="fas fa-history"></i> <span>Projects History</span></a>
+        <a href="messages.html"><i class="fas fa-envelope"></i> <span>Messages</span></a>
+        <a href="settings.html"><i class="fas fa-cog"></i> <span>Settings</span></a>
+        <a href="index.html"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a>
     </div>
 
     <div class="main-content collapsed-desktop">
@@ -698,7 +698,7 @@
                 hamburger.classList.add('fa-bars');
             }
         });
-    
+
         const fileInput = document.getElementById('project-files');
 const uploadedFilesList = document.getElementById('uploaded-files-list');
 const goLiveButtonMobile = document.getElementById('go-live-button-mobile');
@@ -732,7 +732,6 @@ fileInput.addEventListener('change', (event) => {
         listItem.style.backgroundColor = '#f4f4f9';
         listItem.style.gap = '10px';
 
-        // Calculate file size in a human-readable format
         let fileSize;
         if (file.size / (1024 * 1024 * 1024) >= 1) {
             fileSize = (file.size / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
@@ -742,7 +741,6 @@ fileInput.addEventListener('change', (event) => {
             fileSize = (file.size / 1024).toFixed(2) + ' KB';
         }
 
-        // Thumbnail preview
         const thumbnail = document.createElement('img');
         thumbnail.style.width = '80px';
         thumbnail.style.height = '60px';
@@ -751,7 +749,6 @@ fileInput.addEventListener('change', (event) => {
         thumbnail.alt = 'Video thumbnail';
         generateThumbnail(file, thumbnail);
 
-        // File link (filename)
         const fileLink = document.createElement('span');
         fileLink.className = 'video-filename';
         fileLink.textContent = file.name;
@@ -764,14 +761,12 @@ fileInput.addEventListener('change', (event) => {
         fileLink.style.color = '#007bff';
         fileLink.style.textDecoration = 'underline';
 
-        // File size
         const fileSizeLabel = document.createElement('span');
         fileSizeLabel.textContent = fileSize;
         fileSizeLabel.style.padding = '5px 10px';
         fileSizeLabel.style.color = '#333';
         fileSizeLabel.style.fontSize = '0.9rem';
 
-        // File options (delete button)
         const fileOptions = document.createElement('div');
         fileOptions.className = 'file-options';
         fileOptions.style.display = 'flex';
@@ -792,13 +787,11 @@ fileInput.addEventListener('change', (event) => {
         fileOptions.appendChild(fileSizeLabel);
         fileOptions.appendChild(deleteButton);
 
-        // Append elements to list item
         listItem.appendChild(thumbnail);
         listItem.appendChild(fileLink);
         listItem.appendChild(fileOptions);
         uploadedFilesList.prepend(listItem);
 
-        // Video player setup (only once)
         if (!videoPlayer) {
             videoWrapper = document.createElement('div');
             videoWrapper.id = 'video-wrapper';
@@ -844,7 +837,6 @@ fileInput.addEventListener('change', (event) => {
             videoWrapper.appendChild(videoPlayer);
             document.body.appendChild(videoWrapper);
 
-            // Drag support for desktop
             let isDragging = false, offsetX = 0, offsetY = 0;
 
             videoWrapper.addEventListener('mousedown', (e) => {
@@ -879,7 +871,6 @@ fileInput.addEventListener('change', (event) => {
                 videoWrapper.style.transition = 'all 0.2s ease';
             });
 
-            // Mobile touch support
             let touchStartX = 0, touchStartY = 0;
 
             videoWrapper.addEventListener('touchstart', (e) => {
@@ -908,7 +899,6 @@ fileInput.addEventListener('change', (event) => {
             });
         }
 
-        // Play video (mimic editor dashboard behavior)
         fileLink.addEventListener('click', (e) => {
             e.preventDefault();
             const videoURL = URL.createObjectURL(file);
@@ -935,7 +925,6 @@ fileInput.addEventListener('change', (event) => {
             });
         });
 
-        // Delete functionality
         deleteButton.addEventListener('click', () => {
             listItem.remove();
         });
@@ -944,67 +933,124 @@ fileInput.addEventListener('change', (event) => {
     fileInput.value = '';
 });
 
-// Function to generate thumbnail (matches editor dashboard)
 function generateThumbnail(file, imgElement) {
-    console.log('generateThumbnail: Processing file', file);
+    console.log('generateThumbnail: Processing file, type:', file.type, 'size:', file.size);
     const video = document.createElement('video');
-    video.preload = 'metadata';
-    video.src = URL.createObjectURL(file);
+    video.preload = 'auto';
+    const videoURL = URL.createObjectURL(file);
+    video.src = videoURL;
     video.muted = true;
     video.playsInline = true;
 
+    const cleanup = () => {
+        video.pause();
+        video.removeAttribute('src');
+        video.load();
+        URL.revokeObjectURL(videoURL);
+        video.oncanplay = null;
+        video.onseeked = null;
+        video.onerror = null;
+        video.onplaying = null;
+        console.log('generateThumbnail: Cleaned up video element');
+    };
+
     const setThumbnail = () => {
-        console.log('generateThumbnail: Capturing frame, currentTime:', video.currentTime);
-        const aspectRatio = video.videoWidth / video.videoHeight;
+        console.log('generateThumbnail: Capturing frame, currentTime:', video.currentTime, 'videoWidth:', video.videoWidth, 'readyState:', video.readyState);
         const displayWidth = 80;
         const displayHeight = 60;
         const scaleFactor = 2;
 
-        let canvasWidth = displayWidth * scaleFactor;
-        let canvasHeight = displayHeight * scaleFactor;
-
         const canvas = document.createElement('canvas');
-        canvas.width = canvasWidth;
-        canvas.height = canvasHeight;
+        canvas.width = displayWidth * scaleFactor;
+        canvas.height = displayHeight * scaleFactor;
         const ctx = canvas.getContext('2d', { willReadFrequently: true });
 
         ctx.imageSmoothingEnabled = true;
         ctx.imageSmoothingQuality = 'high';
-
-        ctx.drawImage(video, 0, 0, canvasWidth, canvasHeight);
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
         const dataURL = canvas.toDataURL('image/jpeg', 0.95);
         console.log('generateThumbnail: dataURL length:', dataURL.length);
-        imgElement.src = dataURL;
-        imgElement.alt = 'Video thumbnail';
 
-        URL.revokeObjectURL(video.src);
+        // Check if the frame is black by sampling pixels
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+        const isBlack = Array.from(imageData).every((val, i) => i % 4 === 3 || val < 10);
+        if (dataURL.length < 1000 || video.videoWidth === 0 || isBlack) {
+            console.warn('generateThumbnail: Invalid/black thumbnail, setting placeholder');
+            ctx.fillStyle = '#333';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            imgElement.src = canvas.toDataURL('image/jpeg', 0.95);
+        } else {
+            imgElement.src = dataURL;
+        }
+        imgElement.alt = 'Video thumbnail';
+        cleanup();
     };
 
-    video.addEventListener('canplay', () => {
-        console.log('generateThumbnail: canplay fired, duration:', video.duration);
-        if (isNaN(video.duration) || video.duration < 1) {
-            console.log('generateThumbnail: Short or invalid duration, using currentTime 0');
+    let seekAttempts = 0;
+    const maxAttempts = 3;
+    const seekTimes = [1, 0.5, 0.1];
+
+    const trySeek = () => {
+        if (seekAttempts >= maxAttempts) {
+            console.warn('generateThumbnail: Max seek attempts reached, capturing current frame');
             setThumbnail();
-        } else {
-            video.currentTime = 1;
+            return;
         }
-    });
+        const seekTime = seekTimes[seekAttempts];
+        console.log('generateThumbnail: Seeking to:', seekTime);
+        video.currentTime = seekTime;
+        seekAttempts++;
+    };
 
-    video.addEventListener('seeked', () => {
+    video.oncanplay = () => {
+        console.log('generateThumbnail: canplay fired, duration:', video.duration, 'videoWidth:', video.videoWidth);
+        if (isNaN(video.duration) || video.duration <= 0 || video.duration === Infinity || video.videoWidth === 0) {
+            console.warn('generateThumbnail: Invalid video metadata, setting placeholder');
+            setThumbnail();
+            return;
+        }
+        video.play().then(() => {
+            console.log('generateThumbnail: Playback started');
+            trySeek();
+        }).catch(err => {
+            console.warn('generateThumbnail: Play failed, trying seek:', err);
+            trySeek();
+        });
+    };
+
+    video.onseeked = () => {
         console.log('generateThumbnail: seeked fired, currentTime:', video.currentTime);
+        if (video.currentTime === 0 && seekAttempts < maxAttempts) {
+            console.warn('generateThumbnail: Seek to 0, retrying');
+            trySeek();
+            return;
+        }
+        if (video.videoWidth === 0) {
+            console.warn('generateThumbnail: No video frame, retrying');
+            trySeek();
+            return;
+        }
         setThumbnail();
-    });
+    };
 
-    video.addEventListener('error', (e) => {
+    video.onerror = (e) => {
         console.error('generateThumbnail: Video error:', e);
-        // Fallback: Try current frame
-        setThumbnail();
-    });
+        const canvas = document.createElement('canvas');
+        canvas.width = 80 * 2;
+        canvas.height = 60 * 2;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#333';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        imgElement.src = canvas.toDataURL('image/jpeg', 0.95);
+        imgElement.alt = 'Video thumbnail';
+        cleanup();
+    };
 }
 
 let mediaRecorder;
 let recordedChunks = [];
+let screenChunks = [];
 let videoStream;
 let isRecording = false;
 
@@ -1056,10 +1102,19 @@ let isRecording = false;
                 width: '100%',
                 height: 'calc(100% - 60px)',
                 borderRadius: '8px 8px 0 0',
-                objectFit: 'cover'
+                objectFit: 'cover',
+                backgroundColor: 'black'
             });
             videoElement.autoplay = true;
             videoElement.muted = true;
+            await new Promise((resolve, reject) => {
+                videoElement.onloadedmetadata = () => {
+                    console.log('videoElement: Camera stream loaded');
+                    resolve();
+                };
+                videoElement.onerror = () => reject(new Error('Camera stream failed'));
+                setTimeout(() => reject(new Error('Camera stream timeout')), 2000);
+            });
             liveContainer.appendChild(videoElement);
 
             const recordingIndicator = document.createElement('div');
@@ -1090,13 +1145,14 @@ let isRecording = false;
             document.head.appendChild(style);
 
             let startTime = Date.now();
+            let durationInterval;
             const updateDuration = () => {
                 const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
                 const minutes = Math.floor(elapsedTime / 60).toString().padStart(2, '0');
                 const seconds = (elapsedTime % 60).toString().padStart(2, '0');
                 recordingIndicator.textContent = `● Recording - ${minutes}:${seconds}`;
             };
-            const durationInterval = setInterval(updateDuration, 1000);
+            durationInterval = setInterval(updateDuration, 1000);
 
             const buttonContainer = document.createElement('div');
             Object.assign(buttonContainer.style, {
@@ -1136,7 +1192,6 @@ let isRecording = false;
             });
             buttonContainer.appendChild(switchCameraButton);
 
-            // Add full-screen button for all devices
             const fullscreenButton = document.createElement('button');
             fullscreenButton.innerHTML = '<i class="fas fa-expand"></i>';
             Object.assign(fullscreenButton.style, {
@@ -1159,7 +1214,6 @@ let isRecording = false;
                 }
             });
 
-            // Update icon when full-screen state changes
             document.addEventListener('fullscreenchange', () => {
                 if (document.fullscreenElement) {
                     fullscreenButton.innerHTML = '<i class="fas fa-compress"></i>';
@@ -1174,7 +1228,7 @@ let isRecording = false;
                     const videoDevices = devices.filter((d) => d.kind === 'videoinput');
 
                     if (videoDevices.length < 2) {
-                        alert('Only one camera available.');
+                        alert('No multiple cameras available.');
                         return;
                     }
 
@@ -1184,31 +1238,48 @@ let isRecording = false;
                     const nextIndex = (currentIndex + 1) % videoDevices.length;
                     const nextDeviceId = videoDevices[nextIndex].deviceId;
 
-                    // Stop the current video track but keep the stream alive
-                    currentTrack.stop();
-
-                    // Wait briefly to ensure the camera is released
-                    await new Promise(resolve => setTimeout(resolve, 300));
-
-                    // Get a new video track from the next camera
                     const newStream = await navigator.mediaDevices.getUserMedia({
-                        video: { deviceId: { exact: nextDeviceId } }
+                        video: { deviceId: { exact: nextDeviceId } },
+                        audio: true
                     });
-
                     const newVideoTrack = newStream.getVideoTracks()[0];
+                    const newAudioTrack = newStream.getAudioTracks()[0];
 
-                    // Replace the video track in the existing stream
-                    videoStream.removeTrack(currentTrack);
-                    videoStream.addTrack(newVideoTrack);
+                    if (mediaRecorder.state === 'recording') {
+                        await new Promise(resolve => {
+                            mediaRecorder.onstop = () => {
+                                console.log('switchCameraButton: Recorder stopped');
+                                resolve();
+                            };
+                            mediaRecorder.stop();
+                        });
+                    }
 
-                    // Update the video element with the new stream
+                    videoStream.getTracks().forEach(track => track.stop());
+                    videoStream = new MediaStream([newVideoTrack, newAudioTrack]);
                     videoElement.srcObject = videoStream;
 
-                    // No need to restart MediaRecorder; it will automatically use the updated stream
+                    await new Promise((resolve, reject) => {
+                        videoElement.onloadedmetadata = () => {
+                            console.log('videoElement: New camera stream loaded');
+                            resolve();
+                        };
+                        videoElement.onerror = () => reject(new Error('New camera stream failed'));
+                        setTimeout(() => reject(new Error('New camera stream timeout')), 2000);
+                    });
 
+                    mediaRecorder = new MediaRecorder(videoStream, { mimeType: 'video/webm;codecs=vp8,opus' });
+                    mediaRecorder.ondataavailable = (event) => {
+                        if (event.data.size > 0) {
+                            recordedChunks.push(event.data);
+                            console.log('mediaRecorder: Camera chunk added, size:', event.data.size);
+                        }
+                    };
+                    mediaRecorder.onstop = () => handleRecorderStop(liveContainer, durationInterval);
+                    mediaRecorder.start(500);
                 } catch (err) {
-                    alert('Error switching cameras: ' + err.message);
-                    console.error(err);
+                    console.error('Error switching cameras:', err);
+                    alert('Failed to switch camera: ' + err.message);
                 }
             });
 
@@ -1226,45 +1297,208 @@ let isRecording = false;
 
             let isScreenSharing = false;
             let screenStream;
-            shareScreenButton.addEventListener('click', async () => {
-                if (isScreenSharing) {
-                    videoElement.srcObject = videoStream;
-                    shareScreenButton.textContent = 'Share Screen';
-                    isScreenSharing = false;
-                    if (screenStream) {
-                        screenStream.getTracks().forEach(track => track.stop());
+
+            const updateRecorder = async (newStream, isScreen = false) => {
+                console.log('updateRecorder: Updating with', isScreen ? 'screen' : 'camera', 'stream, tracks:', newStream.getTracks().map(t => `${t.kind}: ${t.enabled} ${t.readyState}`));
+                if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                    await new Promise(resolve => {
+                        mediaRecorder.onstop = () => {
+                            console.log('updateRecorder: Previous recorder stopped');
+                            resolve();
+                        };
+                        mediaRecorder.stop();
+                    });
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                }
+                mediaRecorder = new MediaRecorder(newStream, { mimeType: 'video/webm;codecs=vp8,opus' });
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) {
+                        (isScreen ? screenChunks : recordedChunks).push(event.data);
+                        console.log('mediaRecorder:', isScreen ? 'Screen' : 'Camera', 'chunk added, size:', event.data.size);
+                    } else {
+                        console.warn('mediaRecorder: Empty chunk received, isScreen:', isScreen);
                     }
-                } else {
-                    try {
+                };
+                mediaRecorder.onstop = () => handleRecorderStop(liveContainer, durationInterval);
+                mediaRecorder.start(500);
+            };
+
+            shareScreenButton.addEventListener('click', async () => {
+                try {
+                    if (isScreenSharing) {
+                        // Stop screen sharing
+                        if (screenStream) {
+                            screenStream.getTracks().forEach(track => track.stop());
+                            screenStream = null;
+                        }
+                        videoStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                        videoElement.srcObject = videoStream;
+                        await new Promise((resolve, reject) => {
+                            videoElement.onloadedmetadata = () => {
+                                console.log('videoElement: Camera stream restored');
+                                resolve();
+                            };
+                            videoElement.onerror = () => reject(new Error('Camera stream failed'));
+                            setTimeout(() => reject(new Error('Camera stream timeout')), 2000);
+                        });
+                        shareScreenButton.textContent = 'Share Screen';
+                        isScreenSharing = false;
+                        await updateRecorder(videoStream, false);
+                        console.log('shareScreenButton: Reverted to camera stream');
+                    } else {
+                        // Start screen sharing
                         screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
-                        videoElement.srcObject = screenStream;
+                        const micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                        const newStream = new MediaStream([
+                            screenStream.getVideoTracks()[0],
+                            micStream.getAudioTracks()[0]
+                        ]);
+                        videoElement.srcObject = newStream;
+                        await new Promise((resolve, reject) => {
+                            videoElement.onloadedmetadata = () => {
+                                console.log('videoElement: Screen stream loaded');
+                                resolve();
+                            };
+                            videoElement.onerror = () => reject(new Error('Screen stream failed'));
+                            setTimeout(() => reject(new Error('Camera stream timeout')), 2000);
+                        });
                         shareScreenButton.textContent = 'Stop Sharing Screen';
                         isScreenSharing = true;
-                        screenStream.getVideoTracks()[0].addEventListener('ended', () => {
+                        await updateRecorder(newStream, true);
+                        console.log('shareScreenButton: Started screen sharing, tracks:', newStream.getTracks().map(t => `${t.kind}: ${t.enabled} ${t.readyState}`));
+
+                        screenStream.getVideoTracks()[0].addEventListener('ended', async () => {
+                            if (screenStream) {
+                                screenStream.getTracks().forEach(track => track.stop());
+                                screenStream = null;
+                            }
+                            videoStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
                             videoElement.srcObject = videoStream;
+                            await new Promise((resolve, reject) => {
+                                videoElement.onloadedmetadata = () => {
+                                    console.log('videoElement: Camera stream restored');
+                                    resolve();
+                                };
+                                videoElement.onerror = () => reject(new Error('Camera stream failed'));
+                                setTimeout(() => reject(new Error('Camera stream timeout')), 2000);
+                            });
                             shareScreenButton.textContent = 'Share Screen';
                             isScreenSharing = false;
+                            await updateRecorder(videoStream, false);
+                            console.log('shareScreenButton: Screen sharing ended by user');
                         });
-                    } catch (err) {
-                        alert('Error sharing screen: ' + err.message);
+                    }
+                } catch (err) {
+                    alert('Error sharing screen: ' + err.message);
+                    console.error('shareScreenButton:', err);
+                    if (isScreenSharing) {
+                        if (screenStream) {
+                            screenStream.getTracks().forEach(track => track.stop());
+                            screenStream = null;
+                        }
+                        videoStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                        videoElement.srcObject = videoStream;
+                        await new Promise((resolve, reject) => {
+                            videoElement.onloadedmetadata = () => {
+                                console.log('videoElement: Camera stream restored');
+                                resolve();
+                            };
+                            videoElement.onerror = () => reject(new Error('Camera stream failed'));
+                            setTimeout(() => reject(new Error('Camera stream timeout')), 2000);
+                        });
+                        shareScreenButton.textContent = 'Share Screen';
+                        isScreenSharing = false;
+                        await updateRecorder(videoStream, false);
+                        console.log('shareScreenButton: Reverted to camera stream on error');
                     }
                 }
             });
 
-            recordedChunks = [];
-            mediaRecorder = new MediaRecorder(videoStream);
-            mediaRecorder.ondataavailable = (event) => {
-                if (event.data.size > 0) {
-                    recordedChunks.push(event.data);
-                    console.log('mediaRecorder: Chunk added, size:', event.data.size);
-                }
-            };
-
-            mediaRecorder.onstop = () => {
+            const handleRecorderStop = async (liveContainer, durationInterval) => {
+                console.log('handleRecorderStop: Stopping, chunks:', recordedChunks.length, 'screen:', screenChunks.length);
                 clearInterval(durationInterval);
-                const blob = new Blob(recordedChunks, { type: 'video/webm;codecs=vp8,opus' });
+                isRecording = false;
+
+                // Log chunk details
+                recordedChunks.forEach((chunk, i) => console.log(`handleRecorderStop: Camera chunk ${i}, size:`, chunk.size));
+                screenChunks.forEach((chunk, i) => console.log(`handleRecorderStop: Screen chunk ${i}, size:`, chunk.size));
+
+                // Ensure all chunks are collected
+                if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                    await new Promise(resolve => {
+                        mediaRecorder.onstop = resolve;
+                        mediaRecorder.stop();
+                    });
+                    await new Promise(resolve => setTimeout(resolve, 500)); // Wait for final chunks
+                }
+
+                // Turn off flashlight
+                if (videoStream) {
+                    const videoTracks = videoStream.getVideoTracks();
+                    for (const track of videoTracks) {
+                        try {
+                            const capabilities = track.getCapabilities();
+                            if (capabilities.torch) {
+                                await track.applyConstraints({ advanced: [{ torch: false }] });
+                                console.log('handleRecorderStop: Flashlight turned off');
+                            }
+                        } catch (err) {
+                            console.warn('handleRecorderStop: Failed to turn off flashlight:', err);
+                        }
+                        track.stop();
+                        console.log('handleRecorderStop: Video track stopped');
+                    }
+                    videoStream.getAudioTracks().forEach(track => {
+                        track.stop();
+                        console.log('handleRecorderStop: Audio track stopped');
+                    });
+                    videoStream = null;
+                }
+                if (screenStream) {
+                    screenStream.getTracks().forEach(track => {
+                        track.stop();
+                        console.log('handleRecorderStop: Screen track stopped');
+                    });
+                    screenStream = null;
+                }
+
+                const allChunks = [...recordedChunks, ...screenChunks];
+                console.log('handleRecorderStop: Total chunks:', allChunks.length);
+                if (allChunks.length === 0) {
+                    console.error('handleRecorderStop: No chunks recorded, skipping thumbnail and listItem');
+                    liveContainer.remove();
+                    return;
+                }
+                const blob = new Blob(allChunks, { type: 'video/webm;codecs=vp8,opus' });
                 console.log('mediaRecorder.onstop: Blob created, size:', blob.size);
+                if (blob.size < 1000) {
+                    console.error('handleRecorderStop: Blob too small, likely invalid');
+                    liveContainer.remove();
+                    return;
+                }
+                recordedChunks = [];
+                screenChunks = [];
                 const videoURL = URL.createObjectURL(blob);
+
+                // Validate WebM playability
+                const testVideo = document.createElement('video');
+                testVideo.src = videoURL;
+                await new Promise((resolve, reject) => {
+                    testVideo.oncanplay = () => {
+                        console.log('handleRecorderStop: WebM validated, canplay fired');
+                        resolve();
+                    };
+                    testVideo.onerror = () => {
+                        console.error('handleRecorderStop: WebM validation failed');
+                        reject(new Error('Invalid WebM'));
+                    };
+                    setTimeout(() => reject(new Error('WebM validation timeout')), 2000);
+                }).catch(err => {
+                    console.error(err);
+                    URL.revokeObjectURL(videoURL);
+                    liveContainer.remove();
+                    return;
+                });
 
                 const username = 'username';
                 const date = new Date().toISOString().split('T')[0];
@@ -1283,7 +1517,6 @@ let isRecording = false;
                 listItem.style.gap = '10px';
                 listItem.style.position = 'relative';
 
-                // Thumbnail preview
                 const thumbnail = document.createElement('img');
                 thumbnail.style.width = '80px';
                 thumbnail.style.height = '60px';
@@ -1292,7 +1525,6 @@ let isRecording = false;
                 thumbnail.alt = 'Video thumbnail';
                 generateThumbnail(blob, thumbnail);
 
-                // File link (filename)
                 const fileLink = document.createElement('span');
                 fileLink.className = 'video-filename';
                 fileLink.textContent = filename;
@@ -1305,7 +1537,6 @@ let isRecording = false;
                 fileLink.style.color = '#007bff';
                 fileLink.style.textDecoration = 'underline';
 
-                // File options
                 const fileOptions = document.createElement('div');
                 fileOptions.className = 'file-options';
                 fileOptions.style.display = 'flex';
@@ -1331,7 +1562,7 @@ let isRecording = false;
                 dropdown.className = 'file-options-dropdown';
                 dropdown.style.display = 'none';
                 dropdown.style.position = 'absolute';
-                dropdown.style.right = '10px';
+                dropdown.style.right = '0';
                 dropdown.style.top = '100%';
                 dropdown.style.marginTop = '5px';
                 dropdown.style.background = '#f9f9f9';
@@ -1339,24 +1570,23 @@ let isRecording = false;
                 dropdown.style.borderRadius = '5px';
                 dropdown.style.padding = '10px';
                 dropdown.style.zIndex = '10';
+                dropdown.style.minWidth = '100px';
                 dropdown.innerHTML = `
-                    <a href="${videoURL}" download="${filename}">
-                        <button>Download</button>
+                    <a href="${videoURL}" download="${filename}" style="display: block; margin-bottom: 5px;">
+                        <button style="width: 100%; padding: 5px; border: none; background: #007bff; color: white; border-radius: 3px; cursor: pointer;">Download</button>
                     </a>
-                    <button class="delete-file-button">Delete</button>
+                    <button class="delete-file-button" style="width: 100%; padding: 5px; border: none; background: #d9534f; color: white; border-radius: 3px; cursor: pointer;">Delete</button>
                 `;
 
                 fileOptions.appendChild(fileSizeLabel);
                 fileOptions.appendChild(toggleButton);
 
-                // Append elements
                 listItem.appendChild(thumbnail);
                 listItem.appendChild(fileLink);
                 listItem.appendChild(fileOptions);
                 listItem.appendChild(dropdown);
                 uploadedFilesList.prepend(listItem);
 
-                // Filename click handler
                 fileLink.addEventListener('click', () => {
                     const playerContainer = document.createElement('div');
                     Object.assign(playerContainer.style, {
@@ -1419,42 +1649,76 @@ let isRecording = false;
                     });
                 });
 
-                // Dropdown toggle
                 toggleButton.addEventListener('click', () => {
-                    if (dropdown.style.display === 'block') {
-                        dropdown.style.display = 'none';
-                        const nextSibling = listItem.nextElementSibling;
-                        if (nextSibling) {
-                            nextSibling.style.marginTop = '';
-                        }
-                    } else {
-                        dropdown.style.display = 'block';
-                        const nextSibling = listItem.nextElementSibling;
-                        if (nextSibling) {
-                            nextSibling.style.marginTop = `${dropdown.offsetHeight + 10}px`;
-                        }
+                    const isVisible = dropdown.style.display === 'block';
+                    dropdown.style.display = isVisible ? 'none' : 'block';
+                    const nextSibling = listItem.nextElementSibling;
+                    if (nextSibling) {
+                        nextSibling.style.marginTop = isVisible ? '' : `${dropdown.offsetHeight + 10}px`;
                     }
                 });
 
-                // Delete button
                 dropdown.querySelector('.delete-file-button').addEventListener('click', () => {
                     listItem.remove();
                     URL.revokeObjectURL(videoURL);
                 });
 
-                videoStream.getTracks().forEach(track => track.stop());
                 liveContainer.remove();
-                isRecording = false;
             };
 
-            stopRecordingButton.addEventListener('click', () => {
-                mediaRecorder.stop();
-            });
-
-            mediaRecorder.start(1000); // Add timeslice for regular chunks
+            recordedChunks = [];
+            screenChunks = [];
+            mediaRecorder = new MediaRecorder(videoStream, { mimeType: 'video/webm;codecs=vp8,opus' });
+            mediaRecorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    recordedChunks.push(event.data);
+                    console.log('mediaRecorder: Camera chunk added, size:', event.data.size);
+                }
+            };
+            mediaRecorder.onstop = () => handleRecorderStop(liveContainer, durationInterval);
+            mediaRecorder.start(500);
             isRecording = true;
+
+            stopRecordingButton.addEventListener('click', () => {
+                if (!isRecording) {
+                    console.warn('stopRecordingButton: Recording already stopped');
+                    return;
+                }
+                try {
+                    stopRecordingButton.style.opacity = '0.5';
+                    console.log('stopRecordingButton: Stopping, recorder state:', mediaRecorder.state, 'tracks:', videoStream.getTracks().map(t => `${t.kind}: ${t.readyState}`));
+                    if (mediaRecorder && ['recording', 'paused'].includes(mediaRecorder.state)) {
+                        const stopTimeout = setTimeout(() => {
+                            console.warn('stopRecordingButton: Stop timeout, forcing stop');
+                            handleRecorderStop(liveContainer, durationInterval);
+                        }, 2000);
+                        mediaRecorder.onstop = () => {
+                            clearTimeout(stopTimeout);
+                            console.log('stopRecordingButton: Recorder stopped');
+                            handleRecorderStop(liveContainer, durationInterval);
+                        };
+                        mediaRecorder.onerror = (event) => {
+                            clearTimeout(stopTimeout);
+                            console.error('stopRecordingButton: Recorder error:', event.error);
+                            stopRecordingButton.style.opacity = '1';
+                            alert('Error stopping recording: ' + event.error.message);
+                        };
+                        mediaRecorder.stop();
+                    } else {
+                        console.warn('stopRecordingButton: Recorder not active, state:', mediaRecorder ? mediaRecorder.state : 'null');
+                        stopRecordingButton.style.opacity = '1';
+                        handleRecorderStop(liveContainer, durationInterval);
+                    }
+                } catch (err) {
+                    console.error('stopRecordingButton:', err);
+                    stopRecordingButton.style.opacity = '1';
+                    alert('Error stopping recording: ' + err.message);
+                    handleRecorderStop(liveContainer, durationInterval);
+                }
+            });
         } catch (error) {
             alert('Error starting live recording: ' + error.message);
+            console.error('goLiveButton:', error);
         }
     });
 });
