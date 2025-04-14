@@ -672,7 +672,7 @@
             </div>
         </div>
         <footer class="main-footer">
-            &copy; 2025 Clip-Pilot. All rights reserved.
+            © 2025 Clip-Pilot. All rights reserved.
         </footer>
     </div>
 
@@ -729,7 +729,7 @@ fileInput.addEventListener('change', (event) => {
         listItem.style.margin = '5px 0';
         listItem.style.border = '1px solid #ccc';
         listItem.style.borderRadius = '5px';
-        listItem.style.backgroundColor = '#f4f4f9';
+        listItem.style.backgroundColor = '#fIFn4f9';
         listItem.style.gap = '10px';
 
         let fileSize;
@@ -747,6 +747,7 @@ fileInput.addEventListener('change', (event) => {
         thumbnail.style.objectFit = 'fill';
         thumbnail.style.borderRadius = '5px';
         thumbnail.alt = 'Video thumbnail';
+        thumbnail.style.cursor = 'pointer'; // Add cursor to indicate clickability
         generateThumbnail(file, thumbnail);
 
         const fileLink = document.createElement('span');
@@ -898,6 +899,33 @@ fileInput.addEventListener('change', (event) => {
                 videoWrapper.style.transform = 'none';
             });
         }
+
+        // Play video when thumbnail is clicked
+        thumbnail.addEventListener('click', (e) => {
+            e.preventDefault();
+            const videoURL = URL.createObjectURL(file);
+            videoPlayer.src = videoURL;
+            videoWrapper.style.display = 'block';
+            videoPlayer.play();
+
+            videoPlayer.addEventListener('enterpictureinpicture', () => {
+                videoWrapper.style.display = 'none';
+            });
+
+            videoPlayer.addEventListener('leavepictureinpicture', () => {
+                videoWrapper.style.display = 'block';
+            });
+
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'f') {
+                    if (!document.fullscreenElement) {
+                        videoPlayer.requestFullscreen();
+                    } else {
+                        document.exitFullscreen();
+                    }
+                }
+            });
+        });
 
         fileLink.addEventListener('click', (e) => {
             e.preventDefault();
