@@ -900,6 +900,116 @@
         // Cache for video durations
         const durationCache = new Map();
         
+        // Initialize video player
+        function initializeVideoPlayer() {
+            if (!videoPlayer) {
+                videoWrapper = document.createElement('div');
+                videoWrapper.id = 'video-wrapper';
+                videoWrapper.style.position = 'fixed';
+                videoWrapper.style.left = '50%';
+                videoWrapper.style.top = '50%';
+                videoWrapper.style.transform = 'translate(-50%, -50%)';
+                videoWrapper.style.zIndex = '9999';
+                videoWrapper.style.display = 'none';
+                videoWrapper.style.cursor = 'move';
+                videoWrapper.style.background = '#000';
+                videoWrapper.style.borderRadius = '10px';
+                videoWrapper.style.boxShadow = '0 8px 16px rgba(0,0,0,0.3)';
+                videoWrapper.style.padding = '10px';
+        
+                const closeButton = document.createElement('button');
+                closeButton.textContent = '✖';
+                closeButton.style.position = 'absolute';
+                closeButton.style.top = '5px';
+                closeButton.style.right = '8px';
+                closeButton.style.background = 'rgba(255, 255, 255, 0.2)';
+                closeButton.style.border = 'none';
+                closeButton.style.color = 'white';
+                closeButton.style.fontSize = '16px';
+                closeButton.style.cursor = 'pointer';
+                closeButton.style.zIndex = '10000';
+                closeButton.addEventListener('click', () => {
+                    videoPlayer.pause();
+                    videoWrapper.style.display = 'none';
+                });
+        
+                videoPlayer = document.createElement('video');
+                videoPlayer.id = 'video-player';
+                videoPlayer.controls = true;
+                videoPlayer.style.maxWidth = '90vw';
+                videoPlayer.style.maxHeight = '70vh';
+                videoPlayer.style.width = 'auto';
+                videoPlayer.style.height = 'auto';
+                videoPlayer.style.borderRadius = '8px';
+                videoPlayer.style.display = 'block';
+        
+                videoWrapper.appendChild(closeButton);
+                videoWrapper.appendChild(videoPlayer);
+                document.body.appendChild(videoWrapper);
+        
+                let isDragging = false, offsetX = 0, offsetY = 0;
+        
+                videoWrapper.addEventListener('mousedown', (e) => {
+                    if (e.target === closeButton) return;
+                    isDragging = true;
+                    offsetX = e.clientX - videoWrapper.getBoundingClientRect().left;
+                    offsetY = e.clientY - videoWrapper.getBoundingClientRect().top;
+                    videoWrapper.style.transition = 'none';
+                });
+        
+                document.addEventListener('mousemove', (e) => {
+                    if (isDragging) {
+                        let newLeft = e.clientX - offsetX;
+                        let newTop = e.clientY - offsetY;
+                        const wrapperRect = videoWrapper.getBoundingClientRect();
+                        const screenWidth = window.innerWidth;
+                        const screenHeight = window.innerHeight;
+        
+                        if (newLeft + wrapperRect.width > screenWidth) newLeft = screenWidth - wrapperRect.width;
+                        if (newTop + wrapperRect.height > screenHeight) newTop = screenHeight - wrapperRect.height;
+                        if (newLeft < 0) newLeft = 0;
+                        if (newTop < 0) newTop = 0;
+        
+                        videoWrapper.style.left = `${newLeft}px`;
+                        videoWrapper.style.top = `${newTop}px`;
+                        videoWrapper.style.transform = 'none';
+                    }
+                });
+        
+                document.addEventListener('mouseup', () => {
+                    isDragging = false;
+                    videoWrapper.style.transition = 'all 0.2s ease';
+                });
+        
+                let touchStartX = 0, touchStartY = 0;
+        
+                videoWrapper.addEventListener('touchstart', (e) => {
+                    const touch = e.touches[0];
+                    touchStartX = touch.clientX - videoWrapper.getBoundingClientRect().left;
+                    touchStartY = touch.clientY - videoWrapper.getBoundingClientRect().top;
+                    videoWrapper.style.transition = 'none';
+                });
+        
+                videoWrapper.addEventListener('touchmove', (e) => {
+                    const touch = e.touches[0];
+                    let newLeft = touch.clientX - touchStartX;
+                    let newTop = touch.clientY - touchStartY;
+                    const wrapperRect = videoWrapper.getBoundingClientRect();
+                    const screenWidth = window.innerWidth;
+                    const screenHeight = window.innerHeight;
+        
+                    if (newLeft + wrapperRect.width > screenWidth) newLeft = screenWidth - wrapperRect.width;
+                    if (newTop + wrapperRect.height > screenHeight) newTop = screenHeight - wrapperRect.height;
+                    if (newLeft < 0) newLeft = 0;
+                    if (newTop < 0) newTop = 0;
+        
+                    videoWrapper.style.left = `${newLeft}px`;
+                    videoWrapper.style.top = `${newTop}px`;
+                    videoWrapper.style.transform = 'none';
+                });
+            }
+        }
+        
         // Hamburger menu toggle
         hamburger.addEventListener('click', () => {
             if (window.innerWidth > 768) {
@@ -1043,7 +1153,7 @@
         
                 const fileSizeLabel = document.createElement('span');
                 fileSizeLabel.textContent = fileSize;
-                fileSizeLabel.style.padding = '5px 10px';
+                fileSizeLabel.style.padding = '5px 10px 1rem';
                 fileSizeLabel.style.color = '#333';
                 fileSizeLabel.style.fontSize = '0.9rem';
         
@@ -1072,112 +1182,7 @@
                 listItem.appendChild(fileOptions);
                 uploadedFilesList.prepend(listItem);
         
-                if (!videoPlayer) {
-                    videoWrapper = document.createElement('div');
-                    videoWrapper.id = 'video-wrapper';
-                    videoWrapper.style.position = 'fixed';
-                    videoWrapper.style.left = '50%';
-                    videoWrapper.style.top = '50%';
-                    videoWrapper.style.transform = 'translate(-50%, -50%)';
-                    videoWrapper.style.zIndex = '9999';
-                    videoWrapper.style.display = 'none';
-                    videoWrapper.style.cursor = 'move';
-                    videoWrapper.style.background = '#000';
-                    videoWrapper.style.borderRadius = '10px';
-                    videoWrapper.style.boxShadow = '0 8px 16px rgba(0,0,0,0.3)';
-                    videoWrapper.style.padding = '10px';
-        
-                    const closeButton = document.createElement('button');
-                    closeButton.textContent = '✖';
-                    closeButton.style.position = 'absolute';
-                    closeButton.style.top = '5px';
-                    closeButton.style.right = '8px';
-                    closeButton.style.background = 'rgba(255, 255, 255, 0.2)';
-                    closeButton.style.border = 'none';
-                    closeButton.style.color = 'white';
-                    closeButton.style.fontSize = '16px';
-                    closeButton.style.cursor = 'pointer';
-                    closeButton.style.zIndex = '10000';
-                    closeButton.addEventListener('click', () => {
-                        videoPlayer.pause();
-                        videoWrapper.style.display = 'none';
-                    });
-        
-                    videoPlayer = document.createElement('video');
-                    videoPlayer.id = 'video-player';
-                    videoPlayer.controls = true;
-                    videoPlayer.style.maxWidth = '90vw';
-                    videoPlayer.style.maxHeight = '70vh';
-                    videoPlayer.style.width = 'auto';
-                    videoPlayer.style.height = 'auto';
-                    videoPlayer.style.borderRadius = '8px';
-                    videoPlayer.style.display = 'block';
-        
-                    videoWrapper.appendChild(closeButton);
-                    videoWrapper.appendChild(videoPlayer);
-                    document.body.appendChild(videoWrapper);
-        
-                    let isDragging = false, offsetX = 0, offsetY = 0;
-        
-                    videoWrapper.addEventListener('mousedown', (e) => {
-                        if (e.target === closeButton) return;
-                        isDragging = true;
-                        offsetX = e.clientX - videoWrapper.getBoundingClientRect().left;
-                        offsetY = e.clientY - videoWrapper.getBoundingClientRect().top;
-                        videoWrapper.style.transition = 'none';
-                    });
-        
-                    document.addEventListener('mousemove', (e) => {
-                        if (isDragging) {
-                            let newLeft = e.clientX - offsetX;
-                            let newTop = e.clientY - offsetY;
-                            const wrapperRect = videoWrapper.getBoundingClientRect();
-                            const screenWidth = window.innerWidth;
-                            const screenHeight = window.innerHeight;
-        
-                            if (newLeft + wrapperRect.width > screenWidth) newLeft = screenWidth - wrapperRect.width;
-                            if (newTop + wrapperRect.height > screenHeight) newTop = screenHeight - wrapperRect.height;
-                            if (newLeft < 0) newLeft = 0;
-                            if (newTop < 0) newTop = 0;
-        
-                            videoWrapper.style.left = `${newLeft}px`;
-                            videoWrapper.style.top = `${newTop}px`;
-                            videoWrapper.style.transform = 'none';
-                        }
-                    });
-        
-                    document.addEventListener('mouseup', () => {
-                        isDragging = false;
-                        videoWrapper.style.transition = 'all 0.2s ease';
-                    });
-        
-                    let touchStartX = 0, touchStartY = 0;
-        
-                    videoWrapper.addEventListener('touchstart', (e) => {
-                        const touch = e.touches[0];
-                        touchStartX = touch.clientX - videoWrapper.getBoundingClientRect().left;
-                        touchStartY = touch.clientY - videoWrapper.getBoundingClientRect().top;
-                        videoWrapper.style.transition = 'none';
-                    });
-        
-                    videoWrapper.addEventListener('touchmove', (e) => {
-                        const touch = e.touches[0];
-                        let newLeft = touch.clientX - touchStartX;
-                        let newTop = touch.clientY - touchStartY;
-                        const wrapperRect = videoWrapper.getBoundingClientRect();
-                        const screenWidth = window.innerWidth;
-                        const screenHeight = window.innerHeight;
-        
-                        if (newLeft + wrapperRect.width > screenWidth) newLeft = screenWidth - wrapperRect.width;
-                        if (newTop + wrapperRect.height > screenHeight) newTop = screenHeight - wrapperRect.height;
-                        if (newLeft < 0) newLeft = 0;
-                        if (newTop < 0) newTop = 0;
-        
-                        videoWrapper.style.left = `${newLeft}px`;
-                        videoWrapper.style.top = `${newTop}px`;
-                        videoWrapper.style.transform = 'none';
-                    });
-                }
+                initializeVideoPlayer();
         
                 thumbnail.addEventListener('click', (e) => {
                     e.preventDefault();
@@ -1407,6 +1412,7 @@
         
                     let isScreenSharing = false;
                     let screenStream;
+                    let liveContainerVisible = true;
         
                     fullscreenButton.addEventListener('click', () => {
                         if (!document.fullscreenElement) {
@@ -1416,7 +1422,9 @@
                         }
                     });
         
-                    switchCameraButton.addEventListener('click', async () => {
+                    switchCameraButton.addEventListener('click', async (e) => {
+                        e.preventDefault();
+                        if (!videoStream) return;
                         try {
                             const devices = await navigator.mediaDevices.enumerateDevices();
                             const videoDevices = devices.filter(d => d.kind === 'videoinput');
@@ -1427,18 +1435,27 @@
         
                             const currentTrack = videoStream.getVideoTracks()[0];
                             const currentId = currentTrack.getSettings().deviceId;
-                            const nextDeviceId = videoDevices.find(d => d.deviceId !== currentId).deviceId;
+                            const nextDeviceId = videoDevices.find(d => d.deviceId !== currentId)?.deviceId;
         
-                            videoStream.getTracks().forEach(track => track.stop());
-                            videoStream = await navigator.mediaDevices.getUserMedia({
+                            if (!nextDeviceId) {
+                                alert('No alternative camera found.');
+                                return;
+                            }
+        
+                            const newStream = await navigator.mediaDevices.getUserMedia({
                                 video: { deviceId: { exact: nextDeviceId } },
                                 audio: true
                             });
+        
+                            videoStream.getTracks().forEach(track => track.stop());
+                            videoStream = newStream;
                             videoElement.srcObject = videoStream;
         
                             if (mediaRecorder && mediaRecorder.state === 'recording') {
+                                recordedChunks.push(...screenChunks);
+                                screenChunks = [];
                                 mediaRecorder.stop();
-                                await new Promise(resolve => setTimeout(resolve, 500));
+                                await new Promise(resolve => setTimeout(resolve, 100));
                                 mediaRecorder = new MediaRecorder(videoStream, { mimeType: 'video/webm' });
                                 mediaRecorder.ondataavailable = (event) => {
                                     if (event.data.size > 0) recordedChunks.push(event.data);
@@ -1451,44 +1468,103 @@
                         }
                     });
         
-                    shareScreenButton.addEventListener('click', async () => {
+                    shareScreenButton.addEventListener('click', async (e) => {
+                        e.preventDefault();
+                        if (!mediaRecorder || mediaRecorder.state !== 'recording') return;
+        
                         try {
                             if (isScreenSharing) {
-                                screenStream.getTracks().forEach(track => track.stop());
+                                if (screenStream) {
+                                    screenStream.getTracks().forEach(track => track.stop());
+                                    screenStream = null;
+                                }
                                 videoStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
                                 videoElement.srcObject = videoStream;
                                 shareScreenButton.textContent = 'Share Screen';
                                 isScreenSharing = false;
-                                if (mediaRecorder && mediaRecorder.state === 'recording') {
-                                    mediaRecorder.stop();
-                                    await new Promise(resolve => setTimeout(resolve, 500));
-                                    mediaRecorder = new MediaRecorder(videoStream, { mimeType: 'video/webm' });
-                                    mediaRecorder.ondataavailable = (event) => {
-                                        if (event.data.size > 0) recordedChunks.push(event.data);
-                                    };
-                                    mediaRecorder.onstop = () => handleRecorderStop(liveContainer, durationInterval);
-                                    mediaRecorder.start();
-                                }
+                                liveContainer.style.display = liveContainerVisible ? 'flex' : 'none';
+        
+                                recordedChunks.push(...screenChunks);
+                                screenChunks = [];
+                                mediaRecorder.stop();
+                                await new Promise(resolve => setTimeout(resolve, 100));
+                                mediaRecorder = new MediaRecorder(videoStream, { mimeType: 'video/webm' });
+                                mediaRecorder.ondataavailable = (event) => {
+                                    if (event.data.size > 0) recordedChunks.push(event.data);
+                                };
+                                mediaRecorder.onstop = () => handleRecorderStop(liveContainer, durationInterval);
+                                mediaRecorder.start();
                             } else {
-                                screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+                                screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false });
                                 const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
                                 const combinedStream = new MediaStream([...screenStream.getVideoTracks(), ...audioStream.getAudioTracks()]);
                                 videoElement.srcObject = combinedStream;
                                 shareScreenButton.textContent = 'Stop Sharing';
                                 isScreenSharing = true;
-                                if (mediaRecorder && mediaRecorder.state === 'recording') {
-                                    mediaRecorder.stop();
-                                    await new Promise(resolve => setTimeout(resolve, 500));
-                                    mediaRecorder = new MediaRecorder(combinedStream, { mimeType: 'video/webm' });
-                                    mediaRecorder.ondataavailable = (event) => {
-                                        if (event.data.size > 0) screenChunks.push(event.data);
-                                    };
-                                    mediaRecorder.onstop = () => handleRecorderStop(liveContainer, durationInterval);
-                                    mediaRecorder.start();
-                                }
+                                liveContainer.style.display = liveContainerVisible ? 'flex' : 'none';
+        
+                                recordedChunks.push(...screenChunks);
+                                screenChunks = [];
+                                mediaRecorder.stop();
+                                await new Promise(resolve => setTimeout(resolve, 100));
+                                mediaRecorder = new MediaRecorder(combinedStream, { mimeType: 'video/webm; codecs=vp8,opus' });
+                                mediaRecorder.ondataavailable = (event) => {
+                                    if (event.data.size > 0) screenChunks.push(event.data);
+                                };
+                                mediaRecorder.onstop = () => handleRecorderStop(liveContainer, durationInterval);
+                                mediaRecorder.start(100);
                             }
                         } catch (err) {
-                            alert('Error sharing screen: ' + err.message);
+                            if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+                                if (isScreenSharing && screenStream) {
+                                    screenStream.getTracks().forEach(track => track.stop());
+                                    screenStream = null;
+                                }
+                                if (!videoStream) {
+                                    videoStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                                }
+                                videoElement.srcObject = videoStream;
+                                shareScreenButton.textContent = 'Share Screen';
+                                isScreenSharing = false;
+                                liveContainer.style.display = liveContainerVisible ? 'flex' : 'none';
+        
+                                recordedChunks.push(...screenChunks);
+                                screenChunks = [];
+                                if (mediaRecorder.state === 'recording') {
+                                    mediaRecorder.stop();
+                                    await new Promise(resolve => setTimeout(resolve, 100));
+                                }
+                                mediaRecorder = new MediaRecorder(videoStream, { mimeType: 'video/webm' });
+                                mediaRecorder.ondataavailable = (event) => {
+                                    if (event.data.size > 0) recordedChunks.push(event.data);
+                                };
+                                mediaRecorder.onstop = () => handleRecorderStop(liveContainer, durationInterval);
+                                mediaRecorder.start();
+                            } else {
+                                alert('Error sharing screen: ' + err.message);
+                            }
+                        }
+                    });
+        
+                    screenStream && screenStream.getVideoTracks()[0].addEventListener('ended', async () => {
+                        if (isScreenSharing) {
+                            screenStream = null;
+                            videoStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                            videoElement.srcObject = videoStream;
+                            shareScreenButton.textContent = 'Share Screen';
+                            isScreenSharing = false;
+                            liveContainer.style.display = liveContainerVisible ? 'flex' : 'none';
+        
+                            recordedChunks.push(...screenChunks);
+                            screenChunks = [];
+                            mediaRecorder.stop();
+                            await new Promise(resolve => setTimeout(resolve, 100));
+                            mediaRecorder = new MediaRecorder(videoStream, { mimeType: 'video/webm' });
+                            mediaRecorder.ondataavailable = (event) => {
+                                if (event.data.size > 0) recordedChunks.push(event.data);
+                            };
+                            mediaRecorder.onstop = () => handleRecorderStop(liveContainer, durationInterval);
+                            mediaRecorder.start();
                         }
                     });
         
@@ -1508,6 +1584,11 @@
                         if (mediaRecorder && mediaRecorder.state !== 'inactive') {
                             mediaRecorder.stop();
                         }
+                        if (screenStream) {
+                            screenStream.getTracks().forEach(track => track.stop());
+                            screenStream = null;
+                        }
+                        liveContainerVisible = false;
                     });
                 } catch (error) {
                     alert('Error starting live recording: ' + error.message);
@@ -1632,13 +1713,17 @@
             listItem.appendChild(deleteButton);
             uploadedFilesList.prepend(listItem);
         
-            fileLink.addEventListener('click', () => {
+            initializeVideoPlayer();
+        
+            fileLink.addEventListener('click', (e) => {
+                e.preventDefault();
                 videoPlayer.src = videoURL;
                 videoWrapper.style.display = 'block';
                 videoPlayer.play();
             });
         
-            thumbnail.addEventListener('click', () => {
+            thumbnail.addEventListener('click', (e) => {
+                e.preventDefault();
                 videoPlayer.src = videoURL;
                 videoWrapper.style.display = 'block';
                 videoPlayer.play();
