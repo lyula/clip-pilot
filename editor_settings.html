@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings</title>
+    <link rel="shortcut icon" href="images/main-logo.jpg" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #00235f;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Main Header Styles */
+        .main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #00235f;
+            color: white;
+            padding: 15px 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1100;
+        }
+
+        .main-header h1 {
+            font-size: 1.5rem;
+            margin: 0;
+        }
+
+        .main-header .hamburger {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: white;
+        }
+
+        .main-header .logout {
+            color: white;
+            font-size: 1.5rem;
+            text-decoration: none;
+            margin-right: 50px;
+            display: flex;
+            align-items: center;
+        }
+
+        .main-header .logout:hover {
+            color: #ddd;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 130px;
+            height: 100vh;
+            background-color: #00235f;
+            color: white;
+            position: fixed;
+            top: 55px;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            padding-top: 20px;
+            transition: width 0.3s ease, left 0.3s ease;
+            z-index: 1000;
+            overflow-x: hidden;
+        }
+
+        .sidebar.expanded-desktop {
+            width: 220px;
+        }
+
+        .sidebar.expanded-desktop a span {
+            display: inline;
+        }
+
+        .sidebar.open {
+            left: 0;
+            width: 220px;
+            overflow-x: visible;
+        }
+
+        .sidebar.open a span {
+            display: inline;
+            white-space: normal;
+        }
+
+        .sidebar-title {
+            font-size: 1.5rem;
+            color: white;
+            text-align: center;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .sidebar.expanded-desktop .sidebar-title,
+        .sidebar.open .sidebar-title {
+            display: block;
+        }
+
+        .sidebar a {
+            text-decoration: none;
+            color: white;
+            padding: 10px 15px;
+            margin: 5px 0;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .sidebar a i {
+            font-size: 1.2rem;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .sidebar a span {
+            white-space: nowrap;
+            display: none;
+        }
+
+        .sidebar a:hover {
+            background-color: #003080;
+        }
+
+        .sidebar a.active {
+            background-color: #003080;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            margin-left: 130px;
+            padding: 20px;
+            margin-top: 80px;
+            transition: margin-left 0.3s ease;
+            flex-grow: 1;
+        }
+
+        .main-content.collapsed {
+            margin-left: 0;
+        }
+
+        .main-content.expanded-desktop {
+            margin-left: 220px;
+        }
+
+        /* Settings Container */
+        .settings-container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: 50px auto;
+        }
+
+        /* Settings Header */
+        .settings-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .settings-header h2 {
+            font-size: 1.8rem;
+            color: #00235f;
+            margin: 0;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .settings-header img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+        }
+
+        .user-details h3 {
+            margin-bottom: 20px;
+            color: #00235f;
+        }
+
+        .setting-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .setting-item label {
+            flex: 1;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .input-wrapper {
+            flex: 2;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-wrapper input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+            background-color: #f9f9f9;
+            color: #333;
+            width: 100%;
+        }
+
+        .input-wrapper input:read-only {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+        }
+
+        .edit-icon {
+            font-size: 1.2rem;
+            color: #003087;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .edit-icon:hover {
+            color: #0056b3;
+        }
+
+        .save-button {
+            padding: 10px 20px;
+            background-color: #003087;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .save-button:hover {
+            background-color: #002060;
+        }
+
+        /* Profile Picture Responsiveness */
+        #current-profile-picture {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        /* Footer Styles */
+        .main-footer {
+            background-color: #e0e0e0;
+            color: #333;
+            text-align: center;
+            padding: 10px 0;
+            border-radius: 5px;
+            border-top: 1px solid #ccc;
+            font-size: 0.9rem;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .settings-header {
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+                gap: 10px;
+            }
+
+            .settings-header img {
+                width: 40px;
+                height: 40px;
+            }
+
+            .settings-header h2 {
+                text-align: left;
+                margin: 0;
+                font-size: 1.5rem;
+            }
+
+            #current-profile-picture {
+                width: 40px;
+                height: 40px;
+            }
+
+            .input-wrapper {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .setting-item {
+                display: flex;
+                align-items: center;
+                flex-direction: row;
+            }
+
+            .setting-item label {
+                margin-left: 10px;
+                flex: 1;
+                text-align: left;
+            }
+
+            .input-wrapper {
+                flex-direction: row;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .sidebar {
+                width: 0;
+                left: -130px;
+                margin-top: -5px;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .main-content.collapsed {
+                margin-left: 0;
+            }
+
+            .main-header .logout {
+                margin-right: 40px;
+            }
+
+            .settings-container {
+                padding: 15px;
+            }
+
+            .setting-item label {
+                font-size: 0.9rem;
+            }
+
+            .input-wrapper input {
+                font-size: 0.9rem;
+                padding: 8px;
+            }
+
+            .save-button {
+                font-size: 0.9rem;
+                padding: 8px 15px;
+            }
+            .sidebar {
+                margin-top: 2px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <noscript>
+        <p style="color: red; text-align: center;">JavaScript is disabled. Please enable it to update your profile picture.</p>
+    </noscript>
+    <div class="main-header">
+        <i class="fas fa-bars hamburger"></i>
+        <a href="index.html" class="logout"><i class="fas fa-sign-out-alt"></i></a>
+    </div>
+
+    <div class="sidebar collapsed-desktop">
+        <h1 class="sidebar-title">Clip-Pilot</h1>
+        <a href="editor_dashboard.html"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+        <a href="editing_progress.html"><i class="fas fa-video"></i> <span>Current Editing</span></a>
+        <a href="editor_history.html"><i class="fas fa-history"></i> <span>Projects History</span></a>
+        <a href="editor_chat.html" ><i class="fas fa-envelope"></i> <span>Messages</span></a>
+        <a href="editor_settings.html" class="active"><i class="fas fa-cog"></i> <span>Settings</span></a>
+        <a href="index.html"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a>
+    </div>
+
+    <div class="main-content collapsed-desktop">
+        <div class="settings-container">
+            <div class="settings-header">
+                <h2><i class="fas fa-cog"></i> Settings</h2>
+                <img id="current-profile-picture" src="images/my-image.jpeg" alt="Current Profile Picture">
+            </div>
+            <!-- User Details Section -->
+            <div class="user-details">
+                <h3>Profile Information</h3>
+                <div class="setting-item">
+                    <label for="profile-picture">Profile Picture:</label>
+                    <div class="input-wrapper">
+                        <!-- Input for updating the profile picture -->
+                        <input type="file" id="profile-picture" accept="image/jpeg,image/png" aria-label="Upload profile picture">
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <label for="username">Username:</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="username" value="zack254" readonly>
+                        <i class="fas fa-edit edit-icon" onclick="enableEdit('username')"></i>
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <label for="email">Email:</label>
+                    <div class="input-wrapper">
+                        <input type="email" id="email" value="sacredlyula@example.com" readonly>
+                        <i class="fas fa-edit edit-icon" onclick="enableEdit('email')"></i>
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <label for="phone">Phone:</label>
+                    <div class="input-wrapper">
+                        <input type="tel" id="phone" value="+254773079574" readonly>
+                        <i class="fas fa-edit edit-icon" onclick="enableEdit('phone')"></i>
+                    </div>
+                </div>
+                <button class="save-button" onclick="saveChanges()">Save Changes</button>
+            </div>
+        </div>
+
+        <footer class="main-footer">
+            © 2025 Clip-Pilot. All rights reserved.
+        </footer>
+    </div>
+
+    <script>
+        // Store initial input values
+        const initialValues = {
+            username: document.getElementById('username').value,
+            email: document.getElementById('email').value,
+            phone: document.getElementById('phone').value
+        };
+
+        // Track profile picture changes
+        let profilePictureChanged = false;
+
+        // Sidebar toggle functionality
+        const hamburger = document.querySelector('.hamburger');
+        const sidebar = document.querySelector('.sidebar');
+        const mainContent = document.querySelector('.main-content');
+
+        hamburger.addEventListener('click', () => {
+            if (window.innerWidth > 768) {
+                sidebar.classList.toggle('expanded-desktop');
+                mainContent.classList.toggle('expanded-desktop');
+            } else {
+                sidebar.classList.toggle('open');
+                mainContent.classList.toggle('collapsed');
+            }
+
+            if (hamburger.classList.contains('fa-bars')) {
+                hamburger.classList.remove('fa-bars');
+                hamburger.classList.add('fa-times');
+            } else {
+                hamburger.classList.remove('fa-times');
+                hamburger.classList.add('fa-bars');
+            }
+        });
+
+        // Enable editing for a specific input field
+        function enableEdit(fieldId) {
+            const inputField = document.getElementById(fieldId);
+            inputField.removeAttribute('readonly');
+            inputField.style.backgroundColor = '#fff';
+            inputField.focus();
+        }
+
+        // Save changes and disable editing
+        function saveChanges() {
+            const inputs = document.querySelectorAll('.input-wrapper input');
+            const currentValues = {
+                username: document.getElementById('username').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value
+            };
+
+            // Check for changes
+            const hasChanges = (
+                currentValues.username !== initialValues.username ||
+                currentValues.email !== initialValues.email ||
+                currentValues.phone !== initialValues.phone ||
+                profilePictureChanged
+            );
+
+            if (!hasChanges) {
+                alert('No changes detected.');
+                return;
+            }
+
+            // Proceed with saving if changes exist
+            inputs.forEach((input) => {
+                input.setAttribute('readonly', true);
+                input.style.backgroundColor = '#e9ecef';
+            });
+            // Note: Profile picture changes are client-side only; backend saving requires additional logic
+            alert('Changes saved successfully!');
+        }
+
+        // Update the existing profile picture
+        const profilePictureInput = document.getElementById('profile-picture');
+        profilePictureInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                // Validate file type and size
+                const validTypes = ['image/jpeg', 'image/png'];
+                if (!validTypes.includes(file.type)) {
+                    alert('Please upload a JPEG or PNG image.');
+                    return;
+                }
+                if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                    alert('Image size must be less than 5MB.');
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const currentImage = document.getElementById('current-profile-picture');
+                        currentImage.src = e.target.result;
+                        profilePictureChanged = true; // Flag profile picture change
+                    } catch (error) {
+                        alert('Error loading image. Please try again.');
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -137,12 +137,17 @@
             align-items: center;
             gap: 10px;
             transition: background-color 0.3s ease;
+            justify-content: center; /* Center icons when sidebar is collapsed */
+        }
+
+        .sidebar.expanded-desktop a {
+            justify-content: flex-start; /* Align icons to the left when sidebar is expanded */
         }
 
         .sidebar a i {
-            font-size: 1.2rem;
-            min-width: 40px;
+            font-size: 1.5rem;
             text-align: center;
+            width: 40px;
         }
 
         .sidebar a span {
@@ -156,6 +161,47 @@
 
         .sidebar a.active {
             background-color: #003080;
+        }
+
+        /* Sidebar Logo */
+        .sidebar-logo {
+            margin-top: auto; /* Push the logo to the bottom */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 0;
+            margin-top: -3px;
+            
+        }
+
+        .sidebar-logo img {
+            width: 60px; /* Adjust the size of the logo */
+            height: 60px;
+            border-radius: 50%; /* Make the logo circular */
+            object-fit: cover; /* Ensure the image fits within the circle */
+            border: 2px solid white; /* Optional: Add a border around the logo */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: Add a subtle shadow */
+        }
+
+        @media (max-width: 768px) {
+            .sidebar-logo img {
+                width: 60px; /* Adjust size for mobile */
+                height: 60px;
+            }
+        }
+
+        /* Sidebar Footer */
+        .sidebar-footer {
+            display: none; /* Hidden by default */
+            text-align: center;
+            padding: 10px 0;
+            font-size: 0.9rem;
+            color: white;
+            background-color: #001f4d;
+        }
+
+        .sidebar.expanded-desktop .sidebar-footer {
+            display: block; /* Show footer only when sidebar is expanded */
         }
 
         /* Main Content Styles */
@@ -476,6 +522,23 @@
             .payment-section .transfer-button {
                 max-width: 100%;
             }
+            .on-hold {
+                text-align: left !important; /* Ensure alignment to the left */
+                margin-top: 0; /* Adjust margin if necessary */
+                width: 100%; /* Ensure it spans the full width */
+            }
+
+            .sidebar a {
+                justify-content: flex-start; /* Align sidebar links to the left */
+            }
+
+            .sidebar-logo {
+                justify-content: center; /* Keep the logo centered */
+            }
+
+            .sidebar-logo img {
+                margin: 0 auto; /* Ensure the logo remains centered */
+            }
         }
 
         @media (min-width: 769px) {
@@ -550,12 +613,22 @@
 
     <div class="sidebar collapsed-desktop">
         <h1 class="sidebar-title">Clip-Pilot</h1>
-        <a href="#" class="active"><i class="fas fa-home"></i> <span>Dashboard</span></a>
-        <a href="#"><i class="fas fa-video"></i> <span>Current Edits</span></a>
-        <a href="#"><i class="fas fa-history"></i> <span>Edit History</span></a>
-        <a href="#"><i class="fas fa-envelope"></i> <span>Messages</span></a>
-        <a href="#"><i class="fas fa-cog"></i> <span>Settings</span></a>
-        <a href="#"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a>
+        <a href="editor_dashboard.html" class="active"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+        <a href="editing_progress.html"><i class="fas fa-video"></i> <span>Current Editing</span></a>
+        <a href="editor_history.html"><i class="fas fa-history"></i> <span>Projects History</span></a>
+        <a href="editor_chat.html"><i class="fas fa-envelope"></i> <span>Messages</span></a>
+        <a href="editor_settings.html"><i class="fas fa-cog"></i> <span>Settings</span></a>
+        <a href="index.html"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a>
+
+        <!-- Sidebar Logo -->
+        <div class="sidebar-logo">
+            <img src="images/main-logo.jpg" alt="Company Logo">
+        </div>
+
+        <!-- Sidebar Footer -->
+        <div class="sidebar-footer">
+            <p>© 2025 Clip-Pilot</p>
+        </div>
     </div>
 
     <div class="main-content collapsed-desktop">
@@ -571,6 +644,7 @@
             <h1>My Balance</h1>
             <div class="clipilot-content">
                 <span class="balance-info"><h2>$1,500.00 USD</h2></span>
+                <span class="on-hold" style="text-align: left;margin-top: -30px;"><h2>On hold : $250</h2></span>
                 <button class="transfer-button">Transfer Funds</button>
             </div>
         </div>
@@ -625,6 +699,7 @@
                 <p>Order No: c-p1130-ddd/mmm/yyy</p>
                 <p>Deadline: April 20, 2025</p>
                 <p>Tools Required: Adobe Premiere, After Effects</p>
+                <p>Pay : $95</p>
             </div>
             <div class="card">
                 <h3>Project: Corporate Video</h3>
@@ -632,6 +707,7 @@
                 <p>Order No: c-p1113-ddd/mmm/yyy</p>
                 <p>Deadline: April 18, 2025</p>
                 <p>Tools Required: Final Cut Pro, Color Grading</p>
+                <p>Pay : $95</p>
             </div>
         </div>
 

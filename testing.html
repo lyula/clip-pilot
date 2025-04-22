@@ -1,0 +1,1854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+    <link rel="shortcut icon" href="images/main-logo.jpg" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="js/record.js"></script> <!-- Include the external record.js file -->
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #00235f;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Main Header Styles */
+        .main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #00235f; /* Updated theme color */
+            color: white;
+            padding: 15px 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1100;
+        }
+
+        .main-header h1 {
+            font-size: 1.5rem;
+            margin: 0;
+        }
+
+        .main-header .hamburger {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: white;
+        }
+
+        .main-header .logout {
+            color: white;
+            font-size: 1.5rem;
+            text-decoration: none;
+            margin-right: 40px;
+        }
+
+        .main-header .logout:hover {
+            color: #ddd;
+        }
+
+        /* Hamburger Menu */
+        .hamburger {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: white;
+            transition: transform 0.3s ease; /* Smooth animation */
+        }
+
+        /* Rotate hamburger into an X */
+        .hamburger.open {
+            transform: rotate(45deg); /* Rotate to form an X */
+            color: white; /* Optional: Change color to indicate close */
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 130px; /* Increased collapsed width by 70px (original was 60px) */
+            height: 100vh;
+            background-color: #00235f; /* Updated theme color */
+            color: white;
+            position: fixed;
+            top: 60px;
+            left: 0; /* Initially visible on desktop */
+            display: flex;
+            flex-direction: column;
+            padding-top: 20px; /* Adjust top padding */
+            transition: width 0.3s ease, left 0.3s ease; /* Added width transition */
+            z-index: 1000;
+            overflow-x: hidden; /* Hide text when collapsed */
+        }
+
+        .sidebar.expanded-desktop {
+            width: 220px; /* Expanded width remains the same */
+        }
+
+        .sidebar.expanded-desktop a span {
+            display: inline; /* Show labels when expanded on desktop */
+        }
+
+        .sidebar.open {
+            left: -220px; /* Hidden off-screen on mobile initially */
+            width: 220px; /* Full width on mobile when open */
+            overflow-x: visible; /* Show text on mobile */
+        }
+
+        .sidebar.open.expanded-desktop {
+            left: 0; /* Override mobile hidden when manually expanded on a larger mobile screen */
+        }
+
+        .sidebar.open a span {
+            display: inline; /* Always show labels on mobile when open */
+            white-space: normal; /* Allow wrapping */
+        }
+
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        /* Sidebar Title Styles */
+        .sidebar-title {
+            font-size: 1.5rem;
+            color: white;
+            text-align: center;
+            margin-bottom: 20px; /* Add spacing below the title */
+            display: none; /* Hidden by default for collapsed sidebar */
+        }
+
+        /* Show the title when the sidebar is expanded */
+        .sidebar.expanded-desktop .sidebar-title,
+        .sidebar.open .sidebar-title {
+            display: block; /* Show the title when expanded */
+        }
+
+        .sidebar a {
+            text-decoration: none;
+            color: white;
+            padding: 10px 15px;
+            margin: 5px 0;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .sidebar a i {
+            font-size: 1.2rem;
+            min-width: 40px; /* Ensure icon takes enough space for visibility */
+            text-align: center;
+        }
+
+        .sidebar a span {
+            white-space: nowrap; /* Hide text when collapsed on desktop */
+            display: none; /* Initially hidden on desktop */
+        }
+
+        .sidebar a:hover {
+            background-color: #003080; /* Slightly lighter shade for hover */
+        }
+
+        .sidebar a.active {
+            background-color: #003080; /* Active link color */
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            margin-left: 60px; /* Adjusted to match increased initial collapsed sidebar width */
+            padding: 20px;
+            margin-top: 80px; /* Add margin to push content below the fixed header */
+            transition: margin-left 0.3s ease;
+            flex-grow: 1; /* Allow content to take up remaining vertical space */
+        }
+
+        .main-content.collapsed {
+            margin-left: 0; /* Adjust when sidebar is hidden on mobile */
+        }
+
+        .main-content.expanded-desktop {
+            margin-left: 220px; /* Adjust when desktop sidebar is expanded */
+        }
+
+        /* Content Header Styles */
+        .content-header {
+            display: flex;
+            justify-content: flex-start; /* Align content to the left */
+            align-items: center;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            padding: 15px 20px;
+            background-color: white;
+            border-bottom: 1px solid #ddd;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .content-header .user-info {
+            margin-left: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px; /* Add spacing between the image and the title */
+        }
+        
+
+        @media (max-width: 769px) {
+        .content-header .user-info{
+            margin-left: 0;
+        }
+    }
+
+        .content-header .user-info img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+        }
+
+        .content-header .user-info h4 {
+            font-size: 1.5rem;
+            color: #00235f; /* Updated theme color */
+            margin: 0; /* Remove default margin */
+        }
+
+        /* Dashboard Section */
+        .dashboard-section {
+            margin-top: 20px;
+        }
+
+        .dashboard-section h2 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: #00235f; /* Updated theme color */
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .card h3 {
+            margin: 0 0 10px;
+            font-size: 1.1rem;
+            color: #00235f; /* Updated theme color */
+        }
+
+        .card p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* Project Form Styles */
+        .project-form {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch; /* Make children fill the width */
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .project-form > div {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+
+        .project-form label {
+            font-weight: bold;
+            color: #00235f;
+            margin-bottom: 5px;
+        }
+
+        .project-form input[type="text"],
+        .project-form input[type="file"],
+        .project-form textarea,
+        .project-form select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            width: 100%; /* Ensure they take full width within their container */
+        }
+
+        /* Ensure the parent container spans the full width */
+        .form-actions > div {
+            width: 100%; /* Make the parent container full width */
+            box-sizing: border-box; /* Include padding and border in width calculation */
+        }
+
+        /* Video Category Dropdown */
+        #video-category {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+        }
+
+        /* Go Live Button */
+        .go-live-button {
+            background-color: #003087; /* Theme primary color */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 10px; /* Add spacing above the button */
+            width: 100%; /* Full width on all screens */
+            text-align: center;
+            box-sizing: border-box; /* Include padding and border in width calculation */
+            display: block; /* Ensure it behaves like a block element */
+        }
+
+        /* Hover effect for Go Live Button */
+        .go-live-button:hover {
+            background-color: #002060; /* Slightly darker shade for hover */
+        }
+
+        /* Hide the mobile Go Live button on desktops */
+        .mobile-only {
+            display: block; /* Visible by default */
+        }
+
+        .desktop-only {
+            display: none; /* Hidden by default */
+        }
+
+        /* Show the desktop Go Live button on larger screens */
+        @media (min-width: 769px) {
+            .mobile-only {
+                display: none; /* Hide mobile button on desktops */
+            }
+
+            .desktop-only {
+                display: block; /* Show desktop button */
+                width: 100%; /* Full width */
+                max-width: 800px; /* Match the Submit Project button */
+                margin-left: auto; /* Center horizontally */
+                margin-right: auto; /* Center horizontally */
+            }
+        }
+
+        /* Uploaded Files List */
+        .uploaded-files-list {
+            padding: 0;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #333;
+            max-width: 100%; /* Ensure the list stays within the container */
+            word-wrap: break-word; /* Break long words to prevent overflow */
+        }
+
+        .uploaded-files-list li {
+            background-color: #f4f4f9;
+            padding: 8px 10px;
+            margin-bottom: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px; /* Add spacing between file name and size */
+        }
+
+        .uploaded-files-list li span {
+            font-weight: bold;
+            color: #00235f;
+            max-width: 70%; /* Limit the width of the file name */
+            overflow: hidden;
+            text-overflow: ellipsis; /* Add ellipsis for long file names */
+            white-space: nowrap; /* Prevent wrapping */
+        }
+
+        /* Microphone and Submit Button Container */
+        .form-actions {
+            display: flex;
+            flex-direction: column; /* Stack on all screen sizes initially */
+            align-items: center; /* Center items horizontally */
+            gap: 15px; /* Space between microphone and submit button */
+            width: 100%; /* Ensure it spans the form width */
+            box-sizing: border-box;
+        }
+
+        .microphone-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: -25px;
+            width: 100%; /* Ensure full width for centering */
+        }
+
+        .microphone-title {
+            font-size: 0.9rem;
+            color: #666;
+            white-space: nowrap; /* Prevent text wrapping */
+            text-align: center; /* Center the title */
+        }
+
+        .sidebar.expanded-desktop + .main-content .microphone-title {
+            width: auto; /* Adjust width when sidebar is expanded */
+            text-align: left; /* Align title to the left when expanded */
+        }
+
+        /* Microphone Button Styles */
+        .microphone-button {
+            background-color: #003087; /* Match theme color */
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 50%; /* Circular button */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+            transition: background-color 0.3s ease;
+            width: 40px; /* Fixed width and height for circle */
+            height: 40px;
+        }
+
+        .microphone-button:hover {
+            background-color: #003080; /* Slightly lighter shade for hover */
+        }
+
+        /* Submit Button Styles */
+        .submit-button {
+            background-color: #003087; /* Updated theme color */
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-align: center;
+            width: 100%; /* Full width on all screens initially */
+            box-sizing: border-box;
+            font-size: 1rem; /* Match font size with Go Live button */
+        }
+
+        .submit-button:hover {
+            background-color: #003080; /* Slightly lighter shade for hover */
+        }
+
+        #audio-container {
+            margin-top: 10px;
+            width: 100%; /* Make audio player responsive */
+        }
+
+        /* Footer Styles */
+        .main-footer {
+            background-color: #e0e0e0; /* Use the far-right color of the gradient */
+            color: #333; /* Dark gray text for contrast */
+            height: 5vh;
+            text-align: center;
+            padding: 10px 0;
+            border-radius: 5px;
+            position: relative; /* To ensure it's below other fixed elements */
+            z-index: 900; /* Ensure it's below header and sidebar */
+            margin-top: auto;
+            font-size: 0.9rem; /* Adjust font size for better readability */
+            border-top: 1px solid #ccc; /* Subtle border for separation */
+        }
+
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            .sidebar {
+                left: -220px; /* Hidden off-screen */
+                width: 220px;
+                overflow-x: visible; /* Allow text to be visible */
+            }
+
+            .sidebar.open {
+                left: 0; /* Slide in */
+            }
+
+            .sidebar a span {
+                display: inline; /* Always show labels on mobile when open */
+                white-space: normal; /* Allow wrapping */
+            }
+
+            .main-content {
+                margin-left: 0 !important; /* No left margin on mobile */
+                padding-top: 60px; /* Adjust padding below fixed header */
+                margin-top: 25px;
+            }
+
+            .content-header {
+                margin-bottom: 5px; /* Reduced margin on mobile */
+            }
+
+            .main-header .hamburger {
+                display: block;
+            }
+
+            .form-actions {
+                flex-direction: column; /* Stack on mobile */
+                align-items: stretch; /* Full width on mobile */
+            }
+
+            .submit-button {
+                margin-left: 0; /* Reset desktop margin */
+            }
+        }
+
+        /* Desktop Styles */
+        @media (min-width: 769px) {
+            .form-actions {
+                flex-direction: row; /* Align microphone and button in a row on desktop */
+                align-items: flex-start; /* Align items to the top */
+            }
+
+            .microphone-container {
+                align-items: flex-start; /* Align microphone elements to the left */
+                flex-shrink: 0; /* Prevent shrinking */
+            }
+
+            .submit-button {
+                width: auto; /* Adjust width based on content */
+                flex-grow: 1; /* Allow it to take more space */
+                align-self: stretch; /* Make it the same height as the microphone area */
+            }
+        }
+
+        /* Default layout for desktop */
+        .audio-wrapper {
+            display: flex;
+            flex-direction: column; /* Default to column layout */
+            align-items: flex-start;
+            margin-top: 10px;
+        }
+
+        .button-wrapper {
+            display: flex;
+            gap: 10px; /* Add spacing between buttons */
+            margin-top: 10px;
+        }
+
+        /* Mobile-specific styles */
+        @media (max-width: 768px) {
+            .audio-wrapper {
+                flex-direction: column; /* Stack audio and buttons vertically */
+            }
+
+            .button-wrapper {
+                flex-direction: column; /* Stack buttons vertically */
+                align-items: flex-start;
+            }
+        }
+
+        /* Center the project form on larger screens */
+        @media (min-width: 769px) {
+            .project-form {
+                max-width: 800px; /* Set a maximum width for the form */
+                margin: 0 auto; /* Center the form horizontally */
+            }
+
+            .content-header {
+                max-width: 800px; /* Match the max-width of the project form */
+                margin: 0 auto;/* Center horizontally */
+                padding: 15px 5px; /* Maintain padding */
+                border-radius: 8px;
+            }
+
+            .dashboard-section {
+                max-width: 800px; /* Match the max-width of the project form */
+                margin: 0 auto; /* Center horizontally */
+            }
+
+            .main-footer {
+                max-width: 800px; /* Match the max-width of the project form */
+                margin: 0 auto; /* Center horizontally */
+            }
+        }
+
+        /* Payment Modal Styles */
+        .payment-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .payment-modal-content {
+            background: linear-gradient(135deg, #ffffff, #f4f4f9);
+            border-radius: 12px;
+            padding: 30px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            position: relative;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .payment-modal-content h2 {
+            color: #00235f;
+            margin: 0 0 20px;
+            font-size: 1.8rem;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .payment-details {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .payment-details p {
+            font-size: 1.1rem;
+            color: #333;
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .payment-details p span {
+            font-weight: 600;
+            color: #00235f;
+        }
+
+        .proceed-button,
+        .submit-payment-button {
+            background: linear-gradient(90deg, #003087, #0050b3);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-top: 20px;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        .proceed-button:hover,
+        .submit-payment-button:hover {
+            background: linear-gradient(90deg, #002060, #003087);
+            transform: translateY(-2px);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 1.8rem;
+            color: #00235f;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .close-modal:hover {
+            color: #003087;
+        }
+
+        .payment-method {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: border-color 0.2s ease, background-color 0.2s ease;
+        }
+
+        .payment-method img {
+            width: 50px;
+            height: auto;
+            margin-right: 15px;
+        }
+
+        .payment-method span {
+            font-size: 1.1rem;
+            color: #333;
+        }
+
+        .payment-method.selected {
+            border-color: #003087;
+            background-color: #e6f0fa;
+        }
+
+        .payment-form {
+            display: none;
+        }
+
+        .payment-form input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        .payment-form input:focus {
+            border-color: #003087;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 48, 135, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="main-header">
+        <i class="fas fa-bars hamburger"></i>
+        <a href="index.html" class="logout"><i class="fas fa-sign-out-alt"></i></a>
+    </div>
+
+    <div class="sidebar collapsed-desktop">
+        <h1 class="sidebar-title">Clip-Pilot</h1> <!-- Added title -->
+        <a href="dashboard.html" class="active"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+        <a href="progress.html"><i class="fas fa-video"></i> <span>Project Tracking</span></a>
+        <a href="projects_history.html"><i class="fas fa-history"></i> <span>Projects History</span></a>
+        <a href="messages.html"><i class="fas fa-envelope"></i> <span>Messages</span></a>
+        <a href="settings.html"><i class="fas fa-cog"></i> <span>Settings</span></a>
+        <a href="index.html"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a>
+    </div>
+
+    <div class="main-content collapsed-desktop">
+        <div class="content-header">
+            <div class="user-info">
+                <img src="images/my-image.jpeg" alt="User Avatar">
+                <h4>Hey, User 👋</h4>
+            </div>
+        </div>
+
+        <div class="dashboard-section">
+           <h2> Submit a New Project</h2>
+            <form class="project-form">
+                <div>
+                    <label for="project-title">Project Title</label>
+                    <input type="text" id="project-title" name="project-title" placeholder="Enter project title" required>
+                </div>
+                <div>
+                    <label for="video-category">Video Category</label>
+                    <select id="video-category" name="video-category" required>
+                        <option value="" disabled selected>Select a category</option>
+                        <option value="youtube-video">Clip-Pilot Live Video</option>
+                        <option value="youtube-video">YouTube Video</option>
+                        <option value="youtube-short">YouTube Short</option>
+                        <option value="tiktok-video">TikTok Video</option>
+                        <option value="instagram-reel">Instagram Reel</option>
+                        <option value="documentary">Documentary</option>
+                        <option value="trailer">Trailer</option>
+                        <option value="corporate-video">Corporate Video</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="project-files">Upload Files</label>
+                    <input type="file" id="project-files" name="project-files" multiple accept="video/*">
+                    <ul id="uploaded-files-list" class="uploaded-files-list"></ul> <!-- List to display uploaded files -->
+                </div>
+                <div>
+                    <label for="project-description">Project Instructions</label>
+                    <textarea id="project-description" name="project-description" rows="4" placeholder="Please type your instructions here" ></textarea>
+                </div>
+                <div class="form-actions">
+                    <div class="microphone-container">
+                        <span class="microphone-title">Or let us hear them</span>
+                        <button id="record-button" class="microphone-button">
+                            <i class="fas fa-microphone"></i>
+                        </button>
+                        <div id="audio-container"></div>
+                    </div>
+                    <div>
+                        <label for="go-live-button-mobile" class="mobile-only">Go Live</label>
+                        <button id="go-live-button-mobile" class="go-live-button mobile-only">Start Live Recording</button>
+                        <label for="go-live-button-desktop" class="desktop-only">Go Live</label>
+                        <button id="go-live-button-desktop" class="go-live-button desktop-only">Start Live Recording</button>
+                    </div>
+                    <button class="submit-button" type="submit">Submit Project</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="dashboard-section">
+            <h2>Recent Projects</h2>
+            <div class="card">
+                <h3>Project: Social Media Ad</h3>
+                <p>Status: In Progress</p>
+                <p>Order No: c-p1130-ddd/mmm/yyy</p>
+                <p>Date: April 10, 2025</p>
+            </div>
+            <div class="card">
+                <h3>Project: Corporate Video</h3>
+                <p>Status: Completed</p>
+                <p>Order No: c-p1113-ddd/mmm/yyy</p>
+                <p>Date: April 10, 2025</p>
+            </div>
+        </div>
+        <footer class="main-footer">
+            © 2025 Clip-Pilot. All rights reserved.
+        </footer>
+    </div>
+
+    <div class="payment-modal" id="payment-modal">
+        <div class="payment-modal-content">
+            <span class="close-modal" id="close-modal">×</span>
+            <div id="payment-details" class="payment-details">
+                <h2>Payment Summary</h2>
+                <p>Footage Duration: <span id="total-minutes">0</span></p>
+                <p>Total Amount: <span id="total-amount">$0.00</span></p>
+                <button class="proceed-button" id="proceed-button">Proceed to Pay</button>
+            </div>
+            <div id="payment-form" class="payment-form">
+                <h2>Select Payment Method</h2>
+                <div class="payment-method" data-method="paypal">
+                    <img src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_37x23.jpg" alt="PayPal">
+                    <span>PayPal</span>
+                </div>
+                <div class="payment-method" data-method="visa">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa">
+                    <span>Visa</span>
+                </div>
+                <div class="payment-method" data-method="mastercard">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="MasterCard">
+                    <span>MasterCard</span>
+                </div>
+                <div class="payment-method" data-method="stripe">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg" alt="Stripe">
+                    <span>Stripe</span>
+                </div>
+                <div id="card-details" style="display: none;">
+                    <input type="text" id="card-number" placeholder="Card Number" required>
+                    <input type="text" id="card-expiry" placeholder="MM/YY" required>
+                    <input type="text" id="card-cvc" placeholder="CVC" required>
+                    <input type="text" id="card-name" placeholder="Name on Card" required>
+                </div>
+                <button class="submit-payment-button" id="submit-payment">Confirm Payment</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+       const fileInput = document.getElementById('project-files');
+const uploadedFilesList = document.getElementById('uploaded-files-list');
+const goLiveButtonMobile = document.getElementById('go-live-button-mobile');
+const goLiveButtonDesktop = document.getElementById('go-live-button-desktop');
+let isFirstUpload = true;
+
+let videoWrapper;
+let videoPlayer;
+
+fileInput.addEventListener('change', (event) => {
+    const files = Array.from(event.target.files);
+    if (isFirstUpload) {
+        alert('Please upload your files in the chronological order that the edited video should take.');
+        isFirstUpload = false;
+    }
+
+    files.forEach((file) => {
+        if (!file.type.startsWith('video/')) {
+            alert(`Error: ${file.name} is not a valid video file. We only accept video formats.`);
+            return;
+        }
+
+        const listItem = document.createElement('li');
+        listItem.style.display = 'flex';
+        listItem.style.justifyContent = 'space-between';
+        listItem.style.alignItems = 'center';
+        listItem.style.padding = '10px';
+        listItem.style.margin = '5px 0';
+        listItem.style.border = '1px solid #ccc';
+        listItem.style.borderRadius = '5px';
+        listItem.style.backgroundColor = '#f4f4f9';
+        listItem.style.gap = '10px';
+
+        let fileSize;
+        if (file.size / (1024 * 1024 * 1024) >= 1) {
+            fileSize = (file.size / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
+        } else if (file.size / (1024 * 1024) >= 1) {
+            fileSize = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+        } else {
+            fileSize = (file.size / 1024).toFixed(2) + ' KB';
+        }
+
+        const thumbnail = document.createElement('img');
+        thumbnail.style.width = '80px';
+        thumbnail.style.height = '60px';
+        thumbnail.style.objectFit = 'fill';
+        thumbnail.style.borderRadius = '5px';
+        thumbnail.alt = 'Video thumbnail';
+        generateThumbnail(file, thumbnail);
+
+        const fileLink = document.createElement('span');
+        fileLink.className = 'video-filename';
+        fileLink.textContent = file.name;
+        fileLink.title = file.name;
+        fileLink.style.flex = '1';
+        fileLink.style.overflow = 'hidden';
+        fileLink.style.textOverflow = 'ellipsis';
+        fileLink.style.whiteSpace = 'nowrap';
+        fileLink.style.cursor = 'pointer';
+        fileLink.style.color = '#007bff';
+        fileLink.style.textDecoration = 'underline';
+
+        const fileSizeLabel = document.createElement('span');
+        fileSizeLabel.textContent = fileSize;
+        fileSizeLabel.style.padding = '5px 10px';
+        fileSizeLabel.style.color = '#333';
+        fileSizeLabel.style.fontSize = '0.9rem';
+
+        const fileOptions = document.createElement('div');
+        fileOptions.className = 'file-options';
+        fileOptions.style.display = 'flex';
+        fileOptions.style.gap = '10px';
+        fileOptions.style.justifyContent = 'flex-end';
+        fileOptions.style.alignItems = 'center';
+
+        const deleteButton = document.createElement('button');
+        deleteButton.className = 'delete-file-button';
+        deleteButton.textContent = 'Delete';
+        deleteButton.style.padding = '5px 10px';
+        deleteButton.style.border = 'none';
+        deleteButton.style.backgroundColor = '#d9534f';
+        deleteButton.style.color = 'white';
+        deleteButton.style.borderRadius = '5px';
+        deleteButton.style.cursor = 'pointer';
+
+        fileOptions.appendChild(fileSizeLabel);
+        fileOptions.appendChild(deleteButton);
+
+        listItem.appendChild(thumbnail);
+        listItem.appendChild(fileLink);
+        listItem.appendChild(fileOptions);
+        uploadedFilesList.prepend(listItem);
+
+        if (!videoPlayer) {
+            videoWrapper = document.createElement('div');
+            videoWrapper.id = 'video-wrapper';
+            videoWrapper.style.position = 'fixed';
+            videoWrapper.style.left = '50%';
+            videoWrapper.style.top = '50%';
+            videoWrapper.style.transform = 'translate(-50%, -50%)';
+            videoWrapper.style.zIndex = '9999';
+            videoWrapper.style.display = 'none';
+            videoWrapper.style.cursor = 'move';
+            videoWrapper.style.background = '#000';
+            videoWrapper.style.borderRadius = '10px';
+            videoWrapper.style.boxShadow = '0 8px 16px rgba(0,0,0,0.3)';
+            videoWrapper.style.padding = '10px';
+
+            const closeButton = document.createElement('button');
+            closeButton.textContent = '✖';
+            closeButton.style.position = 'absolute';
+            closeButton.style.top = '5px';
+            closeButton.style.right = '8px';
+            closeButton.style.background = 'rgba(255, 255, 255, 0.2)';
+            closeButton.style.border = 'none';
+            closeButton.style.color = 'white';
+            closeButton.style.fontSize = '16px';
+            closeButton.style.cursor = 'pointer';
+            closeButton.style.zIndex = '10000';
+            closeButton.addEventListener('click', () => {
+                videoPlayer.pause();
+                videoWrapper.style.display = 'none';
+            });
+
+            videoPlayer = document.createElement('video');
+            videoPlayer.id = 'video-player';
+            videoPlayer.controls = true;
+            videoPlayer.style.maxWidth = '90vw';
+            videoPlayer.style.maxHeight = '70vh';
+            videoPlayer.style.width = 'auto';
+            videoPlayer.style.height = 'auto';
+            videoPlayer.style.borderRadius = '8px';
+            videoPlayer.style.display = 'block';
+
+            videoWrapper.appendChild(closeButton);
+            videoWrapper.appendChild(videoPlayer);
+            document.body.appendChild(videoWrapper);
+
+            let isDragging = false, offsetX = 0, offsetY = 0;
+
+            videoWrapper.addEventListener('mousedown', (e) => {
+                if (e.target === closeButton) return;
+                isDragging = true;
+                offsetX = e.clientX - videoWrapper.getBoundingClientRect().left;
+                offsetY = e.clientY - videoWrapper.getBoundingClientRect().top;
+                videoWrapper.style.transition = 'none';
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (isDragging) {
+                    let newLeft = e.clientX - offsetX;
+                    let newTop = e.clientY - offsetY;
+                    const wrapperRect = videoWrapper.getBoundingClientRect();
+                    const screenWidth = window.innerWidth;
+                    const screenHeight = window.innerHeight;
+
+                    if (newLeft + wrapperRect.width > screenWidth) newLeft = screenWidth - wrapperRect.width;
+                    if (newTop + wrapperRect.height > screenHeight) newTop = screenHeight - wrapperRect.height;
+                    if (newLeft < 0) newLeft = 0;
+                    if (newTop < 0) newTop = 0;
+
+                    videoWrapper.style.left = `${newLeft}px`;
+                    videoWrapper.style.top = `${newTop}px`;
+                    videoWrapper.style.transform = 'none';
+                }
+            });
+
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+                videoWrapper.style.transition = 'all 0.2s ease';
+            });
+
+            let touchStartX = 0, touchStartY = 0;
+
+            videoWrapper.addEventListener('touchstart', (e) => {
+                const touch = e.touches[0];
+                touchStartX = touch.clientX - videoWrapper.getBoundingClientRect().left;
+                touchStartY = touch.clientY - videoWrapper.getBoundingClientRect().top;
+                videoWrapper.style.transition = 'none';
+            });
+
+            videoWrapper.addEventListener('touchmove', (e) => {
+                const touch = e.touches[0];
+                let newLeft = touch.clientX - touchStartX;
+                let newTop = touch.clientY - touchStartY;
+                const wrapperRect = videoWrapper.getBoundingClientRect();
+                const screenWidth = window.innerWidth;
+                const screenHeight = window.innerHeight;
+
+                if (newLeft + wrapperRect.width > screenWidth) newLeft = screenWidth - wrapperRect.width;
+                if (newTop + wrapperRect.height > screenHeight) newTop = screenHeight - wrapperRect.height;
+                if (newLeft < 0) newLeft = 0;
+                if (newTop < 0) newTop = 0;
+
+                videoWrapper.style.left = `${newLeft}px`;
+                videoWrapper.style.top = `${newTop}px`;
+                videoWrapper.style.transform = 'none';
+            });
+        }
+
+        fileLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            const videoURL = URL.createObjectURL(file);
+            videoPlayer.src = videoURL;
+            videoWrapper.style.display = 'block';
+            videoPlayer.play();
+
+            videoPlayer.addEventListener('enterpictureinpicture', () => {
+                videoWrapper.style.display = 'none';
+            });
+
+            videoPlayer.addEventListener('leavepictureinpicture', () => {
+                videoWrapper.style.display = 'block';
+            });
+
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'f') {
+                    if (!document.fullscreenElement) {
+                        videoPlayer.requestFullscreen();
+                    } else {
+                        document.exitFullscreen();
+                    }
+                }
+            });
+        });
+
+        deleteButton.addEventListener('click', () => {
+            listItem.remove();
+        });
+    });
+
+    fileInput.value = '';
+});
+
+function generateThumbnail(file, imgElement) {
+    console.log('generateThumbnail: Processing file, type:', file.type, 'size:', file.size);
+    const video = document.createElement('video');
+    video.preload = 'auto';
+    const videoURL = URL.createObjectURL(file);
+    video.src = videoURL;
+    video.muted = true;
+    video.playsInline = true;
+
+    const cleanup = () => {
+        video.pause();
+        video.removeAttribute('src');
+        video.load();
+        URL.revokeObjectURL(videoURL);
+        video.oncanplay = null;
+        video.onseeked = null;
+        video.onerror = null;
+        video.onplaying = null;
+        console.log('generateThumbnail: Cleaned up video element');
+    };
+
+    const setThumbnail = () => {
+        console.log('generateThumbnail: Capturing frame, currentTime:', video.currentTime, 'videoWidth:', video.videoWidth, 'readyState:', video.readyState);
+        const displayWidth = 80;
+        const displayHeight = 60;
+        const scaleFactor = 2;
+
+        const canvas = document.createElement('canvas');
+        canvas.width = displayWidth * scaleFactor;
+        canvas.height = displayHeight * scaleFactor;
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        const dataURL = canvas.toDataURL('image/jpeg', 0.95);
+        console.log('generateThumbnail: dataURL length:', dataURL.length);
+
+        // Check if the frame is black by sampling pixels
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+        const isBlack = Array.from(imageData).every((val, i) => i % 4 === 3 || val < 10);
+        if (dataURL.length < 1000 || video.videoWidth === 0 || isBlack) {
+            console.warn('generateThumbnail: Invalid/black thumbnail, setting placeholder');
+            ctx.fillStyle = '#333';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            imgElement.src = canvas.toDataURL('image/jpeg', 0.95);
+        } else {
+            imgElement.src = dataURL;
+        }
+        imgElement.alt = 'Video thumbnail';
+        cleanup();
+    };
+
+    let seekAttempts = 0;
+    const maxAttempts = 3;
+    const seekTimes = [1, 0.5, 0.1];
+
+    const trySeek = () => {
+        if (seekAttempts >= maxAttempts) {
+            console.warn('generateThumbnail: Max seek attempts reached, capturing current frame');
+            setThumbnail();
+            return;
+        }
+        const seekTime = seekTimes[seekAttempts];
+        console.log('generateThumbnail: Seeking to:', seekTime);
+        video.currentTime = seekTime;
+        seekAttempts++;
+    };
+
+    video.oncanplay = () => {
+        console.log('generateThumbnail: canplay fired, duration:', video.duration, 'videoWidth:', video.videoWidth);
+        if (isNaN(video.duration) || video.duration <= 0 || video.duration === Infinity || video.videoWidth === 0) {
+            console.warn('generateThumbnail: Invalid video metadata, setting placeholder');
+            setThumbnail();
+            return;
+        }
+        video.play().then(() => {
+            console.log('generateThumbnail: Playback started');
+            trySeek();
+        }).catch(err => {
+            console.warn('generateThumbnail: Play failed, trying seek:', err);
+            trySeek();
+        });
+    };
+
+    video.onseeked = () => {
+        console.log('generateThumbnail: seeked fired, currentTime:', video.currentTime);
+        if (video.currentTime === 0 && seekAttempts < maxAttempts) {
+            console.warn('generateThumbnail: Seek to 0, retrying');
+            trySeek();
+            return;
+        }
+        if (video.videoWidth === 0) {
+            console.warn('generateThumbnail: No video frame, retrying');
+            trySeek();
+            return;
+        }
+        setThumbnail();
+    };
+
+    video.onerror = (e) => {
+        console.error('generateThumbnail: Video error:', e);
+        const canvas = document.createElement('canvas');
+        canvas.width = 80 * 2;
+        canvas.height = 60 * 2;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#333';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        imgElement.src = canvas.toDataURL('image/jpeg', 0.95);
+        imgElement.alt = 'Video thumbnail';
+        cleanup();
+    };
+}
+
+let mediaRecorder;
+let recordedChunks = [];
+let videoStream;
+let isRecording = false;
+let currentStream;
+
+[goLiveButtonMobile, goLiveButtonDesktop].forEach((goLiveButton) => {
+    goLiveButton.addEventListener('click', async () => {
+        if (isRecording) {
+            alert('Please submit the existing recorded file before starting a new recording.');
+            return;
+        }
+
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            alert('Your browser does not support camera access. Please update your browser or use a modern browser.');
+            return;
+        }
+
+        const consent = confirm('We will use your camera to record footage. Do you consent?');
+        if (!consent) {
+            alert('Camera access denied. Unable to start live recording.');
+            return;
+        }
+
+        try {
+            videoStream = await navigator.mediaDevices.getUserMedia({
+                video: { width: 1280, height: 720, frameRate: 30 },
+                audio: true
+            });
+            if (!videoStream) throw new Error('Failed to access camera and microphone.');
+
+            currentStream = new MediaStream(videoStream.getTracks());
+
+            const liveContainer = document.createElement('div');
+            Object.assign(liveContainer.style, {
+                position: 'fixed',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                width: 'clamp(300px, 70%, 90vw)',
+                height: '75vh',
+                border: '1px solid #00235f',
+                borderRadius: '8px',
+                backgroundColor: 'white',
+                boxShadow: '0 8px 16px rgba(0, 0, 0, 0.2)',
+                padding: '0',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                zIndex: '1000'
+            });
+            document.body.appendChild(liveContainer);
+
+            const videoElement = document.createElement('video');
+            videoElement.srcObject = currentStream;
+            Object.assign(videoElement.style, {
+                width: '100%',
+                height: 'calc(100% - 60px)',
+                borderRadius: '8px 8px 0 0',
+                objectFit: 'cover',
+                backgroundColor: 'black'
+            });
+            videoElement.autoplay = true;
+            videoElement.muted = true;
+            await new Promise((resolve, reject) => {
+                videoElement.onloadedmetadata = () => {
+                    console.log('videoElement: Camera stream loaded');
+                    resolve();
+                };
+                videoElement.onerror = () => reject(new Error('Camera stream failed'));
+                setTimeout(() => reject(new Error('Camera stream timeout')), 2000);
+            });
+            liveContainer.appendChild(videoElement);
+
+            const recordingIndicator = document.createElement('div');
+            Object.assign(recordingIndicator.style, {
+                position: 'absolute',
+                top: '10px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                color: 'red',
+                fontWeight: 'bold',
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                padding: '5px 10px',
+                borderRadius: '5px',
+                animation: 'blink 1s infinite',
+                zIndex: '10'
+            });
+            recordingIndicator.textContent = '● Recording - 00:00';
+            liveContainer.appendChild(recordingIndicator);
+
+            const style = document.createElement('style');
+            style.innerHTML = `
+                @keyframes blink {
+                    0% { opacity: 1; }
+                    50% { opacity: 0; }
+                    100% { opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
+
+            let startTime = Date.now();
+            let durationInterval;
+            const updateDuration = () => {
+                const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+                const minutes = Math.floor(elapsedTime / 60).toString().padStart(2, '0');
+                const seconds = (elapsedTime % 60).toString().padStart(2, '0');
+                recordingIndicator.textContent = `● Recording - ${minutes}:${seconds}`;
+            };
+            durationInterval = setInterval(updateDuration, 1000);
+
+            const buttonContainer = document.createElement('div');
+            Object.assign(buttonContainer.style, {
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: '10px',
+                padding: '10px',
+                margin: '0 10px',
+                width: 'calc(100% - 20px)',
+                backgroundColor: '#f4f4f9',
+                boxSizing: 'border-box'
+            });
+            liveContainer.appendChild(buttonContainer);
+
+            const stopRecordingButton = document.createElement('button');
+            stopRecordingButton.textContent = 'Stop Recording';
+            Object.assign(stopRecordingButton.style, {
+                backgroundColor: '#003087',
+                color: 'white',
+                border: 'none',
+                padding: '10px 20px',
+                borderRadius: '5px',
+                cursor: 'pointer'
+            });
+            buttonContainer.appendChild(stopRecordingButton);
+
+            const switchCameraButton = document.createElement('button');
+            switchCameraButton.innerHTML = '<i class="fas fa-sync-alt"></i>';
+            Object.assign(switchCameraButton.style, {
+                backgroundColor: '#003087',
+                color: 'white',
+                border: 'none',
+                padding: '10px',
+                borderRadius: '50%',
+                cursor: 'pointer'
+            });
+            buttonContainer.appendChild(switchCameraButton);
+
+            const fullscreenButton = document.createElement('button');
+            fullscreenButton.innerHTML = '<i class="fas fa-expand"></i>';
+            Object.assign(fullscreenButton.style, {
+                backgroundColor: '#003087',
+                color: 'white',
+                border: 'none',
+                padding: '10px',
+                borderRadius: '50%',
+                cursor: 'pointer'
+            });
+            buttonContainer.appendChild(fullscreenButton);
+
+            fullscreenButton.addEventListener('click', () => {
+                if (!document.fullscreenElement) {
+                    liveContainer.requestFullscreen().catch(err => {
+                        alert('Error entering full-screen mode: ' + err.message);
+                    });
+                } else {
+                    document.exitFullscreen();
+                }
+            });
+
+            document.addEventListener('fullscreenchange', () => {
+                if (document.fullscreenElement) {
+                    fullscreenButton.innerHTML = '<i class="fas fa-compress"></i>';
+                } else {
+                    fullscreenButton.innerHTML = '<i class="fas fa-expand"></i>';
+                }
+            });
+
+            switchCameraButton.addEventListener('click', async () => {
+                try {
+                    const devices = await navigator.mediaDevices.enumerateDevices();
+                    const videoDevices = devices.filter((d) => d.kind === 'videoinput');
+
+                    if (videoDevices.length < 2) {
+                        alert('No multiple cameras available.');
+                        return;
+                    }
+
+                    const currentTrack = videoStream.getVideoTracks()[0];
+                    const currentId = currentTrack.getSettings().deviceId;
+                    const currentIndex = videoDevices.findIndex(d => d.deviceId === currentId);
+                    const nextIndex = (currentIndex + 1) % videoDevices.length;
+                    const nextDeviceId = videoDevices[nextIndex].deviceId;
+
+                    const newStream = await navigator.mediaDevices.getUserMedia({
+                        video: { deviceId: { exact: nextDeviceId }, width: 1280, height: 720, frameRate: 30 },
+                        audio: true
+                    });
+                    const newVideoTrack = newStream.getVideoTracks()[0];
+                    const newAudioTrack = newStream.getAudioTracks()[0];
+
+                    // Update currentStream tracks
+                    currentStream.getTracks().forEach(track => currentStream.removeTrack(track));
+                    currentStream.addTrack(newVideoTrack);
+                    currentStream.addTrack(newAudioTrack);
+
+                    videoElement.srcObject = currentStream;
+
+                    await new Promise((resolve, reject) => {
+                        videoElement.onloadedmetadata = () => {
+                            console.log('videoElement: New camera stream loaded');
+                            resolve();
+                        };
+                        videoElement.onerror = () => reject(new Error('New camera stream failed'));
+                        setTimeout(() => reject(new Error('New camera stream timeout')), 2000);
+                    });
+
+                    videoStream.getTracks().forEach(track => track.stop());
+                    videoStream = newStream;
+                } catch (err) {
+                    console.error('Error switching cameras:', err);
+                    alert('Failed to switch camera: ' + err.message);
+                }
+            });
+
+            const shareScreenButton = document.createElement('button');
+            shareScreenButton.textContent = 'Share Screen';
+            Object.assign(shareScreenButton.style, {
+                backgroundColor: '#003087',
+                color: 'white',
+                border: 'none',
+                padding: '10px 20px',
+                borderRadius: '5px',
+                cursor: 'pointer'
+            });
+            buttonContainer.appendChild(shareScreenButton);
+
+            let isScreenSharing = false;
+            let screenStream;
+
+            const updateRecorder = async (isScreen = false) => {
+                console.log('updateRecorder: Updating stream, isScreen:', isScreen);
+                try {
+                    if (isScreen) {
+                        // Start screen-sharing
+                        screenStream = await navigator.mediaDevices.getDisplayMedia({
+                            video: { width: 1280, height: 720, frameRate: 30 }
+                        });
+                        const micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                        const newTracks = [
+                            screenStream.getVideoTracks()[0],
+                            micStream.getAudioTracks()[0]
+                        ];
+
+                        // Update currentStream
+                        currentStream.getTracks().forEach(track => currentStream.removeTrack(track));
+                        newTracks.forEach(track => currentStream.addTrack(track));
+                    } else {
+                        // Revert to camera
+                        videoStream = await navigator.mediaDevices.getUserMedia({
+                            video: { width: 1280, height: 720, frameRate: 30 },
+                            audio: true
+                        });
+                        currentStream.getTracks().forEach(track => currentStream.removeTrack(track));
+                        videoStream.getTracks().forEach(track => currentStream.addTrack(track));
+                    }
+
+                    videoElement.srcObject = currentStream;
+                    await new Promise((resolve, reject) => {
+                        videoElement.onloadedmetadata = () => {
+                            console.log('videoElement:', isScreen ? 'Screen' : 'Camera', 'stream loaded');
+                            resolve();
+                        };
+                        videoElement.onerror = () => reject(new Error('Stream failed'));
+                        setTimeout(() => reject(new Error('Stream timeout')), 2000);
+                    });
+
+                    // Clean up old streams
+                    if (isScreen && videoStream) {
+                        videoStream.getTracks().forEach(track => track.stop());
+                        videoStream = null;
+                    } else if (!isScreen && screenStream) {
+                        screenStream.getTracks().forEach(track => track.stop());
+                        screenStream = null;
+                    }
+                } catch (err) {
+                    console.error('updateRecorder:', err);
+                    throw err;
+                }
+            };
+
+            shareScreenButton.addEventListener('click', async () => {
+                try {
+                    if (isScreenSharing) {
+                        // Stop screen-sharing
+                        await updateRecorder(false);
+                        shareScreenButton.textContent = 'Share Screen';
+                        isScreenSharing = false;
+                        console.log('shareScreenButton: Reverted to camera stream');
+                    } else {
+                        // Start screen-sharing
+                        await updateRecorder(true);
+                        shareScreenButton.textContent = 'Stop Sharing Screen';
+                        isScreenSharing = true;
+                        console.log('shareScreenButton: Started screen sharing');
+
+                        screenStream.getVideoTracks()[0].addEventListener('ended', async () => {
+                            if (screenStream) {
+                                screenStream.getTracks().forEach(track => track.stop());
+                                screenStream = null;
+                            }
+                            await updateRecorder(false);
+                            shareScreenButton.textContent = 'Share Screen';
+                            isScreenSharing = false;
+                            console.log('shareScreenButton: Screen sharing ended by user');
+                        });
+                    }
+                } catch (err) {
+                    alert('Error sharing screen: ' + err.message);
+                    console.error('shareScreenButton:', err);
+                    if (isScreenSharing) {
+                        await updateRecorder(false);
+                        shareScreenButton.textContent = 'Share Screen';
+                        isScreenSharing = false;
+                        console.log('shareScreenButton: Reverted to camera stream on error');
+                    }
+                }
+            });
+
+            const handleRecorderStop = async (liveContainer, durationInterval) => {
+                console.log('handleRecorderStop: Stopping, chunks:', recordedChunks.length);
+                clearInterval(durationInterval);
+                isRecording = false;
+
+                // Ensure all chunks are collected
+                if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                    await new Promise(resolve => {
+                        mediaRecorder.onstop = resolve;
+                        mediaRecorder.stop();
+                    });
+                    await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for final chunks
+                }
+
+                // Log chunk details
+                recordedChunks.forEach((chunk, i) => console.log(`handleRecorderStop: Chunk ${i}, size:`, chunk.size));
+
+                // Clean up streams
+                if (videoStream) {
+                    const videoTracks = videoStream.getVideoTracks();
+                    for (const track of videoTracks) {
+                        try {
+                            const capabilities = track.getCapabilities();
+                            if (capabilities.torch) {
+                                await track.applyConstraints({ advanced: [{ torch: false }] });
+                                console.log('handleRecorderStop: Flashlight turned off');
+                            }
+                        } catch (err) {
+                            console.warn('handleRecorderStop: Failed to turn off flashlight:', err);
+                        }
+                        track.stop();
+                        console.log('handleRecorderStop: Video track stopped');
+                    }
+                    videoStream.getAudioTracks().forEach(track => {
+                        track.stop();
+                        console.log('handleRecorderStop: Audio track stopped');
+                    });
+                    videoStream = null;
+                }
+                if (screenStream) {
+                    screenStream.getTracks().forEach(track => {
+                        track.stop();
+                        console.log('handleRecorderStop: Screen track stopped');
+                    });
+                    screenStream = null;
+                }
+
+                if (recordedChunks.length === 0) {
+                    console.error('handleRecorderStop: No chunks recorded, skipping thumbnail and listItem');
+                    liveContainer.remove();
+                    return;
+                }
+
+                const blob = new Blob(recordedChunks, { type: 'video/webm;codecs=vp8,opus' });
+                console.log('handleRecorderStop: Blob created, size:', blob.size);
+                if (blob.size < 1000) {
+                    console.error('handleRecorderStop: Blob too small, likely invalid');
+                    liveContainer.remove();
+                    return;
+                }
+                recordedChunks = [];
+
+                // Validate WebM playability
+                const testVideo = document.createElement('video');
+                const videoURL = URL.createObjectURL(blob);
+                testVideo.src = videoURL;
+                await new Promise((resolve, reject) => {
+                    testVideo.oncanplay = () => {
+                        console.log('handleRecorderStop: WebM validated, canplay fired');
+                        resolve();
+                    };
+                    testVideo.onerror = () => {
+                        console.error('handleRecorderStop: WebM validation failed');
+                        reject(new Error('Invalid WebM'));
+                    };
+                    setTimeout(() => reject(new Error('WebM validation timeout')), 2000);
+                }).catch(err => {
+                    console.error(err);
+                    URL.revokeObjectURL(videoURL);
+                    liveContainer.remove();
+                    return;
+                });
+
+                const username = 'username';
+                const date = new Date().toISOString().split('T')[0];
+                const filename = `Clip-Pilot-media-${username}-${date}.webm`;
+                const fileSize = (blob.size / (1024 * 1024)).toFixed(2);
+
+                const listItem = document.createElement('li');
+                listItem.style.display = 'flex';
+                listItem.style.justifyContent = 'space-between';
+                listItem.style.alignItems = 'center';
+                listItem.style.padding = '10px';
+                listItem.style.margin = '5px 0';
+                listItem.style.border = '1px solid #ccc';
+                listItem.style.borderRadius = '5px';
+                listItem.style.backgroundColor = '#f4f4f9';
+                listItem.style.gap = '10px';
+                listItem.style.position = 'relative';
+
+                const thumbnail = document.createElement('img');
+                thumbnail.style.width = '80px';
+                thumbnail.style.height = '60px';
+                thumbnail.style.objectFit = 'fill';
+                thumbnail.style.borderRadius = '5px';
+                thumbnail.alt = 'Video thumbnail';
+                generateThumbnail(blob, thumbnail);
+
+                const fileLink = document.createElement('span');
+                fileLink.className = 'video-filename';
+                fileLink.textContent = filename;
+                fileLink.title = filename;
+                fileLink.style.flex = '1';
+                fileLink.style.overflow = 'hidden';
+                fileLink.style.textOverflow = 'ellipsis';
+                fileLink.style.whiteSpace = 'nowrap';
+                fileLink.style.cursor = 'pointer';
+                fileLink.style.color = '#007bff';
+                fileLink.style.textDecoration = 'underline';
+
+                const fileOptions = document.createElement('div');
+                fileOptions.className = 'file-options';
+                fileOptions.style.display = 'flex';
+                fileOptions.style.gap = '10px';
+                fileOptions.style.justifyContent = 'flex-end';
+                fileOptions.style.alignItems = 'center';
+
+                const fileSizeLabel = document.createElement('span');
+                fileSizeLabel.textContent = `${fileSize} MB`;
+                fileSizeLabel.style.padding = '5px 10px';
+                fileSizeLabel.style.color = '#333';
+                fileSizeLabel.style.fontSize = '0.9rem';
+
+                const toggleButton = document.createElement('button');
+                toggleButton.className = 'menu-toggle-button';
+                toggleButton.textContent = '⋮';
+                toggleButton.style.background = 'none';
+                toggleButton.style.border = 'none';
+                toggleButton.style.fontSize = '20px';
+                toggleButton.style.cursor = 'pointer';
+
+                const dropdown = document.createElement('div');
+                dropdown.className = 'file-options-dropdown';
+                dropdown.style.display = 'none';
+                dropdown.style.position = 'absolute';
+                dropdown.style.right = '0';
+                dropdown.style.top = '100%';
+                dropdown.style.marginTop = '5px';
+                dropdown.style.background = '#f9f9f9';
+                dropdown.style.border = '1px solid #ccc';
+                dropdown.style.borderRadius = '5px';
+                dropdown.style.padding = '10px';
+                dropdown.style.zIndex = '10';
+                dropdown.style.minWidth = '100px';
+                dropdown.innerHTML = `
+                    <a href="${videoURL}" download="${filename}" style="display: block; margin-bottom: 5px;">
+                        <button style="width: 100%; padding: 5px; border: none; background: #007bff; color: white; border-radius: 3px; cursor: pointer;">Download</button>
+                    </a>
+                    <button class="delete-file-button" style="width: 100%; padding: 5px; border: none; background: #d9534f; color: white; border-radius: 3px; cursor: pointer;">Delete</button>
+                `;
+
+                fileOptions.appendChild(fileSizeLabel);
+                fileOptions.appendChild(toggleButton);
+
+                listItem.appendChild(thumbnail);
+                listItem.appendChild(fileLink);
+                listItem.appendChild(fileOptions);
+                listItem.appendChild(dropdown);
+                uploadedFilesList.prepend(listItem);
+
+                fileLink.addEventListener('click', () => {
+                    const playerContainer = document.createElement('div');
+                    Object.assign(playerContainer.style, {
+                        position: 'fixed',
+                        top: '0',
+                        left: '0',
+                        width: '100vw',
+                        height: '100vh',
+                        backgroundColor: 'black',
+                        zIndex: '2000',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    });
+                    document.body.appendChild(playerContainer);
+
+                    const playerVideo = document.createElement('video');
+                    playerVideo.src = videoURL;
+                    playerVideo.controls = true;
+                    playerVideo.autoplay = true;
+                    Object.assign(playerVideo.style, {
+                        width: '100%',
+                        height: 'calc(100% - 60px)',
+                        objectFit: 'contain'
+                    });
+                    playerContainer.appendChild(playerVideo);
+
+                    const playerButtonContainer = document.createElement('div');
+                    Object.assign(playerButtonContainer.style, {
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        gap: '10px',
+                        padding: '10px',
+                        width: '100%',
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        boxSizing: 'border-box'
+                    });
+                    playerContainer.appendChild(playerButtonContainer);
+
+                    const closeButton = document.createElement('button');
+                    closeButton.innerHTML = '<i class="fas fa-times"></i>';
+                    Object.assign(closeButton.style, {
+                        backgroundColor: '#d9534f',
+                        color: 'white',
+                        border: 'none',
+                        padding: '10px',
+                        borderRadius: '50%',
+                        cursor: 'pointer'
+                    });
+                    playerButtonContainer.appendChild(closeButton);
+
+                    closeButton.addEventListener('click', () => {
+                        document.body.removeChild(playerContainer);
+                    });
+
+                    playerContainer.requestFullscreen().catch(err => {
+                        console.error('Error entering full-screen mode for player:', err);
+                    });
+                });
+
+                toggleButton.addEventListener('click', () => {
+                    const isVisible = dropdown.style.display === 'block';
+                    dropdown.style.display = isVisible ? 'none' : 'block';
+                    const nextSibling = listItem.nextElementSibling;
+                    if (nextSibling) {
+                        nextSibling.style.marginTop = isVisible ? '' : `${dropdown.offsetHeight + 10}px`;
+                    }
+                });
+
+                dropdown.querySelector('.delete-file-button').addEventListener('click', () => {
+                    listItem.remove();
+                    URL.revokeObjectURL(videoURL);
+                });
+
+                liveContainer.remove();
+            };
+
+            recordedChunks = [];
+            mediaRecorder = new MediaRecorder(currentStream, { mimeType: 'video/webm;codecs=vp8,opus' });
+            mediaRecorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    recordedChunks.push(event.data);
+                    console.log('mediaRecorder: Chunk added, size:', event.data.size, 'isScreen:', isScreenSharing);
+                }
+            };
+            mediaRecorder.onstop = () => handleRecorderStop(liveContainer, durationInterval);
+            mediaRecorder.start(500);
+            isRecording = true;
+
+            stopRecordingButton.addEventListener('click', () => {
+                if (!isRecording) {
+                    console.warn('stopRecordingButton: Recording already stopped');
+                    return;
+                }
+                try {
+                    stopRecordingButton.style.opacity = '0.5';
+                    console.log('stopRecordingButton: Stopping, recorder state:', mediaRecorder.state, 'tracks:', currentStream.getTracks().map(t => `${t.kind}: ${t.readyState}`));
+                    if (mediaRecorder && ['recording', 'paused'].includes(mediaRecorder.state)) {
+                        const stopTimeout = setTimeout(() => {
+                            console.warn('stopRecordingButton: Stop timeout, forcing stop');
+                            handleRecorderStop(liveContainer, durationInterval);
+                        }, 2000);
+                        mediaRecorder.onstop = () => {
+                            clearTimeout(stopTimeout);
+                            console.log('stopRecordingButton: Recorder stopped');
+                            handleRecorderStop(liveContainer, durationInterval);
+                        };
+                        mediaRecorder.onerror = (event) => {
+                            clearTimeout(stopTimeout);
+                            console.error('stopRecordingButton: Recorder error:', event.error);
+                            stopRecordingButton.style.opacity = '1';
+                            alert('Error stopping recording: ' + event.error.message);
+                        };
+                        mediaRecorder.stop();
+                    } else {
+                        console.warn('stopRecordingButton: Recorder not active, state:', mediaRecorder ? mediaRecorder.state : 'null');
+                        stopRecordingButton.style.opacity = '1';
+                        handleRecorderStop(liveContainer, durationInterval);
+                    }
+                } catch (err) {
+                    console.error('stopRecordingButton:', err);
+                    stopRecordingButton.style.opacity = '1';
+                    alert('Error stopping recording: ' + err.message);
+                    handleRecorderStop(liveContainer, durationInterval);
+                }
+            });
+        } catch (error) {
+            alert('Error starting live recording: ' + error.message);
+            console.error('goLiveButton:', error);
+        }
+    });
+});
+        </script>
+    
+</body>
+</html>

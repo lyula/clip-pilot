@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages</title>
+    <link rel="shortcut icon" href="images/main-logo.jpg" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #00235f;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Main Header Styles */
+        .main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #00235f;
+            color: white;
+            padding: 15px 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1100;
+        }
+
+        .main-header h1 {
+            font-size: 1.5rem;
+            margin: 0;
+        }
+
+        .main-header .hamburger {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: white;
+        }
+
+        .main-header .logout {
+            color: white;
+            font-size: 1.5rem;
+            text-decoration: none;
+            margin-right: 40px;
+        }
+
+        .main-header .logout:hover {
+            color: #ddd;
+        }
+
+        /* Hamburger Menu */
+        .hamburger {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: white;
+            transition: transform 0.3s ease;
+        }
+
+        .hamburger.open {
+            transform: rotate(45deg);
+            color: white;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 130px;
+            height: 100vh;
+            background-color: #00235f;
+            color: white;
+            position: fixed;
+            top: 60px;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            padding-top: 20px;
+            transition: width 0.3s ease, left 0.3s ease;
+            z-index: 1000;
+            overflow-x: hidden;
+        }
+
+        .sidebar.expanded-desktop {
+            width: 220px;
+        }
+
+        .sidebar.expanded-desktop a span {
+            display: inline;
+        }
+
+        .sidebar.open {
+            left: 0;
+            width: 220px;
+            overflow-x: visible;
+        }
+
+        .sidebar.open a span {
+            display: inline;
+            white-space: normal;
+        }
+
+        .sidebar-title {
+            font-size: 1.5rem;
+            color: white;
+            text-align: center;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .sidebar.expanded-desktop .sidebar-title,
+        .sidebar.open .sidebar-title {
+            display: block;
+        }
+
+        .sidebar a {
+            text-decoration: none;
+            color: white;
+            padding: 10px 15px;
+            margin: 5px 0;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .sidebar a i {
+            font-size: 1.2rem;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .sidebar a span {
+            white-space: nowrap;
+            display: none;
+        }
+
+        .sidebar a:hover {
+            background-color: #003080;
+        }
+
+        .sidebar a.active {
+            background-color: #003080;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            margin-left: 130px;
+            padding: 20px;
+            margin-top: 80px;
+            transition: margin-left 0.3s ease;
+            flex-grow: 1;
+        }
+
+        .main-content.collapsed {
+            margin-left: 0;
+        }
+
+        .main-content.expanded-desktop {
+            margin-left: 220px;
+        }
+
+        /* Content Header Styles */
+        .content-header {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            padding: 15px 20px;
+            background-color: white;
+            border-bottom: 1px solid #ddd;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .content-header .user-info {
+            margin-left: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        @media (max-width: 769px) {
+            .content-header .user-info {
+                margin-left: 0;
+            }
+        }
+
+        .content-header .user-info img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+        }
+
+        .content-header .user-info h4 {
+            font-size: 1.5rem;
+            color: #00235f;
+            margin: 0;
+        }
+
+        /* Dashboard Section */
+        .dashboard-section {
+            margin-top: 20px;
+        }
+
+        .dashboard-section h2 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: #00235f;
+        }
+
+        /* Chat Container */
+        .chat-container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: 0 auto 20px;
+            display: flex;
+            flex-direction: column;
+            height: 50vh;
+        }
+
+        .chat-history {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 10px;
+        }
+
+        .message {
+            margin: 10px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .message.bot {
+            justify-content: flex-start;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message-content {
+            max-width: 60%;
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            position: relative;
+        }
+
+        .message.bot .message-content {
+            background-color: #e0e0e0;
+            color: #333;
+        }
+
+        .message.user .message-content {
+            background-color: #003087;
+            color: white;
+        }
+
+        .message-timestamp {
+            font-size: 0.7rem;
+            color: #666;
+            margin-top: 5px;
+            text-align: right;
+        }
+
+        .message.bot .message-timestamp {
+            text-align: left;
+        }
+
+        .message-profile-pic {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+            align-self: flex-start;
+        }
+
+        .message.bot .message-profile-pic {
+            margin-right: 10px; /* Space between bot picture and content */
+        }
+
+        .message.user .message-profile-pic {
+            margin-left: 10px; /* Space between user content and picture */
+        }
+
+        /* Chat Input */
+        .chat-input {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .chat-input button {
+            padding: 10px 20px;
+            background-color: #003087;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .chat-input button:hover {
+            background-color: #002060;
+        }
+
+        /* Footer Styles */
+        .main-footer {
+            background-color: #e0e0e0;
+            color: #333;
+            height: 5vh;
+            text-align: center;
+            padding: 10px 0;
+            border-radius: 5px;
+            border-top: 1px solid #ccc;
+            font-size: 0.9rem;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            .sidebar {
+                left: -220px;
+                width: 220px;
+                overflow-x: visible;
+            }
+
+            .sidebar.open {
+                left: 0;
+            }
+
+            .sidebar a span {
+                display: inline;
+                white-space: normal;
+            }
+
+            .main-content {
+                margin-left: 0 !important;
+                padding-top: 60px;
+                margin-top: 25px;
+            }
+
+            .content-header {
+                margin-bottom: 5px;
+            }
+
+            .main-header .hamburger {
+                display: block;
+            }
+
+            .chat-container {
+                height: 60vh;
+            }
+
+            .chat-input {
+                flex-direction: column;
+            }
+
+            .chat-input button {
+                width: 100%;
+            }
+        }
+
+        /* Center content on larger screens */
+        @media (min-width: 769px) {
+            .content-header,
+            .dashboard-section,
+            .main-footer {
+                max-width: 800px;
+                margin: 0 auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-header">
+        <i class="fas fa-bars hamburger"></i>
+        <a href="index.html" class="logout"><i class="fas fa-sign-out-alt"></i></a>
+    </div>
+
+    <div class="sidebar collapsed-desktop">
+        <h1 class="sidebar-title">Clip-Pilot</h1>
+        <a href="editor_dashboard.html"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+        <a href="editing_progress.html"><i class="fas fa-video"></i> <span>Current Editing</span></a>
+        <a href="editor_history.html"  ><i class="fas fa-history"></i> <span>Projects History</span></a>
+        <a href="editor_chat.html"  class="active"><i class="fas fa-envelope"></i> <span>Messages</span></a>
+        <a href="editor_settings.html"><i class="fas fa-cog"></i> <span>Settings</span></a>
+        <a href="index.html"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a>
+    </div>
+
+    <div class="main-content collapsed-desktop">
+        <div class="content-header">
+            <div class="user-info">
+                <img src="images/my-image.jpeg" alt="User Avatar">
+                <h4>Hey, User</h4>
+            </div>
+        </div>
+
+        <div class="dashboard-section">
+            <h2><i class="fas fa-envelope"></i> Messages</h2>
+            <div class="chat-container">
+                <div class="chat-history" id="chat-history">
+                    <!-- Messages will be appended here -->
+                </div>
+                <div class="chat-input">
+                    <input type="text" id="message-input" placeholder="Type your message..." required>
+                    <button id="send-message">Send</button>
+                </div>
+            </div>
+        </div>
+        <footer class="main-footer">
+            © 2025 Clip-Pilot. All rights reserved.
+        </footer>
+    </div>
+
+    <script>
+        // Sidebar toggle functionality
+        const hamburger = document.querySelector('.hamburger');
+        const sidebar = document.querySelector('.sidebar');
+        const mainContent = document.querySelector('.main-content');
+
+        hamburger.addEventListener('click', () => {
+            if (window.innerWidth > 768) {
+                sidebar.classList.toggle('expanded-desktop');
+                mainContent.classList.toggle('expanded-desktop');
+            } else {
+                sidebar.classList.toggle('open');
+                mainContent.classList.toggle('collapsed');
+            }
+
+            if (hamburger.classList.contains('fa-bars')) {
+                hamburger.classList.remove('fa-bars');
+                hamburger.classList.add('fa-times');
+            } else {
+                hamburger.classList.remove('fa-times');
+                hamburger.classList.add('fa-bars');
+            }
+        });
+
+        // Chat functionality
+        const chatHistory = document.getElementById('chat-history');
+        const messageInput = document.getElementById('message-input');
+        const sendButton = document.getElementById('send-message');
+
+        // Track if bot is unavailable
+        let unavailableMode = false;
+
+        // Scroll to bottom of chat history
+        function scrollToBottom() {
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        }
+
+        // Format timestamp (e.g., "14:35")
+        function getTimestamp() {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            return `${hours}:${minutes}`;
+        }
+
+        // Get user's time period and appropriate greeting
+        function getTimePeriodAndGreeting() {
+            const now = new Date();
+            const hours = now.getHours();
+            let period, greeting;
+            if (hours < 12) {
+                period = 'morning';
+                greeting = 'Good morning';
+            } else if (hours < 17) {
+                period = 'afternoon';
+                greeting = 'Good afternoon';
+            } else {
+                period = 'evening';
+                greeting = 'Good evening';
+            }
+            return { period, greeting, time: getTimestamp() };
+        }
+
+        // Add message to chat history
+        function addMessage(content, isUser) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+            messageDiv.innerHTML = `
+                ${isUser ? '' : '<img src="images/main-logo.jpg" alt="Bot Avatar" class="message-profile-pic">'}
+                <div class="message-content">${content}</div>
+                ${isUser ? '<img src="images/my-image.jpeg" alt="User Avatar" class="message-profile-pic">' : ''}
+                <div class="message-timestamp">${getTimestamp()}</div>
+            `;
+            chatHistory.appendChild(messageDiv);
+            scrollToBottom();
+        }
+
+        // Simulate bot response
+        function getBotResponse(userMessage) {
+            const message = userMessage.toLowerCase().trim();
+            const { period, greeting, time } = getTimePeriodAndGreeting();
+
+            if (unavailableMode) {
+                return "Please come back again later to see if I can assist.Nice time!";
+            }
+
+            // Greetings
+            const greetings = ['hi', 'hello', 'hey', 'heyy' , 'morning', 'evening', 'afternoon' , 'good morning', 'good afternoon', 'good evening'];
+            const userGreeting = greetings.find(g => message.includes(g));
+            if (userGreeting) {
+                if (userGreeting.includes('good')) {
+                    const userPeriod = userGreeting.split(' ')[1]; // e.g., "morning"
+                    if (userPeriod !== period) {
+                        return `The time now is ${time}, so it's ${period}! ${greeting}, how can I assist you?`;
+                    }
+                }
+                return `${greeting}! How can I support you today?`;
+            }
+
+            // How are you
+            if (message.includes('how are you') || message.includes('how you doing') || message.includes('how’s it going')) {
+                return "I'm doing fine, thank you! How about you?";
+            }
+
+            // Other responses
+            if (message.includes('help')) {
+                return 'How can I assist you? You can ask about project status, account settings, or anything else!';
+            } else if (message.includes('status') || message.includes('project')) {
+                return 'I can check your project status! Please provide the order number (e.g., c-p1113-ddd/mmm/yyy).';
+            } else {
+                unavailableMode = true;
+                return "Sorry, I can't respond anything useful right now. I'm still under Clip-Pilot's development.";
+            }
+        }
+
+        // Handle sending messages
+        function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message) return;
+
+            // Add user message
+            addMessage(message, true);
+            messageInput.value = '';
+
+            // Simulate bot response after a short delay
+            setTimeout(() => {
+                const botResponse = getBotResponse(message);
+                addMessage(botResponse, false);
+            }, 1000);
+        }
+
+        // Send message on button click
+        sendButton.addEventListener('click', sendMessage);
+
+        // Send message on Enter key
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Initial bot greeting
+        const { greeting } = getTimePeriodAndGreeting();
+        addMessage(`${greeting}! Welcome to Clip-Pilot Support! How can I help you today?`, false);
+</script>
+
+</body>
+</html>
