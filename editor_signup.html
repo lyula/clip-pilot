@@ -274,6 +274,26 @@
                 contentTypesSelect.style.overflowY = 'auto';
             }
         });
+
+        // New JavaScript for form validation
+        document.querySelector('form').addEventListener('submit', function(event) {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('username').value; // Assuming 'username' is used as a password field
+            const errorMessages = [];
+
+            if (email.length < 8) {
+                errorMessages.push('Email must be at least 8 characters long.');
+            }
+
+            if (password.length < 8) {
+                errorMessages.push('Password must be at least 8 characters long.');
+            }
+
+            if (errorMessages.length > 0) {
+                event.preventDefault(); // Prevent form submission
+                alert(errorMessages.join('\n')); // Display error messages
+            }
+        });
     </script>
 </body>
 </html>

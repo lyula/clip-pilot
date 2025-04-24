@@ -118,5 +118,27 @@
             <p>Don't have an account? <a href="editor_signup.html">Register here</a></p>
         </div>
     </div>
+
+    <script>
+        document.querySelector('form').addEventListener('submit', function(event) {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            // Email validation regex
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (!emailRegex.test(email)) {
+                event.preventDefault(); // Prevent form submission
+                alert('Please enter a valid email address.');
+                return;
+            }
+
+            if (password.length < 8) {
+                event.preventDefault(); // Prevent form submission
+                alert('Password must be at least 8 characters long.');
+                return;
+            }
+        });
+    </script>
 </body>
 </html>
