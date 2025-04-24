@@ -854,13 +854,26 @@
                     <img src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg" alt="Stripe">
                     <span>Stripe</span>
                 </div>
+                <div class="payment-method" data-method="mpesa">
+                    <img src="images/m-pesa-logo.png" alt="M-Pesa">
+                    <span>M-Pesa</span>
+                </div>
                 <div id="card-details" style="display: none;">
                     <input type="text" id="card-number" placeholder="Card Number" required>
                     <input type="text" id="card-expiry" placeholder="MM/YY" required>
                     <input type="text" id="card-cvc" placeholder="CVC" required>
                     <input type="text" id="card-name" placeholder="Name on Card" required>
                 </div>
+                <div id="mpesa-details" style="display: none;">
+                    <input type="text" id="mpesa-number" placeholder="Enter M-Pesa Number" required>
+                </div>
+                <div id="paypal-details" style="display: none;">
+                    <input type="email" id="paypal-email" placeholder="Enter PayPal Email" required>
+                </div>
                 <button class="submit-payment-button" id="submit-payment">Confirm Payment</button>
+                <div id="back-to-options" style="display: none; margin-top: 20px;">
+                    <a id="back-link" href="#" style="color: #003087; text-decoration: none; font-size: 1rem;">Select a different payment option</a>
+                </div>
             </div>
         </div>
     </div>
@@ -1831,45 +1844,160 @@
             method.addEventListener('click', () => {
                 document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected'));
                 method.classList.add('selected');
-                if (method.dataset.method === 'paypal' || method.dataset.method === 'stripe') {
-                    document.getElementById('card-details').style.display = 'none';
-                } else {
-                    document.getElementById('card-details').style.display = 'block';
+
+                // Hide all additional input fields by default
+                document.getElementById('card-details').style.display = 'none';
+                document.getElementById('mpesa-details').style.display = 'none';
+                document.getElementById('paypal-details').style.display = 'none';
+                document.getElementById('back-to-options').style.display = 'none';
+
+                // Show relevant input fields based on the selected payment method
+                if (method.dataset.method === 'visa' || method.dataset.method === 'mastercard') {
+                    const cardDetails = document.getElementById('card-details');
+                    method.insertAdjacentElement('afterend', cardDetails);
+                    cardDetails.style.display = 'block';
+
+                    // Hide other payment methods
+                    document.querySelectorAll('.payment-method').forEach(m => {
+                        if (m.dataset.method !== 'visa' && m.dataset.method !== 'mastercard') {
+                            m.style.display = 'none';
+                        }
+                    });
+
+                    // Show the "Back to Payment Options" button
+                    document.getElementById('back-to-options').style.display = 'block';
+                } else if (method.dataset.method === 'mpesa') {
+                    const mpesaDetails = document.getElementById('mpesa-details');
+                    method.insertAdjacentElement('afterend', mpesaDetails);
+                    mpesaDetails.style.display = 'block';
+
+                    // Show all payment methods
+                    document.querySelectorAll('.payment-method').forEach(m => {
+                        m.style.display = 'flex';
+                    });
+                } else if (method.dataset.method === 'paypal') {
+                    const paypalDetails = document.getElementById('paypal-details');
+                    method.insertAdjacentElement('afterend', paypalDetails);
+                    paypalDetails.style.display = 'block';
+
+                    // Show all payment methods
+                    document.querySelectorAll('.payment-method').forEach(m => {
+                        m.style.display = 'flex';
+                    });
                 }
             });
         });
-        
+
+
+        document.getElementById('back-link').addEventListener('click', (e) => {
+            e.preventDefault(); // Prevent default link behavior
+
+            // Reset all payment methods to their default state
+            document.querySelectorAll('.payment-method').forEach(m => {
+                m.style.display = 'flex'; // Show all payment methods
+                m.classList.remove('selected'); // Remove the selected class
+            });
+
+            // Hide all additional input fields
+            document.getElementById('card-details').style.display = 'none';
+            document.getElementById('mpesa-details').style.display = 'none';
+            document.getElementById('paypal-details').style.display = 'none';
+
+            // Hide the "Back to Payment Options" link
+            document.getElementById('back-to-options').style.display = 'none';
+        });
+
         submitPaymentButton.addEventListener('click', () => {
             const selectedMethod = document.querySelector('.payment-method.selected');
             if (!selectedMethod) {
                 alert('Please select a payment method.');
                 return;
             }
+
             if (selectedMethod.dataset.method === 'visa' || selectedMethod.dataset.method === 'mastercard') {
                 const cardNumber = document.getElementById('card-number').value;
                 const cardExpiry = document.getElementById('card-expiry').value;
                 const cardCvc = document.getElementById('card-cvc').value;
                 const cardName = document.getElementById('card-name').value;
+
+                // Validate card details
+                const cardNumberRegex = /^\d{16}$/;
+                const cardExpiryRegex = /^(0[1-9]|1[0-2])\/\d{2}$/;
+                const cardCvcRegex = /^\d{3}$/;
+
                 if (!cardNumber || !cardExpiry || !cardCvc || !cardName) {
-                    alert('Please fill in all card details.');
+                    alert('Oops! Looks like you forgot to fill in your card details.');
                     return;
                 }
+
+                if (!cardNumberRegex.test(cardNumber)) {
+                    alert('Invalid card number. Please enter a 16-digit card number.');
+                    return;
+                }
+                if (!cardExpiryRegex.test(cardExpiry)) {
+                    alert('Invalid expiry date. Please use the format MM/YY.');
+                    return;
+                }
+                if (!cardCvcRegex.test(cardCvc)) {
+                    alert('Invalid CVC. Please enter a 3-digit CVC.');
+                    return;
+                }
+                if (!cardName.trim()) {
+                    alert('Please enter the name on the card.');
+                    return;
+                }
+
+                // Notify the user of successful payment
+                alert('Your payment with Visa/MasterCard has been successfully processed!');
+                paymentModal.style.display = 'none';
+                projectForm.reset();
+                uploadedFilesList.innerHTML = '';
+                durationCache.clear();
+                projectData = {
+                    title: '',
+                    category: '',
+                    files: [],
+                    description: '',
+                    recordedAudio: null,
+                    recordedVideo: null
+                };
+                return;
             }
+
+            if (selectedMethod.dataset.method === 'mpesa') {
+                const mpesaNumber = document.getElementById('mpesa-number').value;
+
+                // Validate M-Pesa number
+                const mpesaNumberRegex = /^\d{10}$/;
+                if (!mpesaNumberRegex.test(mpesaNumber)) {
+                    alert('Invalid M-Pesa number. Please enter a 10-digit phone number.');
+                    return;
+                }
+
+                alert('Your payment via M-Pesa has been successfully processed!');
+                paymentModal.style.display = 'none';
+                return;
+            }
+
+            if (selectedMethod.dataset.method === 'paypal') {
+                const paypalEmail = document.getElementById('paypal-email').value;
+
+                // Validate PayPal email
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(paypalEmail)) {
+                    alert('Invalid email address. Please enter a valid PayPal email.');
+                    return;
+                }
+
+                alert('Redirecting to PayPal for payment...');
+                window.location.href = `https://www.paypal.com/signin?email=${encodeURIComponent(paypalEmail)}`;
+                return;
+            }
+
             alert('Payment system still under development!');
             paymentModal.style.display = 'none';
-            projectForm.reset();
-            uploadedFilesList.innerHTML = '';
-            durationCache.clear();
-            projectData = {
-                title: '',
-                category: '',
-                files: [],
-                description: '',
-                recordedAudio: null,
-                recordedVideo: null
-            };
         });
-        </script>
+    </script>
     
 </body>
 </html>
